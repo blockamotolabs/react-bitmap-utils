@@ -6,6 +6,8 @@
     "noEmit": false,
     "target": "ES5",
     "module": "CommonJS",
-    "outDir": "build/cjs"
-  }
+    "outDir": "build/cjs",
+    "rootDir": "src"
+  },
+  "include": ["src/**/*"]
 }

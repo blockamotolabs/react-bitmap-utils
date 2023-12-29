@@ -1,6 +1,8 @@
+/examples/build/*
 /node_modules/*
 /coverage/*
 /build/*
+/.vscode/*
 
 npm-debug.log*
 
@@ -11,3 +13,4 @@ npm-debug.log*
 .gitattributes
 .npmignore
 .nvmrc
+.browserslistrc

@@ -1,6 +1,8 @@
+/examples/build/*
 /node_modules/*
 /coverage/*
 /build/*
+/.vscode/*
 
 .DS_Store
 npm-debug.log*

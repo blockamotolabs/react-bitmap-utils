@@ -19,7 +19,9 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "jsx": "react",
-    "rootDir": "src"
+    "paths": {
+      "@bitmapland/react-bitmap-utils": ["./src/index.ts"]
+    }
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "examples/src/**/*"]
 }
