@@ -13,3 +13,4 @@ npm-debug.log*
 .gitattributes
 .npmignore
 .nvmrc
+.browserslistrc
