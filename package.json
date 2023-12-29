@@ -66,8 +66,6 @@
     },
     "appliesTo": {
       "includeExtensions": [
-        ".js",
-        ".jsx",
         ".ts",
         ".tsx"
       ]
