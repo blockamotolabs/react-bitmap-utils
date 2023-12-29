@@ -2,9 +2,6 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "target": "ES5",
-    "module": "CommonJS",
-    "paths": {
-      "@bitmapland/react-bitmap-utils": ["../src/index.ts"]
-    }
+    "module": "CommonJS"
   }
 }
