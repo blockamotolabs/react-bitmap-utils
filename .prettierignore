@@ -1,0 +1,13 @@
+/node_modules/*
+/coverage/*
+/build/*
+
+npm-debug.log*
+
+.DS_Store
+.eslintignore
+.prettierignore
+.gitignore
+.gitattributes
+.npmignore
+.nvmrc
