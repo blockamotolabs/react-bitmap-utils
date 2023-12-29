@@ -6,6 +6,8 @@
     "noEmit": false,
     "target": "ESNext",
     "module": "ESNext",
-    "outDir": "build/esm"
-  }
+    "outDir": "build/esm",
+    "rootDir": "src"
+  },
+  "include": ["src/**/*"]
 }

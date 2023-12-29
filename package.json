@@ -5,10 +5,10 @@
   "main": "build/cjs/index.js",
   "module": "build/esm/index.js",
   "scripts": {
-    "dev": "concurrently -n 'watch ,serve ,reload' -c 'cyan,red,yellow' \"npm run serve\" \"npm run watch\" \"npm run reload\"",
+    "dev": "concurrently -n 'watch ,serve ,reload' -c 'yellow,cyan,green' \"npm run serve\" \"npm run watch\" \"npm run reload\"",
     "serve": "http-server -p 8080 -c-1 examples",
-    "watch": "rm -rf build && mkdir -p examples/build && watchify ./examples/src/index.tsx --debug -t [ babelify --presets [ @babel/preset-env ] ] -p [ tsify --project tsconfig.cjs.json ] -o examples/build/index.js",
-    "reload": "livereload ./examples/build",
+    "watch": "rm -rf build && mkdir -p examples/build && watchify ./examples/src/index.tsx --debug -t [ aliasify ] -t [ babelify --presets [ @babel/preset-env ] ] -p [ tsify --project examples/tsconfig.json ] -o examples/build/index.js",
+    "reload": "livereload -e 'html,css,js' ./examples/",
     "build": "rm -rf build && tsc --project tsconfig.esm.json && tsc --project tsconfig.cjs.json",
     "format": "prettier --write '**/*'",
     "format-check": "prettier --check '**/*'",
@@ -46,6 +46,7 @@
     "@types/react-dom": "^18.2.18",
     "@typescript-eslint/eslint-plugin": "^6.16.0",
     "@typescript-eslint/parser": "^6.16.0",
+    "aliasify": "^2.1.0",
     "concurrently": "^8.2.2",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
@@ -58,5 +59,18 @@
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
+  },
+  "aliasify": {
+    "aliases": {
+      "@bitmapland/react-bitmap-utils": "./src/index.ts"
+    },
+    "appliesTo": {
+      "includeExtensions": [
+        ".js",
+        ".jsx",
+        ".ts",
+        ".tsx"
+      ]
+    }
   }
 }

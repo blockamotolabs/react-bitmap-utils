@@ -18,8 +18,7 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Node",
-    "jsx": "react",
-    "rootDir": "src"
+    "jsx": "react"
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "examples/src/**/*"]
 }
