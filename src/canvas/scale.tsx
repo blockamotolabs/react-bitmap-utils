@@ -16,16 +16,16 @@ export interface ScaleProps extends CommonCanvasComponentProps {
 
 export const Scale: CanvasComponent<ScaleProps> = memo(() => null);
 
-Scale.drawBeforeChildren = (ctx, { x = 1, y = 1, children, preserve }) => {
-  if (children && preserve !== false) {
+Scale.drawBeforeChildren = (ctx, { x = 1, y = 1, children, restore }) => {
+  if (children && restore !== false) {
     ctx.save();
   }
 
   ctx.scale(x, y);
 };
 
-Scale.drawAfterChildren = (ctx, { children, preserve }) => {
-  if (children && preserve !== false) {
+Scale.drawAfterChildren = (ctx, { children, restore }) => {
+  if (children && restore !== false) {
     ctx.restore();
   }
 };

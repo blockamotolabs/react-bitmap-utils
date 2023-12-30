@@ -15,16 +15,16 @@ export interface RotateProps extends CommonCanvasComponentProps {
 
 export const Rotate: CanvasComponent<RotateProps> = memo(() => null);
 
-Rotate.drawBeforeChildren = (ctx, { radians, children, preserve }) => {
-  if (children && preserve !== false) {
+Rotate.drawBeforeChildren = (ctx, { radians, children, restore }) => {
+  if (children && restore !== false) {
     ctx.save();
   }
 
   ctx.rotate(radians);
 };
 
-Rotate.drawAfterChildren = (ctx, { children, preserve }) => {
-  if (children && preserve !== false) {
+Rotate.drawAfterChildren = (ctx, { children, restore }) => {
+  if (children && restore !== false) {
     ctx.restore();
   }
 };

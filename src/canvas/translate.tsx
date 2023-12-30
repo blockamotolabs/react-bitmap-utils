@@ -16,16 +16,16 @@ export interface TranslateProps extends CommonCanvasComponentProps {
 
 export const Translate: CanvasComponent<TranslateProps> = memo(() => null);
 
-Translate.drawBeforeChildren = (ctx, { x = 0, y = 0, children, preserve }) => {
-  if (children && preserve !== false) {
+Translate.drawBeforeChildren = (ctx, { x = 0, y = 0, children, restore }) => {
+  if (children && restore !== false) {
     ctx.save();
   }
 
   ctx.translate(x, y);
 };
 
-Translate.drawAfterChildren = (ctx, { children, preserve }) => {
-  if (children && preserve !== false) {
+Translate.drawAfterChildren = (ctx, { children, restore }) => {
+  if (children && restore !== false) {
     ctx.restore();
   }
 };

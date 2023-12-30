@@ -12,5 +12,5 @@ export interface CanvasComponent<P extends CommonCanvasComponentProps>
 }
 
 export interface CommonCanvasComponentProps {
-  preserve?: boolean;
+  restore?: boolean;
 }

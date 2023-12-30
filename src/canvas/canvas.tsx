@@ -97,7 +97,7 @@ export const Canvas = memo(
             return;
           }
 
-          if (childProps.preserve) {
+          if (childProps.restore) {
             ctx.save();
           }
 
@@ -117,7 +117,7 @@ export const Canvas = memo(
             type.drawAfterChildren(ctx, childProps);
           }
 
-          if (childProps.preserve) {
+          if (childProps.restore) {
             ctx.restore();
           }
         };
