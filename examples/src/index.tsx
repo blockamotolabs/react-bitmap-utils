@@ -1,6 +1,7 @@
 import {
   Canvas,
   Rectangle,
+  Scale,
   Text,
   Translate,
   useAutoPixelRatio,
@@ -16,6 +17,8 @@ const App = () => {
   const height = (width / 16) * 9;
   const now = useFrameNow();
   const frameRate = useFrameRate(100);
+
+  const scale = 1 + Math.cos(now * 0.0025) * 0.2;
 
   return (
     <>
@@ -36,16 +39,18 @@ const App = () => {
             fill="red"
             stroke="black"
           />
-          <Text
-            x={0}
-            y={0}
-            fontSize={16 * pixelRatio}
-            textAlign="center"
-            verticalAlign="middle"
-            fill="white"
-          >
-            {Math.round(frameRate)}fps
-          </Text>
+          <Scale x={scale} y={scale}>
+            <Text
+              x={0}
+              y={0}
+              fontSize={16 * pixelRatio}
+              textAlign="center"
+              verticalAlign="middle"
+              fill="white"
+            >
+              {Math.round(frameRate)}fps
+            </Text>
+          </Scale>
         </Translate>
       </Canvas>
     </>

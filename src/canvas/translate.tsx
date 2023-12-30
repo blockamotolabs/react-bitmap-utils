@@ -18,8 +18,18 @@ export const Translate: CanvasComponent<TranslateProps> = memo(() => {
   return null;
 });
 
-Translate.drawBeforeChildren = (ctx, { x = 0, y = 0 }) => {
+Translate.drawBeforeChildren = (ctx, { x = 0, y = 0, children, preserve }) => {
+  if (children && preserve !== false) {
+    ctx.save();
+  }
+
   ctx.translate(x, y);
+};
+
+Translate.drawAfterChildren = (ctx, { children, preserve }) => {
+  if (children && preserve !== false) {
+    ctx.restore();
+  }
 };
 
 Translate.displayName = 'Translate';
