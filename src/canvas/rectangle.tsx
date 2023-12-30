@@ -2,7 +2,7 @@ import { memo } from 'react';
 
 import { CanvasComponent, CommonCanvasComponentProps } from '../types';
 
-interface RectangleProps extends CommonCanvasComponentProps {
+export interface RectangleProps extends CommonCanvasComponentProps {
   x: number;
   y: number;
   width: number;
@@ -25,10 +25,12 @@ Rectangle.drawBeforeChildren = (
   }
 
   if (fill) {
+    ctx.fillStyle = fill;
     ctx.fillRect(x, y, width, height);
   }
 
   if (stroke && strokeWidth) {
+    ctx.strokeStyle = stroke;
     ctx.lineWidth = strokeWidth;
     ctx.strokeRect(x, y, width, height);
   }
