@@ -1,13 +1,13 @@
-import { Canvas } from '@bitmapland/react-bitmap-utils';
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-
 import {
+  Canvas,
+  Rectangle,
+  Text,
   useAutoPixelRatio,
   useFrameNow,
   useFrameRate,
-} from '../../src/canvas/hooks';
-import { Rectangle } from '../../src/canvas/rectangle';
+} from '@bitmapland/react-bitmap-utils';
+import React from 'react';
+import { createRoot } from 'react-dom/client';
 
 const App = () => {
   const pixelRatio = useAutoPixelRatio();
@@ -20,6 +20,14 @@ const App = () => {
     <>
       <h1>Hello, World!</h1>
       <Canvas pixelRatio={pixelRatio} style={{ width, height }}>
+        <Text
+          x={5 * pixelRatio}
+          y={5 * pixelRatio}
+          fontSize={20 * pixelRatio}
+          fill="black"
+        >
+          {Math.round(frameRate)}
+        </Text>
         <Rectangle
           x={width * 0.5 * pixelRatio - 50 * 0.5 * pixelRatio}
           y={
@@ -32,7 +40,6 @@ const App = () => {
           fill="red"
         />
       </Canvas>
-      <div>{Math.round(frameRate).toString()}</div>
     </>
   );
 };
