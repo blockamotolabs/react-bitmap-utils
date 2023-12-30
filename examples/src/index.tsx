@@ -1,6 +1,7 @@
 import {
   Canvas,
   degreesToRadians,
+  Line,
   Rectangle,
   Rotate,
   Scale,
@@ -26,6 +27,14 @@ const App = () => {
     <>
       <h1>Hello, World!</h1>
       <Canvas pixelRatio={pixelRatio} style={{ width, height }}>
+        <Line
+          startX={width * 0.5 * pixelRatio}
+          startY={0}
+          endX={width * 0.5 * pixelRatio}
+          endY={height * pixelRatio}
+          strokeWidth={1 * pixelRatio}
+          stroke="cyan"
+        />
         <Translate
           x={width * 0.5 * pixelRatio}
           y={
@@ -40,6 +49,7 @@ const App = () => {
               width={50 * pixelRatio}
               height={50 * pixelRatio}
               fill="red"
+              strokeWidth={1 * pixelRatio}
               stroke="black"
             />
           </Rotate>
