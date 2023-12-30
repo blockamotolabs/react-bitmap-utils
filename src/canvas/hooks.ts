@@ -21,6 +21,23 @@ export const useFrameNow = () => {
   return now;
 };
 
+export const useDelta = () => {
+  const now = useFrameNow();
+  const [{ delta }, setLastDelta] = useState({
+    last: now,
+    delta: 0,
+  });
+
+  useEffect(() => {
+    setLastDelta(({ last }) => ({
+      last: now,
+      delta: now - last,
+    }));
+  }, [now]);
+
+  return delta;
+};
+
 export const useFrameRate = (lastXFrames = 5) => {
   const now = useFrameNow();
   const [frames, setFrames] = useState<readonly number[]>([]);

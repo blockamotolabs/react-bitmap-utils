@@ -27,6 +27,14 @@ const App = () => {
     <>
       <h1>Hello, World!</h1>
       <Canvas pixelRatio={pixelRatio} style={{ width, height }}>
+        <Text
+          x={5 * pixelRatio}
+          y={5 * pixelRatio}
+          fontSize={16 * pixelRatio}
+          fill="black"
+        >
+          Delta: {Math.round(frameRate)}fps
+        </Text>
         <Line
           startX={width * 0.5 * pixelRatio}
           startY={0}
