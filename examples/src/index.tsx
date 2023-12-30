@@ -1,6 +1,8 @@
 import {
   Canvas,
+  degreesToRadians,
   Rectangle,
+  Rotate,
   Scale,
   Text,
   Translate,
@@ -31,14 +33,16 @@ const App = () => {
             Math.sin(now * 0.005) * height * 0.25 * pixelRatio
           }
         >
-          <Rectangle
-            x={-50 * 0.5 * pixelRatio}
-            y={-50 * 0.5 * pixelRatio}
-            width={50 * pixelRatio}
-            height={50 * pixelRatio}
-            fill="red"
-            stroke="black"
-          />
+          <Rotate radians={degreesToRadians(Math.sin(now * 0.005) * 45)}>
+            <Rectangle
+              x={-50 * 0.5 * pixelRatio}
+              y={-50 * 0.5 * pixelRatio}
+              width={50 * pixelRatio}
+              height={50 * pixelRatio}
+              fill="red"
+              stroke="black"
+            />
+          </Rotate>
           <Scale x={scale} y={scale}>
             <Text
               x={0}
