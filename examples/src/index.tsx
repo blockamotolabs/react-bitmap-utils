@@ -2,6 +2,7 @@ import {
   Canvas,
   Rectangle,
   Text,
+  Translate,
   useAutoPixelRatio,
   useFrameNow,
   useFrameRate,
@@ -20,25 +21,32 @@ const App = () => {
     <>
       <h1>Hello, World!</h1>
       <Canvas pixelRatio={pixelRatio} style={{ width, height }}>
-        <Text
-          x={5 * pixelRatio}
-          y={5 * pixelRatio}
-          fontSize={20 * pixelRatio}
-          fill="black"
-        >
-          {Math.round(frameRate)}
-        </Text>
-        <Rectangle
-          x={width * 0.5 * pixelRatio - 50 * 0.5 * pixelRatio}
+        <Translate
+          x={width * 0.5 * pixelRatio}
           y={
-            height * 0.5 * pixelRatio -
-            50 * 0.5 * pixelRatio +
+            height * 0.5 * pixelRatio +
             Math.sin(now * 0.005) * height * 0.25 * pixelRatio
           }
-          width={50 * pixelRatio}
-          height={50 * pixelRatio}
-          fill="red"
-        />
+        >
+          <Rectangle
+            x={-50 * 0.5 * pixelRatio}
+            y={-50 * 0.5 * pixelRatio}
+            width={50 * pixelRatio}
+            height={50 * pixelRatio}
+            fill="red"
+            stroke="black"
+          />
+          <Text
+            x={0}
+            y={0}
+            fontSize={16 * pixelRatio}
+            textAlign="center"
+            verticalAlign="middle"
+            fill="white"
+          >
+            {Math.round(frameRate)}fps
+          </Text>
+        </Translate>
       </Canvas>
     </>
   );
