@@ -8,6 +8,7 @@ import {
   Text,
   Translate,
   useAutoPixelRatio,
+  useDelta,
   useFrameNow,
   useFrameRate,
 } from '@bitmapland/react-bitmap-utils';
@@ -20,6 +21,7 @@ const App = () => {
   const height = (width / 16) * 9;
   const now = useFrameNow();
   const frameRate = useFrameRate(100);
+  const delta = useDelta();
 
   const scale = 1 + Math.cos(now * 0.0025) * 0.2;
 
@@ -33,7 +35,7 @@ const App = () => {
           fontSize={16 * pixelRatio}
           fill="black"
         >
-          Delta: {Math.round(frameRate)}fps
+          Delta: {delta}
         </Text>
         <Line
           startX={width * 0.5 * pixelRatio}
