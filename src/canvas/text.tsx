@@ -21,8 +21,20 @@ export interface TextProps extends CommonCanvasComponentProps {
   fill?: string;
   stroke?: string;
   strokeWidth?: number;
-  children: number | string;
+  children: number | string | readonly (number | string)[];
 }
+
+const stringify = (children: TextProps['children']) => {
+  if (typeof children === 'string') {
+    return children;
+  }
+
+  if (typeof children === 'number') {
+    return children.toString();
+  }
+
+  return children.join('');
+};
 
 export const Text: CanvasComponent<TextProps> = memo(() => {
   return null;
@@ -58,17 +70,15 @@ Text.drawBeforeChildren = (
 
   ctx.font = font;
 
-  if (typeof children === 'number' || typeof children === 'string') {
-    if (fill) {
-      ctx.fillStyle = fill;
-      ctx.fillText(children.toString(), x, y);
-    }
+  if (fill) {
+    ctx.fillStyle = fill;
+    ctx.fillText(stringify(children), x, y);
+  }
 
-    if (stroke && strokeWidth) {
-      ctx.strokeStyle = stroke;
-      ctx.lineWidth = strokeWidth;
-      ctx.strokeText(children.toString(), x, y);
-    }
+  if (stroke && strokeWidth) {
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = strokeWidth;
+    ctx.strokeText(stringify(children), x, y);
   }
 };
 
