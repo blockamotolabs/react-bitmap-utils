@@ -36,9 +36,7 @@ const stringify = (children: TextProps['children']) => {
   return children.join('');
 };
 
-export const Text: CanvasComponent<TextProps> = memo(() => {
-  return null;
-});
+export const Text: CanvasComponent<TextProps> = memo(() => null);
 
 Text.drawBeforeChildren = (
   ctx,

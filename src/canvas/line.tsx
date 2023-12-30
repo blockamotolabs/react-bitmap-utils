@@ -11,9 +11,7 @@ export interface LineProps extends CommonCanvasComponentProps {
   strokeWidth?: number;
 }
 
-export const Line: CanvasComponent<LineProps> = memo(() => {
-  return null;
-});
+export const Line: CanvasComponent<LineProps> = memo(() => null);
 
 Line.drawBeforeChildren = (
   ctx,

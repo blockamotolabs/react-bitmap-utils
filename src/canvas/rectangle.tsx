@@ -12,9 +12,7 @@ export interface RectangleProps extends CommonCanvasComponentProps {
   strokeWidth?: number;
 }
 
-export const Rectangle: CanvasComponent<RectangleProps> = memo(() => {
-  return null;
-});
+export const Rectangle: CanvasComponent<RectangleProps> = memo(() => null);
 
 Rectangle.drawBeforeChildren = (
   ctx,

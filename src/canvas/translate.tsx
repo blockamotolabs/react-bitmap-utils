@@ -14,9 +14,7 @@ export interface TranslateProps extends CommonCanvasComponentProps {
     | readonly ReactElement<AnyObject, CanvasComponent<AnyObject>>[];
 }
 
-export const Translate: CanvasComponent<TranslateProps> = memo(() => {
-  return null;
-});
+export const Translate: CanvasComponent<TranslateProps> = memo(() => null);
 
 Translate.drawBeforeChildren = (ctx, { x = 0, y = 0, children, preserve }) => {
   if (children && preserve !== false) {

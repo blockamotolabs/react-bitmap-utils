@@ -13,9 +13,7 @@ export interface RotateProps extends CommonCanvasComponentProps {
     | readonly ReactElement<AnyObject, CanvasComponent<AnyObject>>[];
 }
 
-export const Rotate: CanvasComponent<RotateProps> = memo(() => {
-  return null;
-});
+export const Rotate: CanvasComponent<RotateProps> = memo(() => null);
 
 Rotate.drawBeforeChildren = (ctx, { radians, children, preserve }) => {
   if (children && preserve !== false) {

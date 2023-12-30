@@ -14,9 +14,7 @@ export interface ScaleProps extends CommonCanvasComponentProps {
     | readonly ReactElement<AnyObject, CanvasComponent<AnyObject>>[];
 }
 
-export const Scale: CanvasComponent<ScaleProps> = memo(() => {
-  return null;
-});
+export const Scale: CanvasComponent<ScaleProps> = memo(() => null);
 
 Scale.drawBeforeChildren = (ctx, { x = 1, y = 1, children, preserve }) => {
   if (children && preserve !== false) {
