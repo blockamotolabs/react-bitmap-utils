@@ -7,3 +7,4 @@ export * from './translate';
 export * from './scale';
 export * from './rotate';
 export * from './math';
+export * from './for-each';

@@ -1,6 +1,7 @@
 import {
   Canvas,
   degreesToRadians,
+  ForEach,
   Line,
   Rectangle,
   Rotate,
@@ -45,6 +46,17 @@ const App = () => {
           strokeWidth={1 * pixelRatio}
           stroke="cyan"
         />
+        <ForEach end={3}>
+          {(index) => (
+            <Rectangle
+              x={5 * pixelRatio}
+              y={(5 + index * 10) * pixelRatio}
+              width={10 * pixelRatio}
+              height={10 * pixelRatio}
+              fill="black"
+            />
+          )}
+        </ForEach>
         <Translate
           x={width * 0.5 * pixelRatio}
           y={
