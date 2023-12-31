@@ -4,23 +4,21 @@ import React, {
   forwardRef,
   HTMLAttributes,
   memo,
-  MemoExoticComponent,
   ReactElement,
   ReactNode,
   useCallback,
   useEffect,
   useMemo,
+  useRef,
 } from 'react';
 
-import { AnyObject, CanvasComponent } from '../types';
+import CanvasReconcilerPublic from './reconciler';
 
 export interface CanvasProps extends HTMLAttributes<HTMLCanvasElement> {
   width?: number;
   height?: number;
   pixelRatio?: number;
-  children?:
-    | ReactElement<AnyObject, CanvasComponent<AnyObject>>
-    | readonly ReactElement<AnyObject, CanvasComponent<AnyObject>>[];
+  children?: ReactElement | readonly ReactElement[];
   ref?: ForwardedRef<HTMLCanvasElement>;
 }
 
@@ -54,6 +52,27 @@ export const Canvas = memo(
       const ctx = useMemo(() => canvas?.getContext('2d'), [canvas]);
       const dimensions = getDimensions(pixelRatio, width, height, canvas);
 
+      const rootContainerRef = useRef<null | ReturnType<
+        typeof CanvasReconcilerPublic.render
+      >>(null);
+
+      useEffect(() => {
+        if (!canvas) {
+          rootContainerRef.current?.unmount();
+          rootContainerRef.current = null;
+          return;
+        }
+
+        if (!rootContainerRef.current) {
+          rootContainerRef.current = CanvasReconcilerPublic.render(
+            <>{children}</>,
+            canvas
+          );
+        } else {
+          rootContainerRef.current.update(<>{children}</>);
+        }
+      }, [canvas, children]);
+
       const refWrapper = useCallback(
         (nextCanvas: HTMLCanvasElement | null) => {
           setCanvas(nextCanvas);
@@ -77,16 +96,7 @@ export const Canvas = memo(
         canvas.width = dimensions.width;
         canvas.height = dimensions.height;
 
-        const drawChild = (
-          child:
-            | ReactNode
-            | ReactElement<AnyObject, CanvasComponent<AnyObject>>
-            | ReactElement<
-                AnyObject,
-                MemoExoticComponent<CanvasComponent<AnyObject>>
-              >
-            | undefined
-        ) => {
+        const drawChild = (child: ReactNode) => {
           if (!child || typeof child !== 'object' || !('type' in child)) {
             return;
           }
@@ -123,14 +133,7 @@ export const Canvas = memo(
         };
 
         Children.forEach(children, drawChild);
-      }, [
-        canvas,
-        children,
-        ctx,
-        dimensions.height,
-        dimensions.width,
-        pixelRatio,
-      ]);
+      }, [canvas, children, ctx, dimensions.height, dimensions.width]);
 
       return (
         <canvas

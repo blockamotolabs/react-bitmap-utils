@@ -13,7 +13,7 @@ import {
   useFrameNow,
   useFrameRate,
 } from '@bitmapland/react-bitmap-utils';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 
 const App = () => {
@@ -25,6 +25,20 @@ const App = () => {
   const delta = useDelta();
 
   const scale = 1 + Math.cos(now * 0.0025) * 0.2;
+
+  const forEach = useCallback(
+    (index: number) => (
+      <Rectangle
+        key={index}
+        x={5 * pixelRatio}
+        y={(5 + index * 10) * pixelRatio}
+        width={10 * pixelRatio}
+        height={10 * pixelRatio}
+        fill="black"
+      />
+    ),
+    [pixelRatio]
+  );
 
   return (
     <>
@@ -46,17 +60,7 @@ const App = () => {
           strokeWidth={1 * pixelRatio}
           stroke="cyan"
         />
-        <ForEach end={3}>
-          {(index) => (
-            <Rectangle
-              x={5 * pixelRatio}
-              y={(5 + index * 10) * pixelRatio}
-              width={10 * pixelRatio}
-              height={10 * pixelRatio}
-              fill="black"
-            />
-          )}
-        </ForEach>
+        <ForEach end={3}>{forEach}</ForEach>
         <Translate
           x={width * 0.5 * pixelRatio}
           y={
