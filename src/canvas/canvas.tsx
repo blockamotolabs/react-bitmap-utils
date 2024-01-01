@@ -12,13 +12,16 @@ import React, {
 import { isArray, isKeyOf } from '../utils';
 import CanvasReconcilerPublic, { CanvasChild, TextChild } from './reconciler';
 import { RENDERERS } from './renderers';
+import { Dimensions } from './types';
 
-export interface CanvasProps extends HTMLAttributes<HTMLCanvasElement> {
+export interface CanvasProps
+  extends Omit<HTMLAttributes<HTMLCanvasElement>, 'onResize'> {
   width?: number;
   height?: number;
   pixelRatio?: number;
   children?: ReactElement | readonly ReactElement[];
   ref?: ForwardedRef<HTMLCanvasElement>;
+  onResize?: (dimensions: Dimensions) => void;
 }
 
 const getDimensions = (
@@ -42,7 +45,14 @@ const getDimensions = (
 export const Canvas = memo(
   forwardRef(
     (
-      { width, height, pixelRatio = 1, children, ...props }: CanvasProps,
+      {
+        width,
+        height,
+        pixelRatio = 1,
+        onResize,
+        children,
+        ...props
+      }: CanvasProps,
       ref
     ) => {
       const [canvasCtx, setCanvasCtx] = React.useState<{
@@ -148,6 +158,13 @@ export const Canvas = memo(
         },
         [ref]
       );
+
+      useEffect(() => {
+        onResize?.({
+          width: dimensions.width / pixelRatio,
+          height: dimensions.height / pixelRatio,
+        });
+      }, [dimensions.width, dimensions.height, onResize, pixelRatio]);
 
       return (
         <canvas

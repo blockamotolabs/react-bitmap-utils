@@ -57,3 +57,8 @@ export interface CanvasComponentRenderers<
 export interface CommonCanvasComponentProps {
   restore?: boolean;
 }
+
+export interface Dimensions {
+  width: number;
+  height: number;
+}

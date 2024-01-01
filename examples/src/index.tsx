@@ -13,13 +13,12 @@ import {
   useFrameNow,
   useFrameRate,
 } from '@bitmapland/react-bitmap-utils';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 const App = () => {
   const pixelRatio = useAutoPixelRatio();
-  const width = 500;
-  const height = (width / 16) * 9;
+  const [{ width, height }, setDimensions] = useState({ width: 0, height: 0 });
   const now = useFrameNow();
   const frameRate = useFrameRate(100);
   const delta = useDelta();
@@ -42,8 +41,11 @@ const App = () => {
 
   return (
     <>
-      <h1>Hello, World!</h1>
-      <Canvas pixelRatio={pixelRatio} style={{ width, height }}>
+      <Canvas
+        pixelRatio={pixelRatio}
+        style={{ width: '100%', height: '100%' }}
+        onResize={setDimensions}
+      >
         <Text x={5} y={5} fontSize={16} fill="black">
           Delta: {delta}
         </Text>
