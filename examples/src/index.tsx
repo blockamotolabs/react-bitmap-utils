@@ -31,7 +31,7 @@ const App = () => {
       <Rectangle
         key={index}
         x={5 * pixelRatio}
-        y={(20 + index * 20) * pixelRatio}
+        y={(25 + index * 20) * pixelRatio}
         width={10 * pixelRatio}
         height={10 * pixelRatio}
         fill="black"

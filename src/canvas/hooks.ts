@@ -50,17 +50,19 @@ export const useFrameRate = (lastXFrames = 5) => {
     });
   }, [lastXFrames, now]);
 
-  return (
-    1000 /
-    (frames.reduce((acc, num, index, context) => {
-      const num2 = context[index + 1];
+  const sum = frames.reduce((acc, num, index, context) => {
+    const num2 = context[index + 1];
 
-      if (typeof num2 !== 'number') {
-        return acc;
-      }
+    if (typeof num2 !== 'number') {
+      return acc;
+    }
 
-      return acc + (num - num2);
-    }, 0) /
-      (frames.length ?? 1))
-  );
+    return acc + (num - num2);
+  }, 0);
+
+  if (!sum) {
+    return 0;
+  }
+
+  return 1000 / (sum / (frames.length || 1));
 };
