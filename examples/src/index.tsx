@@ -30,52 +30,44 @@ const App = () => {
     (index: number) => (
       <Rectangle
         key={index}
-        x={5 * pixelRatio}
-        y={(25 + index * 20) * pixelRatio}
-        width={10 * pixelRatio}
-        height={10 * pixelRatio}
+        x={5}
+        y={25 + index * 20}
+        width={10}
+        height={10}
         fill="black"
       />
     ),
-    [pixelRatio]
+    []
   );
 
   return (
     <>
       <h1>Hello, World!</h1>
       <Canvas pixelRatio={pixelRatio} style={{ width, height }}>
-        <Text
-          x={5 * pixelRatio}
-          y={5 * pixelRatio}
-          fontSize={16 * pixelRatio}
-          fill="black"
-        >
+        <Text x={5} y={5} fontSize={16} fill="black">
           Delta: {delta}
         </Text>
         <Line
-          startX={width * 0.5 * pixelRatio}
+          startX={width * 0.5}
           startY={0}
-          endX={width * 0.5 * pixelRatio}
-          endY={height * pixelRatio}
-          strokeWidth={1 * pixelRatio}
+          endX={width * 0.5}
+          endY={height}
+          strokeWidth={1}
           stroke="cyan"
         />
         <ForEach end={3}>{forEach}</ForEach>
         <Translate
-          x={width * 0.5 * pixelRatio}
-          y={
-            height * 0.5 * pixelRatio +
-            Math.sin(now * 0.005) * height * 0.25 * pixelRatio
-          }
+          x={width * 0.5}
+          y={height * 0.5 + Math.sin(now * 0.005) * height * 0.25}
         >
           <Rotate radians={degreesToRadians(Math.sin(now * 0.005) * 45)}>
             <Rectangle
-              x={-50 * 0.5 * pixelRatio}
-              y={-50 * 0.5 * pixelRatio}
-              width={50 * pixelRatio}
-              height={50 * pixelRatio}
+              x={-50 * 0.5}
+              y={-50 * 0.5}
+              width={50}
+              height={50}
               fill="red"
-              strokeWidth={1 * pixelRatio}
+              strokeWidth={1}
               stroke="black"
             />
           </Rotate>
@@ -83,7 +75,7 @@ const App = () => {
             <Text
               x={0}
               y={0}
-              fontSize={16 * pixelRatio}
+              fontSize={16}
               textAlign="center"
               verticalAlign="middle"
               fill="white"

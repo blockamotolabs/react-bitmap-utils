@@ -84,6 +84,7 @@ export const Canvas = memo(
 
         canvas.width = dimensions.width;
         canvas.height = dimensions.height;
+        ctx.scale(pixelRatio, pixelRatio);
 
         const drawChild = (child: CanvasChild | TextChild) => {
           if (!isKeyOf(RENDERERS, child.type)) {
@@ -116,7 +117,13 @@ export const Canvas = memo(
         };
 
         containerInfo.rendered.forEach(drawChild);
-      }, [canvasCtx, children, dimensions.height, dimensions.width]);
+      }, [
+        canvasCtx,
+        children,
+        dimensions.height,
+        dimensions.width,
+        pixelRatio,
+      ]);
 
       const refWrapper = useCallback(
         (canvas: HTMLCanvasElement | null) => {
