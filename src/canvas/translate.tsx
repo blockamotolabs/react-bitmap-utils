@@ -1,11 +1,11 @@
-import { ReactElement } from 'react';
+import { PropsWithChildren } from 'react';
 
 import { CanvasElementType, CommonCanvasComponentProps } from './types';
 
-export interface TranslateProps extends CommonCanvasComponentProps {
+export interface TranslateProps
+  extends PropsWithChildren<CommonCanvasComponentProps> {
   x?: number;
   y?: number;
-  children?: ReactElement | readonly ReactElement[];
 }
 
 export const Translate = CanvasElementType.Translate;

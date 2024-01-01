@@ -1,10 +1,10 @@
-import { ReactElement } from 'react';
+import { PropsWithChildren } from 'react';
 
 import { CanvasElementType, CommonCanvasComponentProps } from './types';
 
-export interface RotateProps extends CommonCanvasComponentProps {
+export interface RotateProps
+  extends PropsWithChildren<CommonCanvasComponentProps> {
   radians: number;
-  children?: ReactElement | readonly ReactElement[];
 }
 
 export const Rotate = CanvasElementType.Rotate;

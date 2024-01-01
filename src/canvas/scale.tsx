@@ -1,11 +1,11 @@
-import { ReactElement } from 'react';
+import { PropsWithChildren } from 'react';
 
 import { CanvasElementType, CommonCanvasComponentProps } from './types';
 
-export interface ScaleProps extends CommonCanvasComponentProps {
+export interface ScaleProps
+  extends PropsWithChildren<CommonCanvasComponentProps> {
   x?: number;
   y?: number;
-  children?: ReactElement | readonly ReactElement[];
 }
 
 export const Scale = CanvasElementType.Scale;

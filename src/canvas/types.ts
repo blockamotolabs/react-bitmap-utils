@@ -1,6 +1,5 @@
-import { ReactElement } from 'react';
+import { PropsWithChildren } from 'react';
 
-import { AnyObject } from '../types';
 import { LineProps } from './line';
 import { CanvasChild } from './reconciler';
 import { RectangleProps } from './rectangle';
@@ -25,9 +24,7 @@ declare global {
     interface IntrinsicElements {
       [CanvasElementType.Rectangle]: RectangleProps;
       [CanvasElementType.Line]: LineProps;
-      [CanvasElementType.ForEach]: {
-        children: ReactElement<AnyObject, CanvasElementType>[];
-      };
+      [CanvasElementType.ForEach]: PropsWithChildren;
       [CanvasElementType.Rotate]: RotateProps;
       [CanvasElementType.Translate]: TranslateProps;
       [CanvasElementType.Scale]: ScaleProps;

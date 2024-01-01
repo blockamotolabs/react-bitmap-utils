@@ -1,6 +1,5 @@
-import React, { memo, ReactElement, useMemo } from 'react';
+import React, { memo, ReactNode, useMemo } from 'react';
 
-import { AnyObject } from '../types';
 import { CanvasElementType, CommonCanvasComponentProps } from './types';
 
 export interface ForEachProps extends CommonCanvasComponentProps {
@@ -12,7 +11,7 @@ export interface ForEachProps extends CommonCanvasComponentProps {
     start: number,
     step: number,
     end: number
-  ) => ReactElement<AnyObject, CanvasElementType>;
+  ) => ReactNode;
 }
 
 export const ForEach = memo(
