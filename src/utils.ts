@@ -16,3 +16,6 @@ export const isArray = <T>(
   input: T
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): input is T extends readonly any[] ? T : never => Array.isArray(input);
+
+export const percentageOf = (percentage: number, total: number) =>
+  (percentage / 100) * total;
