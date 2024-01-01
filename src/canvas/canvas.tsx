@@ -1,18 +1,17 @@
 import React, {
-  Children,
   ForwardedRef,
   forwardRef,
   HTMLAttributes,
   memo,
   ReactElement,
-  ReactNode,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
 } from 'react';
 
-import CanvasReconcilerPublic from './reconciler';
+import { isArray, isKeyOf } from '../utils';
+import CanvasReconcilerPublic, { CanvasChild, TextChild } from './reconciler';
+import { RENDERERS } from './renderers';
 
 export interface CanvasProps extends HTMLAttributes<HTMLCanvasElement> {
   width?: number;
@@ -26,7 +25,7 @@ const getDimensions = (
   pixelRatio: number,
   width: number | undefined,
   height: number | undefined,
-  canvas: HTMLCanvasElement | null
+  canvas: HTMLCanvasElement | undefined
 ) => {
   return {
     width:
@@ -46,18 +45,23 @@ export const Canvas = memo(
       { width, height, pixelRatio = 1, children, ...props }: CanvasProps,
       ref
     ) => {
-      const [canvas, setCanvas] = React.useState<HTMLCanvasElement | null>(
-        null
+      const [canvasCtx, setCanvasCtx] = React.useState<{
+        canvas: HTMLCanvasElement;
+        ctx: CanvasRenderingContext2D;
+      } | null>(null);
+      const dimensions = getDimensions(
+        pixelRatio,
+        width,
+        height,
+        canvasCtx?.canvas
       );
-      const ctx = useMemo(() => canvas?.getContext('2d'), [canvas]);
-      const dimensions = getDimensions(pixelRatio, width, height, canvas);
 
       const rootContainerRef = useRef<null | ReturnType<
         typeof CanvasReconcilerPublic.render
       >>(null);
 
       useEffect(() => {
-        if (!canvas) {
+        if (!canvasCtx) {
           rootContainerRef.current?.unmount();
           rootContainerRef.current = null;
           return;
@@ -66,74 +70,77 @@ export const Canvas = memo(
         if (!rootContainerRef.current) {
           rootContainerRef.current = CanvasReconcilerPublic.render(
             <>{children}</>,
-            canvas
+            canvasCtx
           );
         } else {
           rootContainerRef.current.update(<>{children}</>);
         }
-      }, [canvas, children]);
+
+        const {
+          container: { containerInfo },
+        } = rootContainerRef.current;
+
+        const { canvas, ctx } = canvasCtx;
+
+        canvas.width = dimensions.width;
+        canvas.height = dimensions.height;
+
+        const drawChild = (child: CanvasChild | TextChild) => {
+          if (!isKeyOf(RENDERERS, child.type)) {
+            return;
+          }
+
+          const renderer = RENDERERS[child.type];
+
+          if (child.props?.restore) {
+            ctx.save();
+          }
+
+          renderer.drawBeforeChildren?.(
+            { ...canvasCtx, drawChild },
+            child.props
+          );
+
+          if (isArray(child.rendered)) {
+            child.rendered.forEach(drawChild);
+          }
+
+          renderer.drawAfterChildren?.(
+            { ...canvasCtx, drawChild },
+            child.props
+          );
+
+          if (child.props?.restore) {
+            ctx.restore();
+          }
+        };
+
+        containerInfo.rendered.forEach(drawChild);
+      }, [canvasCtx, children, dimensions.height, dimensions.width]);
 
       const refWrapper = useCallback(
-        (nextCanvas: HTMLCanvasElement | null) => {
-          setCanvas(nextCanvas);
+        (canvas: HTMLCanvasElement | null) => {
+          setCanvasCtx(() => {
+            if (!canvas) {
+              return null;
+            }
+
+            return {
+              canvas,
+              ctx: canvas.getContext('2d')!,
+            };
+          });
 
           if (ref) {
             if (typeof ref === 'object') {
-              ref.current = nextCanvas;
+              ref.current = canvas;
             } else if (typeof ref === 'function') {
-              ref(nextCanvas);
+              ref(canvas);
             }
           }
         },
         [ref]
       );
-
-      useEffect(() => {
-        if (!canvas || !ctx) {
-          return;
-        }
-
-        canvas.width = dimensions.width;
-        canvas.height = dimensions.height;
-
-        const drawChild = (child: ReactNode) => {
-          if (!child || typeof child !== 'object' || !('type' in child)) {
-            return;
-          }
-
-          const { type, props: childProps } = child;
-
-          if (typeof type !== 'function' && typeof type !== 'object') {
-            return;
-          }
-
-          if (childProps.restore) {
-            ctx.save();
-          }
-
-          if (
-            'drawBeforeChildren' in type &&
-            typeof type.drawBeforeChildren === 'function'
-          ) {
-            type.drawBeforeChildren(ctx, childProps);
-          }
-
-          Children.forEach(childProps.children, drawChild);
-
-          if (
-            'drawAfterChildren' in type &&
-            typeof type.drawAfterChildren === 'function'
-          ) {
-            type.drawAfterChildren(ctx, childProps);
-          }
-
-          if (childProps.restore) {
-            ctx.restore();
-          }
-        };
-
-        Children.forEach(children, drawChild);
-      }, [canvas, children, ctx, dimensions.height, dimensions.width]);
 
       return (
         <canvas

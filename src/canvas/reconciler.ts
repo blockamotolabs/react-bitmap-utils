@@ -6,9 +6,10 @@ import { DefaultEventPriority } from 'react-reconciler/constants';
 import { AnyObject } from '../types';
 import { CanvasElementType } from './types';
 
-interface TextChild {
+export interface TextChild {
   type: 'text';
-  text: string;
+  props?: never;
+  rendered: string;
 }
 
 export interface CanvasChild {
@@ -62,7 +63,7 @@ const HOST_CONFIG: HostConfig<
   }),
   createTextInstance: (text, _rootContainer, _hostContext) => ({
     type: 'text',
-    text,
+    rendered: text,
   }),
   appendChildToContainer: (parent, child) => parent.rendered.push(child),
   appendChild: (parent, child) => parent.rendered.push(child),
@@ -79,7 +80,7 @@ const HOST_CONFIG: HostConfig<
   commitUpdate: (instance, _updatePayload, _type, _oldProps, newProps) =>
     (instance.props = newProps),
   commitTextUpdate: (textInstance, _oldText, newText) =>
-    (textInstance.text = newText),
+    (textInstance.rendered = newText),
   getPublicInstance: (instance) => instance,
   preparePortalMount: () => {},
   scheduleTimeout: globalThis.setTimeout,
@@ -111,9 +112,12 @@ const HOST_CONFIG: HostConfig<
 const CanvasReconciler = Reconciler(HOST_CONFIG);
 
 const CanvasReconcilerPublic = {
-  render: (reactElement: ReactNode, canvas: HTMLCanvasElement) => {
+  render: (
+    reactElement: ReactNode,
+    canvasCtx: { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D }
+  ) => {
     const container = CanvasReconciler.createContainer(
-      { canvas, ctx: canvas.getContext('2d')!, rendered: [] },
+      { ...canvasCtx, rendered: [] },
       0,
       null,
       false,
@@ -129,7 +133,7 @@ const CanvasReconcilerPublic = {
         }
       },
       null
-    ) as Container;
+    ) as { containerInfo: Container };
 
     CanvasReconciler.updateContainer(reactElement, container, null, () => null);
 
