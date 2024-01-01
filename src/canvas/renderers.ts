@@ -1,5 +1,6 @@
 import { ForEachProps } from './for-each';
 import { LineProps } from './line';
+import { OpacityProps } from './opacity';
 import { RectangleProps } from './rectangle';
 import { RotateProps } from './rotate';
 import { ScaleProps } from './scale';
@@ -149,6 +150,22 @@ const textRenderers: CanvasComponentRenderers<TextProps> = {
   },
 };
 
+const opacityRenderers: CanvasComponentRenderers<OpacityProps> = {
+  drawBeforeChildren: ({ ctx }, { opacity = 1, children, restore }) => {
+    if (children && restore !== false) {
+      ctx.save();
+    }
+
+    ctx.globalAlpha = opacity;
+  },
+
+  drawAfterChildren: ({ ctx }, { children, restore }) => {
+    if (children && restore !== false) {
+      ctx.restore();
+    }
+  },
+};
+
 export const RENDERERS: Record<
   CanvasElementType,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -161,4 +178,5 @@ export const RENDERERS: Record<
   [CanvasElementType.Translate]: translateRenderers,
   [CanvasElementType.Scale]: scaleRenderers,
   [CanvasElementType.Text]: textRenderers,
+  [CanvasElementType.Opacity]: opacityRenderers,
 };

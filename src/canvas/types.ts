@@ -1,6 +1,7 @@
 import { PropsWithChildren } from 'react';
 
 import { LineProps } from './line';
+import { OpacityProps } from './opacity';
 import { CanvasChild } from './reconciler';
 import { RectangleProps } from './rectangle';
 import { RotateProps } from './rotate';
@@ -16,6 +17,7 @@ export enum CanvasElementType {
   Translate = 'Canvas.Translate',
   Scale = 'Canvas.Scale',
   Rotate = 'Canvas.Rotate',
+  Opacity = 'Canvas.Opacity',
 }
 
 declare global {
@@ -29,6 +31,7 @@ declare global {
       [CanvasElementType.Translate]: TranslateProps;
       [CanvasElementType.Scale]: ScaleProps;
       [CanvasElementType.Text]: TextProps;
+      [CanvasElementType.Opacity]: OpacityProps;
     }
   }
 }
