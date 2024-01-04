@@ -19,3 +19,22 @@ export const isArray = <T>(
 
 export const percentageOf = (percentage: number, total: number) =>
   (percentage / 100) * total;
+
+export const roundSquareRoot = (total: number) => {
+  let idealX = 0;
+  let idealY = 0;
+  let smallestDiff = Infinity;
+
+  for (let x = 1; x < total; x += 1) {
+    const y = total / x;
+    const diff = Math.abs(x - y);
+
+    if (!(y % 1) && diff < smallestDiff) {
+      smallestDiff = diff;
+      idealX = x;
+      idealY = y;
+    }
+  }
+
+  return idealX > idealY ? idealX : idealY;
+};
