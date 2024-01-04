@@ -1,4 +1,4 @@
-import { AnyObject } from './types';
+import { AnyObject, HandleNameToEventName } from './types';
 
 export const hasKey = <T extends AnyObject, K extends string>(
   obj: T,
@@ -38,3 +38,15 @@ export const roundSquareRoot = (total: number) => {
 
   return idealX > idealY ? idealX : idealY;
 };
+
+export const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max);
+
+const MATCHES_ON_PREFIX = /^on/;
+
+export const handlerNameToEventName = <const T extends string>(
+  handlerName: T
+) =>
+  handlerName
+    .replace(MATCHES_ON_PREFIX, '')
+    .toLowerCase() as HandleNameToEventName<T>;

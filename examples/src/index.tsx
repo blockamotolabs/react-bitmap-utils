@@ -1,6 +1,7 @@
 import {
   BLACK,
   Canvas,
+  clamp,
   ForEach,
   Line,
   Opacity,
@@ -11,8 +12,9 @@ import {
   Scale,
   Translate,
   useAutoPixelRatio,
+  useEventHandlers,
 } from '@bitmapland/react-bitmap-utils';
-import React, { useEffect, useReducer, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 const BLOCK_SIZE = 100;
@@ -25,6 +27,7 @@ const App = () => {
   const countTotalBlocks = 812345;
   const countEpochs = Math.floor(countTotalBlocks / BLOCKS_PER_EPOCH);
 
+  const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
   const pixelRatio = useAutoPixelRatio();
   const [{ width, height }, setDimensions] = useState({ width: 0, height: 0 });
 
@@ -41,19 +44,33 @@ const App = () => {
   const fitWidth = innerAspectRatio < mapAspectRatio;
 
   const scale = fitWidth ? innerWidth / mapWidth : innerHeight / mapHeight;
-  const [zoom, setZoom] = useReducer(
-    (_prevZoom: number, nextZoom: number) =>
-      Math.min(Math.max(nextZoom, scale), 1),
-    scale
-  );
+  const [zoom, setZoom] = useState(scale);
 
   useEffect(() => {
-    setZoom(scale);
+    setZoom((prev) => clamp(prev, scale, 1));
   }, [scale]);
+
+  useEventHandlers(
+    useMemo(
+      () => ({
+        onWheel: (event) => {
+          event.preventDefault();
+          const { deltaY } = event;
+
+          setZoom((prevZoom) =>
+            clamp(prevZoom + deltaY * prevZoom * -0.01, scale, 1)
+          );
+        },
+      }),
+      [scale]
+    ),
+    canvas
+  );
 
   return (
     <>
       <Canvas
+        ref={setCanvas}
         pixelRatio={pixelRatio}
         backgroundColor={BLACK}
         style={{ width: '100%', height: '100%' }}
