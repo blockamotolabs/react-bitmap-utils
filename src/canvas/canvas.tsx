@@ -19,6 +19,7 @@ export interface CanvasProps
   width?: number;
   height?: number;
   pixelRatio?: number;
+  backgroundColor?: string;
   children?: ReactElement | readonly ReactElement[];
   ref?: ForwardedRef<HTMLCanvasElement>;
   onResize?: (dimensions: Dimensions) => void;
@@ -50,6 +51,7 @@ export const Canvas = memo(
         height,
         pixelRatio = 1,
         onResize,
+        backgroundColor,
         children,
         ...props
       }: CanvasProps,
@@ -94,6 +96,12 @@ export const Canvas = memo(
 
         canvas.width = dimensions.width;
         canvas.height = dimensions.height;
+
+        if (backgroundColor) {
+          ctx.fillStyle = backgroundColor;
+          ctx.fillRect(0, 0, dimensions.width, dimensions.height);
+        }
+
         ctx.scale(pixelRatio, pixelRatio);
 
         const drawChild = (child: CanvasChild | TextChild) => {
@@ -133,6 +141,7 @@ export const Canvas = memo(
         dimensions.height,
         dimensions.width,
         pixelRatio,
+        backgroundColor,
       ]);
 
       const refWrapper = useCallback(
