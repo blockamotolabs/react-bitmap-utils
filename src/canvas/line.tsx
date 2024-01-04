@@ -1,6 +1,4 @@
-import { memo } from 'react';
-
-import { CanvasComponent, CommonCanvasComponentProps } from '../types';
+import { CanvasElementType, CommonCanvasComponentProps } from './types';
 
 export interface LineProps extends CommonCanvasComponentProps {
   startX: number;
@@ -9,22 +7,7 @@ export interface LineProps extends CommonCanvasComponentProps {
   endY: number;
   stroke?: string;
   strokeWidth?: number;
+  continuePath?: boolean;
 }
 
-export const Line: CanvasComponent<LineProps> = memo(() => null);
-
-Line.drawBeforeChildren = (
-  ctx,
-  { startX, startY, endX, endY, stroke, strokeWidth = 1 }
-) => {
-  ctx.moveTo(startX, startY);
-  ctx.lineTo(endX, endY);
-
-  if (stroke && strokeWidth) {
-    ctx.strokeStyle = stroke;
-    ctx.lineWidth = strokeWidth;
-    ctx.stroke();
-  }
-};
-
-Line.displayName = 'Line';
+export const Line = CanvasElementType.Line;

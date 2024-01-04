@@ -2,10 +2,9 @@ import { PropsWithChildren } from 'react';
 
 import { CanvasElementType, CommonCanvasComponentProps } from './types';
 
-export interface TranslateProps
+export interface OpacityProps
   extends PropsWithChildren<CommonCanvasComponentProps> {
-  x?: number;
-  y?: number;
+  opacity: number;
 }
 
-export const Translate = CanvasElementType.Translate;
+export const Opacity = CanvasElementType.Opacity;

@@ -1,79 +1,103 @@
 import {
+  BLACK,
   Canvas,
-  degreesToRadians,
+  ForEach,
   Line,
+  Opacity,
+  ORANGE,
+  percentageOf,
   Rectangle,
-  Rotate,
+  roundSquareRoot,
   Scale,
-  Text,
   Translate,
   useAutoPixelRatio,
-  useDelta,
-  useFrameNow,
-  useFrameRate,
 } from '@bitmapland/react-bitmap-utils';
-import React from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
-const App = () => {
-  const pixelRatio = useAutoPixelRatio();
-  const width = 500;
-  const height = (width / 16) * 9;
-  const now = useFrameNow();
-  const frameRate = useFrameRate(100);
-  const delta = useDelta();
+const BLOCK_SIZE = 100;
+const BLOCKS_PER_EPOCH = 210000;
+// const BLOCKS_PER_DIFFICULTY_PERIOD = 2016;
+const BLOCKS_PER_ROW = roundSquareRoot(BLOCKS_PER_EPOCH);
+const BLOCKS_PER_COLUMN = BLOCKS_PER_EPOCH / BLOCKS_PER_ROW;
 
-  const scale = 1 + Math.cos(now * 0.0025) * 0.2;
+const App = () => {
+  const countTotalBlocks = 812345;
+  const countEpochs = Math.floor(countTotalBlocks / BLOCKS_PER_EPOCH);
+
+  const pixelRatio = useAutoPixelRatio();
+  const [{ width, height }, setDimensions] = useState({ width: 0, height: 0 });
+
+  const padding = Math.min(percentageOf(5, width), percentageOf(5, height));
+
+  const innerWidth = width - padding * 2;
+  const innerHeight = height - padding * 2;
+  const innerAspectRatio = innerWidth / innerHeight;
+
+  const mapWidth = countEpochs * BLOCK_SIZE * BLOCKS_PER_ROW;
+  const mapHeight = BLOCKS_PER_COLUMN * BLOCK_SIZE;
+  const mapAspectRatio = mapWidth / mapHeight;
+
+  const fitWidth = innerAspectRatio < mapAspectRatio;
+
+  const scale = fitWidth ? innerWidth / mapWidth : innerHeight / mapHeight;
+  const [zoom, setZoom] = useReducer(
+    (_prevZoom: number, nextZoom: number) =>
+      Math.min(Math.max(nextZoom, scale), 1),
+    scale
+  );
+
+  useEffect(() => {
+    setZoom(scale);
+  }, [scale]);
 
   return (
     <>
-      <h1>Hello, World!</h1>
-      <Canvas pixelRatio={pixelRatio} style={{ width, height }}>
-        <Text
-          x={5 * pixelRatio}
-          y={5 * pixelRatio}
-          fontSize={16 * pixelRatio}
-          fill="black"
-        >
-          Delta: {delta}
-        </Text>
-        <Line
-          startX={width * 0.5 * pixelRatio}
-          startY={0}
-          endX={width * 0.5 * pixelRatio}
-          endY={height * pixelRatio}
-          strokeWidth={1 * pixelRatio}
-          stroke="cyan"
-        />
-        <Translate
-          x={width * 0.5 * pixelRatio}
-          y={
-            height * 0.5 * pixelRatio +
-            Math.sin(now * 0.005) * height * 0.25 * pixelRatio
-          }
-        >
-          <Rotate radians={degreesToRadians(Math.sin(now * 0.005) * 45)}>
-            <Rectangle
-              x={-50 * 0.5 * pixelRatio}
-              y={-50 * 0.5 * pixelRatio}
-              width={50 * pixelRatio}
-              height={50 * pixelRatio}
-              fill="red"
-              strokeWidth={1 * pixelRatio}
-              stroke="black"
-            />
-          </Rotate>
-          <Scale x={scale} y={scale}>
-            <Text
-              x={0}
-              y={0}
-              fontSize={16 * pixelRatio}
-              textAlign="center"
-              verticalAlign="middle"
-              fill="white"
-            >
-              {Math.round(frameRate)}fps
-            </Text>
+      <Canvas
+        pixelRatio={pixelRatio}
+        backgroundColor={BLACK}
+        style={{ width: '100%', height: '100%' }}
+        onResize={setDimensions}
+      >
+        <Translate x={width * 0.5} y={height * 0.5}>
+          <Scale x={zoom} y={zoom}>
+            <Translate x={mapWidth * -0.5} y={mapHeight * -0.5}>
+              <Rectangle
+                x={0}
+                y={0}
+                width={mapWidth}
+                height={mapHeight}
+                fill={ORANGE}
+              />
+              <Opacity opacity={zoom}>
+                <ForEach
+                  end={countEpochs * BLOCKS_PER_ROW}
+                  callback={({ index }) => (
+                    <Line
+                      startX={index * BLOCK_SIZE}
+                      startY={0}
+                      endX={index * BLOCK_SIZE}
+                      endY={BLOCKS_PER_COLUMN * BLOCK_SIZE}
+                      stroke={BLACK}
+                      strokeWidth={1 / zoom}
+                    />
+                  )}
+                />
+                <ForEach
+                  end={BLOCKS_PER_COLUMN}
+                  callback={({ index }) => (
+                    <Line
+                      startX={0}
+                      startY={index * BLOCK_SIZE}
+                      endX={countEpochs * BLOCKS_PER_ROW * BLOCK_SIZE}
+                      endY={index * BLOCK_SIZE}
+                      stroke={BLACK}
+                      strokeWidth={1 / zoom}
+                    />
+                  )}
+                />
+              </Opacity>
+            </Translate>
           </Scale>
         </Translate>
       </Canvas>

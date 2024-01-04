@@ -1,32 +1,10 @@
-import { memo, ReactElement } from 'react';
+import { PropsWithChildren } from 'react';
 
-import {
-  AnyObject,
-  CanvasComponent,
-  CommonCanvasComponentProps,
-} from '../types';
+import { CanvasElementType, CommonCanvasComponentProps } from './types';
 
-export interface RotateProps extends CommonCanvasComponentProps {
+export interface RotateProps
+  extends PropsWithChildren<CommonCanvasComponentProps> {
   radians: number;
-  children?:
-    | ReactElement<AnyObject, CanvasComponent<AnyObject>>
-    | readonly ReactElement<AnyObject, CanvasComponent<AnyObject>>[];
 }
 
-export const Rotate: CanvasComponent<RotateProps> = memo(() => null);
-
-Rotate.drawBeforeChildren = (ctx, { radians, children, restore }) => {
-  if (children && restore !== false) {
-    ctx.save();
-  }
-
-  ctx.rotate(radians);
-};
-
-Rotate.drawAfterChildren = (ctx, { children, restore }) => {
-  if (children && restore !== false) {
-    ctx.restore();
-  }
-};
-
-Rotate.displayName = 'Rotate';
+export const Rotate = CanvasElementType.Rotate;

@@ -1,6 +1,4 @@
-import { memo } from 'react';
-
-import { CanvasComponent, CommonCanvasComponentProps } from '../types';
+import { CanvasElementType, CommonCanvasComponentProps } from './types';
 
 export interface RectangleProps extends CommonCanvasComponentProps {
   x: number;
@@ -12,26 +10,4 @@ export interface RectangleProps extends CommonCanvasComponentProps {
   strokeWidth?: number;
 }
 
-export const Rectangle: CanvasComponent<RectangleProps> = memo(() => null);
-
-Rectangle.drawBeforeChildren = (
-  ctx,
-  { x, y, width, height, fill, stroke, strokeWidth = 1 }
-) => {
-  if (!fill && !stroke) {
-    ctx.rect(x, y, width, height);
-  }
-
-  if (fill) {
-    ctx.fillStyle = fill;
-    ctx.fillRect(x, y, width, height);
-  }
-
-  if (stroke && strokeWidth) {
-    ctx.strokeStyle = stroke;
-    ctx.lineWidth = strokeWidth;
-    ctx.strokeRect(x, y, width, height);
-  }
-};
-
-Rectangle.displayName = 'Rectangle';
+export const Rectangle = CanvasElementType.Rectangle;

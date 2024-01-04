@@ -1,34 +1,36 @@
 import React, {
-  Children,
   ForwardedRef,
   forwardRef,
   HTMLAttributes,
   memo,
-  MemoExoticComponent,
   ReactElement,
-  ReactNode,
   useCallback,
   useEffect,
-  useMemo,
+  useRef,
+  useState,
 } from 'react';
 
-import { AnyObject, CanvasComponent } from '../types';
+import { isArray, isKeyOf } from '../utils';
+import CanvasReconcilerPublic, { CanvasChild, TextChild } from './reconciler';
+import { RENDERERS } from './renderers';
+import { Dimensions } from './types';
 
-export interface CanvasProps extends HTMLAttributes<HTMLCanvasElement> {
+export interface CanvasProps
+  extends Omit<HTMLAttributes<HTMLCanvasElement>, 'onResize'> {
   width?: number;
   height?: number;
   pixelRatio?: number;
-  children?:
-    | ReactElement<AnyObject, CanvasComponent<AnyObject>>
-    | readonly ReactElement<AnyObject, CanvasComponent<AnyObject>>[];
+  backgroundColor?: string;
+  children?: ReactElement | readonly ReactElement[];
   ref?: ForwardedRef<HTMLCanvasElement>;
+  onResize?: (dimensions: Dimensions) => void;
 }
 
 const getDimensions = (
   pixelRatio: number,
   width: number | undefined,
   height: number | undefined,
-  canvas: HTMLCanvasElement | null
+  canvas: HTMLCanvasElement | null | undefined
 ) => {
   return {
     width:
@@ -45,92 +47,177 @@ const getDimensions = (
 export const Canvas = memo(
   forwardRef(
     (
-      { width, height, pixelRatio = 1, children, ...props }: CanvasProps,
+      {
+        width,
+        height,
+        pixelRatio = 1,
+        onResize,
+        backgroundColor,
+        children,
+        ...props
+      }: CanvasProps,
       ref
     ) => {
-      const [canvas, setCanvas] = React.useState<HTMLCanvasElement | null>(
-        null
+      const [canvasCtx, setCanvasCtx] = useState<{
+        canvas: HTMLCanvasElement;
+        ctx: CanvasRenderingContext2D;
+      } | null>(null);
+      const [dimensions, setDimensions] = useState(
+        getDimensions(pixelRatio, width, height, canvasCtx?.canvas)
       );
-      const ctx = useMemo(() => canvas?.getContext('2d'), [canvas]);
-      const dimensions = getDimensions(pixelRatio, width, height, canvas);
 
-      const refWrapper = useCallback(
-        (nextCanvas: HTMLCanvasElement | null) => {
-          setCanvas(nextCanvas);
-
-          if (ref) {
-            if (typeof ref === 'object') {
-              ref.current = nextCanvas;
-            } else if (typeof ref === 'function') {
-              ref(nextCanvas);
-            }
-          }
-        },
-        [ref]
-      );
+      const rootContainerRef = useRef<null | ReturnType<
+        typeof CanvasReconcilerPublic.render
+      >>(null);
 
       useEffect(() => {
-        if (!canvas || !ctx) {
+        if (!canvasCtx) {
+          rootContainerRef.current?.unmount();
+          rootContainerRef.current = null;
           return;
         }
+
+        if (!rootContainerRef.current) {
+          rootContainerRef.current = CanvasReconcilerPublic.render(
+            <>{children}</>
+          );
+        } else {
+          rootContainerRef.current.update(<>{children}</>);
+        }
+
+        const {
+          container: { containerInfo },
+        } = rootContainerRef.current;
+
+        const { canvas, ctx } = canvasCtx;
 
         canvas.width = dimensions.width;
         canvas.height = dimensions.height;
 
-        const drawChild = (
-          child:
-            | ReactNode
-            | ReactElement<AnyObject, CanvasComponent<AnyObject>>
-            | ReactElement<
-                AnyObject,
-                MemoExoticComponent<CanvasComponent<AnyObject>>
-              >
-            | undefined
-        ) => {
-          if (!child || typeof child !== 'object' || !('type' in child)) {
+        if (backgroundColor) {
+          ctx.fillStyle = backgroundColor;
+          ctx.fillRect(0, 0, dimensions.width, dimensions.height);
+        }
+
+        ctx.scale(pixelRatio, pixelRatio);
+
+        const drawChild = (child: CanvasChild | TextChild) => {
+          if (!isKeyOf(RENDERERS, child.type)) {
             return;
           }
 
-          const { type, props: childProps } = child;
+          const renderer = RENDERERS[child.type];
 
-          if (typeof type !== 'function' && typeof type !== 'object') {
-            return;
-          }
-
-          if (childProps.restore) {
+          if (child.props?.restore) {
             ctx.save();
           }
 
-          if (
-            'drawBeforeChildren' in type &&
-            typeof type.drawBeforeChildren === 'function'
-          ) {
-            type.drawBeforeChildren(ctx, childProps);
+          renderer.drawBeforeChildren?.(
+            {
+              canvas,
+              ctx,
+              drawChild,
+              width: canvas.width / pixelRatio,
+              height: canvas.height / pixelRatio,
+              pixelRatio,
+            },
+            child.props
+          );
+
+          if (isArray(child.rendered)) {
+            child.rendered.forEach(drawChild);
           }
 
-          Children.forEach(childProps.children, drawChild);
+          renderer.drawAfterChildren?.(
+            {
+              canvas,
+              ctx,
+              drawChild,
+              width: canvas.width,
+              height: canvas.height,
+              pixelRatio,
+            },
+            child.props
+          );
 
-          if (
-            'drawAfterChildren' in type &&
-            typeof type.drawAfterChildren === 'function'
-          ) {
-            type.drawAfterChildren(ctx, childProps);
-          }
-
-          if (childProps.restore) {
+          if (child.props?.restore) {
             ctx.restore();
           }
         };
 
-        Children.forEach(children, drawChild);
+        containerInfo.rendered.forEach(drawChild);
       }, [
-        canvas,
+        backgroundColor,
+        canvasCtx,
         children,
-        ctx,
         dimensions.height,
         dimensions.width,
         pixelRatio,
       ]);
+
+      useEffect(() => {
+        if (!canvasCtx) {
+          return;
+        }
+
+        const resizeObserver = new ResizeObserver(() => {
+          const nextDimensions = getDimensions(
+            pixelRatio,
+            width,
+            height,
+            canvasCtx.canvas
+          );
+          setDimensions({
+            width: nextDimensions.width,
+            height: nextDimensions.height,
+          });
+          onResize?.({
+            width: nextDimensions.width / pixelRatio,
+            height: nextDimensions.height / pixelRatio,
+          });
+        });
+
+        resizeObserver.observe(canvasCtx.canvas);
+
+        return () => {
+          resizeObserver.disconnect();
+        };
+      }, [canvasCtx, height, onResize, pixelRatio, width]);
+
+      const refWrapper = useCallback(
+        (canvas: HTMLCanvasElement | null) => {
+          setCanvasCtx(() => {
+            if (!canvas) {
+              return null;
+            }
+
+            return {
+              canvas,
+              ctx: canvas.getContext('2d')!,
+            };
+          });
+          const nextDimensions = getDimensions(
+            pixelRatio,
+            width,
+            height,
+            canvas
+          );
+          setDimensions(nextDimensions);
+          onResize?.({
+            width: nextDimensions.width / pixelRatio,
+            height: nextDimensions.height / pixelRatio,
+          });
+
+          if (ref) {
+            if (typeof ref === 'object') {
+              ref.current = canvas;
+            } else if (typeof ref === 'function') {
+              ref(canvas);
+            }
+          }
+        },
+        [height, onResize, pixelRatio, ref, width]
+      );
 
       return (
         <canvas
@@ -138,7 +225,7 @@ export const Canvas = memo(
           height={dimensions.height}
           {...props}
           ref={refWrapper}
-        ></canvas>
+        />
       );
     }
   )

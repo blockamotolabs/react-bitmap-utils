@@ -6,4 +6,7 @@ export * from './text';
 export * from './translate';
 export * from './scale';
 export * from './rotate';
+export * from './opacity';
 export * from './math';
+export * from './for-each';
+export * from './types';
