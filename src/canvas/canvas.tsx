@@ -114,10 +114,11 @@ export const Canvas = memo(
 
           renderer.drawBeforeChildren?.(
             {
-              ...canvasCtx,
+              canvas,
+              ctx,
               drawChild,
-              width: canvas.width,
-              height: canvas.height,
+              width: canvas.width / pixelRatio,
+              height: canvas.height / pixelRatio,
               pixelRatio,
             },
             child.props
@@ -129,7 +130,8 @@ export const Canvas = memo(
 
           renderer.drawAfterChildren?.(
             {
-              ...canvasCtx,
+              canvas,
+              ctx,
               drawChild,
               width: canvas.width,
               height: canvas.height,
@@ -223,7 +225,7 @@ export const Canvas = memo(
           height={dimensions.height}
           {...props}
           ref={refWrapper}
-        ></canvas>
+        />
       );
     }
   )

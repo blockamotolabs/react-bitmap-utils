@@ -7,6 +7,7 @@ export interface LineProps extends CommonCanvasComponentProps {
   endY: number;
   stroke?: string;
   strokeWidth?: number;
+  continuePath?: boolean;
 }
 
 export const Line = CanvasElementType.Line;

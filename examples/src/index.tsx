@@ -3,6 +3,7 @@ import {
   Canvas,
   ForEach,
   Line,
+  Opacity,
   ORANGE,
   percentageOf,
   Rectangle,
@@ -11,7 +12,7 @@ import {
   Translate,
   useAutoPixelRatio,
 } from '@bitmapland/react-bitmap-utils';
-import React, { useCallback, useState } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 const BLOCK_SIZE = 100;
@@ -40,32 +41,15 @@ const App = () => {
   const fitWidth = innerAspectRatio < mapAspectRatio;
 
   const scale = fitWidth ? innerWidth / mapWidth : innerHeight / mapHeight;
-
-  const forEachVerticalLine = useCallback(
-    (index: number) => (
-      <Line
-        startX={index * BLOCK_SIZE}
-        startY={0}
-        endX={index * BLOCK_SIZE}
-        endY={BLOCKS_PER_COLUMN * BLOCK_SIZE}
-        stroke={BLACK}
-      />
-    ),
-    []
+  const [zoom, setZoom] = useReducer(
+    (_prevZoom: number, nextZoom: number) =>
+      Math.min(Math.max(nextZoom, scale), 1),
+    scale
   );
 
-  const forEachHorizontalLine = useCallback(
-    (index: number) => (
-      <Line
-        startX={0}
-        startY={index * BLOCK_SIZE}
-        endX={countEpochs * BLOCKS_PER_ROW * BLOCK_SIZE}
-        endY={index * BLOCK_SIZE}
-        stroke={BLACK}
-      />
-    ),
-    [countEpochs]
-  );
+  useEffect(() => {
+    setZoom(scale);
+  }, [scale]);
 
   return (
     <>
@@ -76,7 +60,7 @@ const App = () => {
         onResize={setDimensions}
       >
         <Translate x={width * 0.5} y={height * 0.5}>
-          <Scale x={scale} y={scale}>
+          <Scale x={zoom} y={zoom}>
             <Translate x={mapWidth * -0.5} y={mapHeight * -0.5}>
               <Rectangle
                 x={0}
@@ -85,14 +69,34 @@ const App = () => {
                 height={mapHeight}
                 fill={ORANGE}
               />
-              <ForEach
-                end={countEpochs * BLOCKS_PER_ROW}
-                callback={forEachVerticalLine}
-              />
-              <ForEach
-                end={BLOCKS_PER_COLUMN}
-                callback={forEachHorizontalLine}
-              />
+              <Opacity opacity={zoom}>
+                <ForEach
+                  end={countEpochs * BLOCKS_PER_ROW}
+                  callback={({ index }) => (
+                    <Line
+                      startX={index * BLOCK_SIZE}
+                      startY={0}
+                      endX={index * BLOCK_SIZE}
+                      endY={BLOCKS_PER_COLUMN * BLOCK_SIZE}
+                      stroke={BLACK}
+                      strokeWidth={1 / zoom}
+                    />
+                  )}
+                />
+                <ForEach
+                  end={BLOCKS_PER_COLUMN}
+                  callback={({ index }) => (
+                    <Line
+                      startX={0}
+                      startY={index * BLOCK_SIZE}
+                      endX={countEpochs * BLOCKS_PER_ROW * BLOCK_SIZE}
+                      endY={index * BLOCK_SIZE}
+                      stroke={BLACK}
+                      strokeWidth={1 / zoom}
+                    />
+                  )}
+                />
+              </Opacity>
             </Translate>
           </Scale>
         </Translate>

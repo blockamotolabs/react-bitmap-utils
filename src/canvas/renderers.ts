@@ -34,8 +34,12 @@ const rectangleRenderers: CanvasComponentRenderers<RectangleProps> = {
 const lineRenderers: CanvasComponentRenderers<LineProps> = {
   drawBeforeChildren: (
     { ctx },
-    { startX, startY, endX, endY, stroke, strokeWidth = 1 }
+    { startX, startY, endX, endY, stroke, strokeWidth = 1, continuePath }
   ) => {
+    if (continuePath !== false) {
+      ctx.beginPath();
+    }
+
     ctx.moveTo(startX, startY);
     ctx.lineTo(endX, endY);
 
@@ -48,15 +52,22 @@ const lineRenderers: CanvasComponentRenderers<LineProps> = {
 };
 
 const forEachRenderers: CanvasComponentRenderers<ForEachProps> = {
-  drawBeforeChildren: (
-    { drawChild },
-    { start = 0, step = 1, end, callback }
-  ) => {
+  drawBeforeChildren: (context, { start = 0, step = 1, end, callback }) => {
     for (let index = start; index < end; index += step) {
-      const {
-        container: { containerInfo },
-      } = CanvasReconcilerPublic.render(callback(index, start, step, end));
-      containerInfo.rendered.forEach(drawChild);
+      const returned = callback({
+        ...context,
+        index,
+        start,
+        step,
+        end,
+      });
+
+      if (returned) {
+        const {
+          container: { containerInfo },
+        } = CanvasReconcilerPublic.render(returned);
+        containerInfo.rendered.forEach(context.drawChild);
+      }
     }
   },
 };
