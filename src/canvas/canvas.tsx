@@ -7,6 +7,7 @@ import React, {
   useCallback,
   useEffect,
   useRef,
+  useState,
 } from 'react';
 
 import { isArray, isKeyOf } from '../utils';
@@ -29,7 +30,7 @@ const getDimensions = (
   pixelRatio: number,
   width: number | undefined,
   height: number | undefined,
-  canvas: HTMLCanvasElement | undefined
+  canvas: HTMLCanvasElement | null | undefined
 ) => {
   return {
     width:
@@ -57,15 +58,12 @@ export const Canvas = memo(
       }: CanvasProps,
       ref
     ) => {
-      const [canvasCtx, setCanvasCtx] = React.useState<{
+      const [canvasCtx, setCanvasCtx] = useState<{
         canvas: HTMLCanvasElement;
         ctx: CanvasRenderingContext2D;
       } | null>(null);
-      const dimensions = getDimensions(
-        pixelRatio,
-        width,
-        height,
-        canvasCtx?.canvas
+      const [dimensions, setDimensions] = useState(
+        getDimensions(pixelRatio, width, height, canvasCtx?.canvas)
       );
 
       const rootContainerRef = useRef<null | ReturnType<
@@ -135,6 +133,18 @@ export const Canvas = memo(
         };
 
         containerInfo.rendered.forEach(drawChild);
+
+        const resizeObserver = new ResizeObserver(() => {
+          setDimensions(
+            getDimensions(pixelRatio, width, height, canvasCtx.canvas)
+          );
+        });
+
+        resizeObserver.observe(canvas);
+
+        return () => {
+          resizeObserver.disconnect();
+        };
       }, [
         canvasCtx,
         children,
@@ -142,6 +152,8 @@ export const Canvas = memo(
         dimensions.width,
         pixelRatio,
         backgroundColor,
+        width,
+        height,
       ]);
 
       const refWrapper = useCallback(
@@ -156,6 +168,7 @@ export const Canvas = memo(
               ctx: canvas.getContext('2d')!,
             };
           });
+          setDimensions(getDimensions(pixelRatio, width, height, canvas));
 
           if (ref) {
             if (typeof ref === 'object') {
@@ -165,7 +178,7 @@ export const Canvas = memo(
             }
           }
         },
-        [ref]
+        [height, pixelRatio, ref, width]
       );
 
       useEffect(() => {
