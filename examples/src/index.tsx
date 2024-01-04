@@ -86,7 +86,7 @@ const App = () => {
                 height={mapHeight}
                 fill={ORANGE}
               />
-              <Opacity opacity={zoom}>
+              <Opacity opacity={Math.min(zoom * 8, 1)}>
                 <ForEach
                   end={countEpochs * BLOCKS_PER_ROW}
                   callback={({ index }) => (
