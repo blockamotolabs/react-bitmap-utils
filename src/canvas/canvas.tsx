@@ -79,8 +79,7 @@ export const Canvas = memo(
 
         if (!rootContainerRef.current) {
           rootContainerRef.current = CanvasReconcilerPublic.render(
-            <>{children}</>,
-            canvasCtx
+            <>{children}</>
           );
         } else {
           rootContainerRef.current.update(<>{children}</>);
@@ -133,28 +132,43 @@ export const Canvas = memo(
         };
 
         containerInfo.rendered.forEach(drawChild);
-
-        const resizeObserver = new ResizeObserver(() => {
-          setDimensions(
-            getDimensions(pixelRatio, width, height, canvasCtx.canvas)
-          );
-        });
-
-        resizeObserver.observe(canvas);
-
-        return () => {
-          resizeObserver.disconnect();
-        };
       }, [
+        backgroundColor,
         canvasCtx,
         children,
         dimensions.height,
         dimensions.width,
         pixelRatio,
-        backgroundColor,
-        width,
-        height,
       ]);
+
+      useEffect(() => {
+        if (!canvasCtx) {
+          return;
+        }
+
+        const resizeObserver = new ResizeObserver(() => {
+          const nextDimensions = getDimensions(
+            pixelRatio,
+            width,
+            height,
+            canvasCtx.canvas
+          );
+          setDimensions({
+            width: nextDimensions.width,
+            height: nextDimensions.height,
+          });
+          onResize?.({
+            width: nextDimensions.width / pixelRatio,
+            height: nextDimensions.height / pixelRatio,
+          });
+        });
+
+        resizeObserver.observe(canvasCtx.canvas);
+
+        return () => {
+          resizeObserver.disconnect();
+        };
+      }, [canvasCtx, height, onResize, pixelRatio, width]);
 
       const refWrapper = useCallback(
         (canvas: HTMLCanvasElement | null) => {
@@ -168,7 +182,17 @@ export const Canvas = memo(
               ctx: canvas.getContext('2d')!,
             };
           });
-          setDimensions(getDimensions(pixelRatio, width, height, canvas));
+          const nextDimensions = getDimensions(
+            pixelRatio,
+            width,
+            height,
+            canvas
+          );
+          setDimensions(nextDimensions);
+          onResize?.({
+            width: nextDimensions.width / pixelRatio,
+            height: nextDimensions.height / pixelRatio,
+          });
 
           if (ref) {
             if (typeof ref === 'object') {
@@ -178,15 +202,8 @@ export const Canvas = memo(
             }
           }
         },
-        [height, pixelRatio, ref, width]
+        [height, onResize, pixelRatio, ref, width]
       );
-
-      useEffect(() => {
-        onResize?.({
-          width: dimensions.width / pixelRatio,
-          height: dimensions.height / pixelRatio,
-        });
-      }, [dimensions.width, dimensions.height, onResize, pixelRatio]);
 
       return (
         <canvas

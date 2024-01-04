@@ -1,8 +1,7 @@
-import { PropsWithChildren } from 'react';
-
+import { ForEachProps } from './for-each';
 import { LineProps } from './line';
 import { OpacityProps } from './opacity';
-import { CanvasChild } from './reconciler';
+import { CanvasChild, TextChild } from './reconciler';
 import { RectangleProps } from './rectangle';
 import { RotateProps } from './rotate';
 import { ScaleProps } from './scale';
@@ -26,7 +25,7 @@ declare global {
     interface IntrinsicElements {
       [CanvasElementType.Rectangle]: RectangleProps;
       [CanvasElementType.Line]: LineProps;
-      [CanvasElementType.ForEach]: PropsWithChildren;
+      [CanvasElementType.ForEach]: ForEachProps;
       [CanvasElementType.Rotate]: RotateProps;
       [CanvasElementType.Translate]: TranslateProps;
       [CanvasElementType.Scale]: ScaleProps;
@@ -43,7 +42,7 @@ export interface CanvasComponentRenderers<
     canvasContext: {
       canvas: HTMLCanvasElement;
       ctx: CanvasRenderingContext2D;
-      drawChild: (child: CanvasChild) => void;
+      drawChild: (child: CanvasChild | TextChild) => void;
     },
     props: P
   ) => void;

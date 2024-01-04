@@ -19,8 +19,7 @@ export interface CanvasChild {
 }
 
 export interface Container {
-  canvas: HTMLCanvasElement;
-  ctx: CanvasRenderingContext2D;
+  type: 'root';
   rendered: (TextChild | CanvasChild)[];
 }
 
@@ -112,17 +111,14 @@ const HOST_CONFIG: HostConfig<
 const CanvasReconciler = Reconciler(HOST_CONFIG);
 
 const CanvasReconcilerPublic = {
-  render: (
-    reactElement: ReactNode,
-    canvasCtx: { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D }
-  ) => {
+  render: (reactElement: ReactNode) => {
     const container = CanvasReconciler.createContainer(
-      { ...canvasCtx, rendered: [] },
+      { type: 'root', rendered: [] },
       0,
       null,
       false,
       false,
-      'canvas',
+      'Canvas',
       (error) => {
         if (
           globalThis.console &&

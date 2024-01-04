@@ -1,6 +1,7 @@
 import { ForEachProps } from './for-each';
 import { LineProps } from './line';
 import { OpacityProps } from './opacity';
+import CanvasReconcilerPublic from './reconciler';
 import { RectangleProps } from './rectangle';
 import { RotateProps } from './rotate';
 import { ScaleProps } from './scale';
@@ -46,7 +47,19 @@ const lineRenderers: CanvasComponentRenderers<LineProps> = {
   },
 };
 
-const forEachRenderers: CanvasComponentRenderers<ForEachProps> = {};
+const forEachRenderers: CanvasComponentRenderers<ForEachProps> = {
+  drawBeforeChildren: (
+    { drawChild },
+    { start = 0, step = 1, end, callback }
+  ) => {
+    for (let index = start; index < end; index += step) {
+      const {
+        container: { containerInfo },
+      } = CanvasReconcilerPublic.render(callback(index, start, step, end));
+      containerInfo.rendered.forEach(drawChild);
+    }
+  },
+};
 
 const rotateRenderers: CanvasComponentRenderers<RotateProps> = {
   drawBeforeChildren: ({ ctx }, { radians, children, restore }) => {

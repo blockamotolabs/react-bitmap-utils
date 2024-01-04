@@ -44,7 +44,6 @@ const App = () => {
   const forEachVerticalLine = useCallback(
     (index: number) => (
       <Line
-        key={index}
         startX={index * BLOCK_SIZE}
         startY={0}
         endX={index * BLOCK_SIZE}
@@ -58,7 +57,6 @@ const App = () => {
   const forEachHorizontalLine = useCallback(
     (index: number) => (
       <Line
-        key={index}
         startX={0}
         startY={index * BLOCK_SIZE}
         endX={countEpochs * BLOCKS_PER_ROW * BLOCK_SIZE}
@@ -87,10 +85,14 @@ const App = () => {
                 height={mapHeight}
                 fill={ORANGE}
               />
-              <ForEach end={countEpochs * BLOCKS_PER_ROW}>
-                {forEachVerticalLine}
-              </ForEach>
-              <ForEach end={BLOCKS_PER_COLUMN}>{forEachHorizontalLine}</ForEach>
+              <ForEach
+                end={countEpochs * BLOCKS_PER_ROW}
+                callback={forEachVerticalLine}
+              />
+              <ForEach
+                end={BLOCKS_PER_COLUMN}
+                callback={forEachHorizontalLine}
+              />
             </Translate>
           </Scale>
         </Translate>
