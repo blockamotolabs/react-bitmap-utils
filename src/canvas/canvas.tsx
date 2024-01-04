@@ -113,7 +113,12 @@ export const Canvas = memo(
           }
 
           renderer.drawBeforeChildren?.(
-            { ...canvasCtx, drawChild },
+            {
+              ...canvasCtx,
+              drawChild,
+              width: canvas.width,
+              height: canvas.height,
+            },
             child.props
           );
 
@@ -122,7 +127,12 @@ export const Canvas = memo(
           }
 
           renderer.drawAfterChildren?.(
-            { ...canvasCtx, drawChild },
+            {
+              ...canvasCtx,
+              drawChild,
+              width: canvas.width,
+              height: canvas.height,
+            },
             child.props
           );
 

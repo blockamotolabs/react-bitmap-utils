@@ -35,25 +35,19 @@ declare global {
   }
 }
 
+export interface DrawContext {
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  width: number;
+  height: number;
+  drawChild: (child: CanvasChild | TextChild) => void;
+}
+
 export interface CanvasComponentRenderers<
   P extends CommonCanvasComponentProps,
 > {
-  drawBeforeChildren?: (
-    canvasContext: {
-      canvas: HTMLCanvasElement;
-      ctx: CanvasRenderingContext2D;
-      drawChild: (child: CanvasChild | TextChild) => void;
-    },
-    props: P
-  ) => void;
-  drawAfterChildren?: (
-    canvasContext: {
-      canvas: HTMLCanvasElement;
-      ctx: CanvasRenderingContext2D;
-      drawChild: (child: CanvasChild) => void;
-    },
-    props: P
-  ) => void;
+  drawBeforeChildren?: (canvasContext: DrawContext, props: P) => void;
+  drawAfterChildren?: (canvasContext: DrawContext, props: P) => void;
 }
 
 export interface CommonCanvasComponentProps {
