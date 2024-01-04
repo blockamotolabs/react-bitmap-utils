@@ -40,6 +40,7 @@ export interface DrawContext {
   ctx: CanvasRenderingContext2D;
   width: number;
   height: number;
+  pixelRatio: number;
   drawChild: (child: CanvasChild | TextChild) => void;
 }
 

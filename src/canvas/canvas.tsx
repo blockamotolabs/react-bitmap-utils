@@ -118,6 +118,7 @@ export const Canvas = memo(
               drawChild,
               width: canvas.width,
               height: canvas.height,
+              pixelRatio,
             },
             child.props
           );
@@ -132,6 +133,7 @@ export const Canvas = memo(
               drawChild,
               width: canvas.width,
               height: canvas.height,
+              pixelRatio,
             },
             child.props
           );
