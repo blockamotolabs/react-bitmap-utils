@@ -114,22 +114,20 @@ const App = () => {
                   )}
                 />
               </Opacity>
-              <Opacity opacity={Math.min(0.5 + zoom, 1)}>
-                <ForEach
-                  start={1}
-                  end={countEpochs}
-                  callback={({ index }) => (
-                    <Line
-                      startX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
-                      startY={0}
-                      endX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
-                      endY={BLOCKS_PER_COLUMN * BLOCK_SIZE}
-                      stroke={BLACK}
-                      strokeWidth={2 / zoom}
-                    />
-                  )}
-                />
-              </Opacity>
+              <ForEach
+                start={1}
+                end={countEpochs}
+                callback={({ index }) => (
+                  <Line
+                    startX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
+                    startY={0}
+                    endX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
+                    endY={BLOCKS_PER_COLUMN * BLOCK_SIZE}
+                    stroke={BLACK}
+                    strokeWidth={2 / zoom + Math.cos(zoom) * 10}
+                  />
+                )}
+              />
             </Translate>
           </Scale>
         </Translate>
