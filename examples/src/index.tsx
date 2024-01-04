@@ -25,7 +25,7 @@ const BLOCKS_PER_COLUMN = BLOCKS_PER_EPOCH / BLOCKS_PER_ROW;
 
 const App = () => {
   const countTotalBlocks = 812345;
-  const countEpochs = Math.floor(countTotalBlocks / BLOCKS_PER_EPOCH);
+  const countEpochs = Math.ceil(countTotalBlocks / BLOCKS_PER_EPOCH);
 
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
   const pixelRatio = useAutoPixelRatio();
@@ -114,6 +114,20 @@ const App = () => {
                   )}
                 />
               </Opacity>
+              <ForEach
+                start={1}
+                end={countEpochs}
+                callback={({ index }) => (
+                  <Line
+                    startX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
+                    startY={0}
+                    endX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
+                    endY={BLOCKS_PER_COLUMN * BLOCK_SIZE}
+                    stroke={BLACK}
+                    strokeWidth={2 / zoom}
+                  />
+                )}
+              />
             </Translate>
           </Scale>
         </Translate>
