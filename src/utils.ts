@@ -47,13 +47,21 @@ export const remapValue = (
   fromMin: number,
   fromMax: number,
   toMin: number,
-  toMax: number
+  toMax: number,
+  shouldClamp?: boolean
 ) => {
   const fromRange = fromMax - fromMin;
   const toRange = toMax - toMin;
   const scale = toRange / fromRange;
   const dist = value - fromMin;
-  return toMin + dist * scale;
+
+  const result = toMin + dist * scale;
+
+  if (shouldClamp) {
+    return clamp(result, toMin, toMax);
+  }
+
+  return result;
 };
 
 const MATCHES_ON_PREFIX = /^on/;
