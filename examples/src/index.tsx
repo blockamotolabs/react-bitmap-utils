@@ -73,6 +73,13 @@ const App = () => {
     canvas
   );
 
+  const partiallyEmptyRow = Math.floor(
+    (countTotalBlocks - (countEpochs - 1) * BLOCKS_PER_EPOCH) / BLOCKS_PER_ROW
+  );
+
+  const partiallyEmptyIndexInRow = countTotalBlocks % BLOCKS_PER_ROW;
+  const partiallyEmptyWidth = BLOCKS_PER_ROW - partiallyEmptyIndexInRow;
+
   return (
     <>
       <Canvas
@@ -133,6 +140,24 @@ const App = () => {
                     strokeWidth={2 / mappedScale + Math.cos(mappedScale) * 4}
                   />
                 )}
+              />
+              <Rectangle
+                x={
+                  ((countEpochs - 1) * BLOCKS_PER_ROW +
+                    partiallyEmptyIndexInRow) *
+                  BLOCK_SIZE
+                }
+                y={partiallyEmptyRow * BLOCK_SIZE}
+                width={partiallyEmptyWidth * BLOCK_SIZE}
+                height={BLOCK_SIZE}
+                fill={BLACK}
+              />
+              <Rectangle
+                x={(countEpochs - 1) * BLOCKS_PER_ROW * BLOCK_SIZE}
+                y={(partiallyEmptyRow + 1) * BLOCK_SIZE}
+                width={(BLOCKS_PER_ROW + 1) * BLOCK_SIZE}
+                height={(BLOCKS_PER_COLUMN - partiallyEmptyRow) * BLOCK_SIZE}
+                fill={BLACK}
               />
             </Translate>
           </Scale>
