@@ -8,13 +8,14 @@ import {
   ORANGE,
   percentageOf,
   Rectangle,
+  remapValue,
   roundSquareRoot,
   Scale,
   Translate,
   useAutoPixelRatio,
   useEventHandlers,
 } from '@bitmapland/react-bitmap-utils';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 const BLOCK_SIZE = 100;
@@ -22,6 +23,8 @@ const BLOCKS_PER_EPOCH = 210000;
 // const BLOCKS_PER_DIFFICULTY_PERIOD = 2016;
 const BLOCKS_PER_ROW = roundSquareRoot(BLOCKS_PER_EPOCH);
 const BLOCKS_PER_COLUMN = BLOCKS_PER_EPOCH / BLOCKS_PER_ROW;
+const MIN_ZOOM = 1;
+const MAX_ZOOM = 2;
 
 const App = () => {
   const countTotalBlocks = 812345;
@@ -44,11 +47,8 @@ const App = () => {
   const fitWidth = innerAspectRatio < mapAspectRatio;
 
   const scale = fitWidth ? innerWidth / mapWidth : innerHeight / mapHeight;
-  const [zoom, setZoom] = useState(scale);
-
-  useEffect(() => {
-    setZoom((prev) => clamp(prev, scale, 1));
-  }, [scale]);
+  const [zoom, setZoom] = useState(MIN_ZOOM);
+  const mappedScale = remapValue(zoom, 1, 2, scale, 1);
 
   useEventHandlers(
     useMemo(
@@ -58,11 +58,17 @@ const App = () => {
           const { deltaY } = event;
 
           setZoom((prevZoom) =>
-            clamp(prevZoom + deltaY * prevZoom * -0.01, scale, 1)
+            clamp(
+              prevZoom +
+                -deltaY *
+                  remapValue(prevZoom, MIN_ZOOM, MAX_ZOOM, 0.00001, 0.002),
+              MIN_ZOOM,
+              MAX_ZOOM
+            )
           );
         },
       }),
-      [scale]
+      []
     ),
     canvas
   );
@@ -77,7 +83,7 @@ const App = () => {
         onResize={setDimensions}
       >
         <Translate x={width * 0.5} y={height * 0.5}>
-          <Scale x={zoom} y={zoom}>
+          <Scale x={mappedScale} y={mappedScale}>
             <Translate x={mapWidth * -0.5} y={mapHeight * -0.5}>
               <Rectangle
                 x={0}
@@ -86,7 +92,7 @@ const App = () => {
                 height={mapHeight}
                 fill={ORANGE}
               />
-              <Opacity opacity={Math.min(zoom * 8, 1)}>
+              <Opacity opacity={remapValue(zoom, MIN_ZOOM, MAX_ZOOM, 0, 1)}>
                 <ForEach
                   end={countEpochs * BLOCKS_PER_ROW}
                   callback={({ index }) => (
@@ -96,7 +102,7 @@ const App = () => {
                       endX={index * BLOCK_SIZE}
                       endY={BLOCKS_PER_COLUMN * BLOCK_SIZE}
                       stroke={BLACK}
-                      strokeWidth={1 / zoom}
+                      strokeWidth={1 / mappedScale}
                     />
                   )}
                 />
@@ -109,7 +115,7 @@ const App = () => {
                       endX={countEpochs * BLOCKS_PER_ROW * BLOCK_SIZE}
                       endY={index * BLOCK_SIZE}
                       stroke={BLACK}
-                      strokeWidth={1 / zoom}
+                      strokeWidth={1 / mappedScale}
                     />
                   )}
                 />
@@ -124,7 +130,7 @@ const App = () => {
                     endX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
                     endY={BLOCKS_PER_COLUMN * BLOCK_SIZE}
                     stroke={BLACK}
-                    strokeWidth={2 / zoom + Math.cos(zoom) * 10}
+                    strokeWidth={2 / mappedScale + Math.cos(mappedScale) * 4}
                   />
                 )}
               />

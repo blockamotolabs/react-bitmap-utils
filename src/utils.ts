@@ -42,6 +42,20 @@ export const roundSquareRoot = (total: number) => {
 export const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
 
+export const remapValue = (
+  value: number,
+  fromMin: number,
+  fromMax: number,
+  toMin: number,
+  toMax: number
+) => {
+  const fromRange = fromMax - fromMin;
+  const toRange = toMax - toMin;
+  const scale = toRange / fromRange;
+  const dist = value - fromMin;
+  return toMin + dist * scale;
+};
+
 const MATCHES_ON_PREFIX = /^on/;
 
 export const handlerNameToEventName = <const T extends string>(
