@@ -48,7 +48,7 @@ const App = () => {
 
   const scale = fitWidth ? innerWidth / mapWidth : innerHeight / mapHeight;
   const [zoom, setZoom] = useState(MIN_ZOOM);
-  const mappedScale = remapValue(zoom, 1, 2, scale, 1);
+  const mappedScale = remapValue(zoom, MIN_ZOOM, MAX_ZOOM, scale, 1);
 
   useEventHandlers(
     useMemo(
