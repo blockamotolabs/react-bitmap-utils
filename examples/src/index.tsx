@@ -148,7 +148,7 @@ const App = () => {
                   BLOCK_SIZE
                 }
                 y={partiallyEmptyRow * BLOCK_SIZE}
-                width={partiallyEmptyWidth * BLOCK_SIZE}
+                width={(partiallyEmptyWidth + 1) * BLOCK_SIZE}
                 height={BLOCK_SIZE}
                 fill={BLACK}
               />
