@@ -1,18 +1,21 @@
 import {
   BLACK,
   Canvas,
+  clamp,
   ForEach,
   Line,
   Opacity,
   ORANGE,
   percentageOf,
   Rectangle,
+  remapValue,
   roundSquareRoot,
   Scale,
   Translate,
   useAutoPixelRatio,
+  useEventHandlers,
 } from '@bitmapland/react-bitmap-utils';
-import React, { useEffect, useReducer, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 const BLOCK_SIZE = 100;
@@ -20,11 +23,14 @@ const BLOCKS_PER_EPOCH = 210000;
 // const BLOCKS_PER_DIFFICULTY_PERIOD = 2016;
 const BLOCKS_PER_ROW = roundSquareRoot(BLOCKS_PER_EPOCH);
 const BLOCKS_PER_COLUMN = BLOCKS_PER_EPOCH / BLOCKS_PER_ROW;
+const MIN_ZOOM = 1;
+const MAX_ZOOM = 2;
 
 const App = () => {
   const countTotalBlocks = 812345;
-  const countEpochs = Math.floor(countTotalBlocks / BLOCKS_PER_EPOCH);
+  const countEpochs = Math.ceil(countTotalBlocks / BLOCKS_PER_EPOCH);
 
+  const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
   const pixelRatio = useAutoPixelRatio();
   const [{ width, height }, setDimensions] = useState({ width: 0, height: 0 });
 
@@ -41,26 +47,50 @@ const App = () => {
   const fitWidth = innerAspectRatio < mapAspectRatio;
 
   const scale = fitWidth ? innerWidth / mapWidth : innerHeight / mapHeight;
-  const [zoom, setZoom] = useReducer(
-    (_prevZoom: number, nextZoom: number) =>
-      Math.min(Math.max(nextZoom, scale), 1),
-    scale
+  const [zoom, setZoom] = useState(MIN_ZOOM);
+  const mappedScale = remapValue(zoom, MIN_ZOOM, MAX_ZOOM, scale, 1);
+
+  useEventHandlers(
+    useMemo(
+      () => ({
+        onWheel: (event) => {
+          event.preventDefault();
+          const { deltaY } = event;
+
+          setZoom((prevZoom) =>
+            clamp(
+              prevZoom +
+                -deltaY *
+                  remapValue(prevZoom, MIN_ZOOM, MAX_ZOOM, 0.00001, 0.002),
+              MIN_ZOOM,
+              MAX_ZOOM
+            )
+          );
+        },
+      }),
+      []
+    ),
+    canvas
   );
 
-  useEffect(() => {
-    setZoom(scale);
-  }, [scale]);
+  const partiallyEmptyRow = Math.floor(
+    (countTotalBlocks - (countEpochs - 1) * BLOCKS_PER_EPOCH) / BLOCKS_PER_ROW
+  );
+
+  const partiallyEmptyIndexInRow = countTotalBlocks % BLOCKS_PER_ROW;
+  const partiallyEmptyWidth = BLOCKS_PER_ROW - partiallyEmptyIndexInRow;
 
   return (
     <>
       <Canvas
+        ref={setCanvas}
         pixelRatio={pixelRatio}
         backgroundColor={BLACK}
         style={{ width: '100%', height: '100%' }}
         onResize={setDimensions}
       >
         <Translate x={width * 0.5} y={height * 0.5}>
-          <Scale x={zoom} y={zoom}>
+          <Scale x={mappedScale} y={mappedScale}>
             <Translate x={mapWidth * -0.5} y={mapHeight * -0.5}>
               <Rectangle
                 x={0}
@@ -69,7 +99,7 @@ const App = () => {
                 height={mapHeight}
                 fill={ORANGE}
               />
-              <Opacity opacity={zoom}>
+              <Opacity opacity={remapValue(zoom, MIN_ZOOM, MAX_ZOOM, 0, 1)}>
                 <ForEach
                   end={countEpochs * BLOCKS_PER_ROW}
                   callback={({ index }) => (
@@ -79,7 +109,7 @@ const App = () => {
                       endX={index * BLOCK_SIZE}
                       endY={BLOCKS_PER_COLUMN * BLOCK_SIZE}
                       stroke={BLACK}
-                      strokeWidth={1 / zoom}
+                      strokeWidth={1 / mappedScale}
                     />
                   )}
                 />
@@ -92,11 +122,43 @@ const App = () => {
                       endX={countEpochs * BLOCKS_PER_ROW * BLOCK_SIZE}
                       endY={index * BLOCK_SIZE}
                       stroke={BLACK}
-                      strokeWidth={1 / zoom}
+                      strokeWidth={1 / mappedScale}
                     />
                   )}
                 />
               </Opacity>
+              <ForEach
+                start={1}
+                end={countEpochs}
+                callback={({ index }) => (
+                  <Line
+                    startX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
+                    startY={0}
+                    endX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
+                    endY={BLOCKS_PER_COLUMN * BLOCK_SIZE}
+                    stroke={BLACK}
+                    strokeWidth={2 / mappedScale + Math.cos(mappedScale) * 4}
+                  />
+                )}
+              />
+              <Rectangle
+                x={
+                  ((countEpochs - 1) * BLOCKS_PER_ROW +
+                    partiallyEmptyIndexInRow) *
+                  BLOCK_SIZE
+                }
+                y={partiallyEmptyRow * BLOCK_SIZE}
+                width={(partiallyEmptyWidth + 1) * BLOCK_SIZE}
+                height={BLOCK_SIZE}
+                fill={BLACK}
+              />
+              <Rectangle
+                x={(countEpochs - 1) * BLOCKS_PER_ROW * BLOCK_SIZE}
+                y={(partiallyEmptyRow + 1) * BLOCK_SIZE}
+                width={(BLOCKS_PER_ROW + 1) * BLOCK_SIZE}
+                height={(BLOCKS_PER_COLUMN - partiallyEmptyRow) * BLOCK_SIZE}
+                fill={BLACK}
+              />
             </Translate>
           </Scale>
         </Translate>

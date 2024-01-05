@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { handlerNameToEventName } from '../utils';
+
 export const useAutoPixelRatio = () =>
   globalThis.devicePixelRatio >= 2 ? 2 : 1;
 
@@ -65,4 +67,42 @@ export const useFrameRate = (lastXFrames = 5) => {
   }
 
   return 1000 / (sum / (frames.length || 1));
+};
+
+interface Handlers {
+  onWheel?: (event: WheelEvent) => void;
+  onMouseDown?: (event: MouseEvent) => void;
+  onMouseMove?: (event: MouseEvent) => void;
+  onMouseUp?: (event: MouseEvent) => void;
+  onMouseLeave?: (event: MouseEvent) => void;
+  onTouchStart?: (event: TouchEvent) => void;
+  onTouchMove?: (event: TouchEvent) => void;
+  onTouchEnd?: (event: TouchEvent) => void;
+  onTouchCancel?: (event: TouchEvent) => void;
+  onTouchLeave?: (event: TouchEvent) => void;
+}
+
+export const useEventHandlers = (
+  handlers: Handlers,
+  canvas: HTMLCanvasElement | null | undefined
+) => {
+  useEffect(() => {
+    if (canvas) {
+      Object.entries(handlers).forEach(([key, handler]) => {
+        if (handler) {
+          canvas.addEventListener(handlerNameToEventName(key), handler);
+        }
+      });
+    }
+
+    return () => {
+      if (canvas) {
+        Object.entries(handlers).forEach(([key, handler]) => {
+          if (handler) {
+            canvas.removeEventListener(handlerNameToEventName(key), handler);
+          }
+        });
+      }
+    };
+  }, [canvas, handlers]);
 };
