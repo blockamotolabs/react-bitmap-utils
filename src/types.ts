@@ -40,6 +40,6 @@ export type RemapKeys<
   >
 >;
 
-export type HandleNameToEventName<T extends string> = T extends `on${infer U}`
+export type HandlerNameToEventName<T extends string> = T extends `on${infer U}`
   ? Lowercase<U>
   : string;

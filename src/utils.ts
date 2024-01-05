@@ -1,4 +1,4 @@
-import { AnyObject, HandleNameToEventName } from './types';
+import { AnyObject, HandlerNameToEventName } from './types';
 
 export const hasKey = <T extends AnyObject, K extends string>(
   obj: T,
@@ -63,4 +63,4 @@ export const handlerNameToEventName = <const T extends string>(
 ) =>
   handlerName
     .replace(MATCHES_ON_PREFIX, '')
-    .toLowerCase() as HandleNameToEventName<T>;
+    .toLowerCase() as HandlerNameToEventName<T>;
