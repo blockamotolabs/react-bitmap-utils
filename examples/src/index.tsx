@@ -99,7 +99,9 @@ const App = () => {
                 height={mapHeight}
                 fill={ORANGE}
               />
-              <Opacity opacity={remapValue(zoom, MIN_ZOOM, MAX_ZOOM, 0, 1)}>
+              <Opacity
+                opacity={remapValue(zoom, MIN_ZOOM, MAX_ZOOM - 0.5, 0, 1)}
+              >
                 <ForEach
                   end={countEpochs * BLOCKS_PER_ROW}
                   callback={({ index }) => (
