@@ -10,7 +10,7 @@ import React, {
   useState,
 } from 'react';
 
-import { isArray, isKeyOf } from '../utils';
+import { getDimensions, isArray, isKeyOf } from '../utils';
 import CanvasReconcilerPublic, { CanvasChild, TextChild } from './reconciler';
 import { RENDERERS } from './renderers';
 import { Dimensions } from './types';
@@ -25,24 +25,6 @@ export interface CanvasProps
   ref?: ForwardedRef<HTMLCanvasElement>;
   onResize?: (dimensions: Dimensions) => void;
 }
-
-const getDimensions = (
-  pixelRatio: number,
-  width: number | undefined,
-  height: number | undefined,
-  canvas: HTMLCanvasElement | null | undefined
-) => {
-  return {
-    width:
-      typeof width === 'number'
-        ? width * pixelRatio
-        : (canvas?.clientWidth ?? 0) * pixelRatio,
-    height:
-      typeof height === 'number'
-        ? height * pixelRatio
-        : (canvas?.clientHeight ?? 0) * pixelRatio,
-  };
-};
 
 export const Canvas = memo(
   forwardRef(

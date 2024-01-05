@@ -17,6 +17,10 @@ export const isArray = <T>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): input is T extends readonly any[] ? T : never => Array.isArray(input);
 
+export const degreesToRadians = (degrees: number) => degrees * (Math.PI / 180);
+
+export const radiansToDegrees = (radians: number) => radians * (180 / Math.PI);
+
 export const percentageOf = (percentage: number, total: number) =>
   (percentage / 100) * total;
 
@@ -72,3 +76,21 @@ export const handlerNameToEventName = <const T extends string>(
   handlerName
     .replace(MATCHES_ON_PREFIX, '')
     .toLowerCase() as HandlerNameToEventName<T>;
+
+export const getDimensions = (
+  pixelRatio: number,
+  width: number | undefined,
+  height: number | undefined,
+  canvas: HTMLCanvasElement | null | undefined
+) => {
+  return {
+    width:
+      typeof width === 'number'
+        ? width * pixelRatio
+        : (canvas?.clientWidth ?? 0) * pixelRatio,
+    height:
+      typeof height === 'number'
+        ? height * pixelRatio
+        : (canvas?.clientHeight ?? 0) * pixelRatio,
+  };
+};
