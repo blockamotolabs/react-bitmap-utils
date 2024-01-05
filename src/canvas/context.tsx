@@ -1,10 +1,5 @@
 import { createContext } from 'react';
 
-import {
-  CanvasContextValuePopulated,
-  CanvasContextValueUnpopulated,
-} from './types';
+import { CanvasContextValue } from './types';
 
-export const CanvasContext = createContext<
-  CanvasContextValueUnpopulated | CanvasContextValuePopulated | null
->(null);
+export const CanvasContext = createContext<CanvasContextValue | null>(null);

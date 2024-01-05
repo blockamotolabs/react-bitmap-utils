@@ -1,4 +1,4 @@
-import { ForEachProps } from './for-each';
+import { ImageProps } from './image';
 import { LineProps } from './line';
 import { OpacityProps } from './opacity';
 import { CanvasChild, TextChild } from './reconciler';
@@ -9,7 +9,6 @@ import { TextProps } from './text';
 import { TranslateProps } from './translate';
 
 export enum CanvasElementType {
-  ForEach = 'Canvas.ForEach',
   Rectangle = 'Canvas.Rectangle',
   Line = 'Canvas.Line',
   Text = 'Canvas.Text',
@@ -17,6 +16,7 @@ export enum CanvasElementType {
   Scale = 'Canvas.Scale',
   Rotate = 'Canvas.Rotate',
   Opacity = 'Canvas.Opacity',
+  Image = 'Canvas.Image',
 }
 
 declare global {
@@ -25,12 +25,12 @@ declare global {
     interface IntrinsicElements {
       [CanvasElementType.Rectangle]: RectangleProps;
       [CanvasElementType.Line]: LineProps;
-      [CanvasElementType.ForEach]: ForEachProps;
       [CanvasElementType.Rotate]: RotateProps;
       [CanvasElementType.Translate]: TranslateProps;
       [CanvasElementType.Scale]: ScaleProps;
       [CanvasElementType.Text]: TextProps;
       [CanvasElementType.Opacity]: OpacityProps;
+      [CanvasElementType.Image]: ImageProps;
     }
   }
 }
@@ -66,6 +66,7 @@ export interface CanvasContextValueUnpopulated {
   width: number;
   height: number;
   pixelRatio: number;
+  parent?: CanvasContextValue | null;
 }
 
 export interface CanvasContextValuePopulated {
@@ -74,4 +75,9 @@ export interface CanvasContextValuePopulated {
   width: number;
   height: number;
   pixelRatio: number;
+  parent?: CanvasContextValue | null;
 }
+
+export type CanvasContextValue =
+  | CanvasContextValueUnpopulated
+  | CanvasContextValuePopulated;

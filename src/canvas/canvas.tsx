@@ -3,18 +3,15 @@ import React, {
   forwardRef,
   HTMLAttributes,
   memo,
-  ReactElement,
-  useCallback,
+  ReactNode,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 
-import { getDimensions, isArray, isKeyOf } from '../utils';
+import { getDimensions } from '../utils';
 import { CanvasContext } from './context';
-import CanvasReconcilerPublic, { CanvasChild, TextChild } from './reconciler';
-import { RENDERERS } from './renderers';
+import { useCanvasRefWrapper, useDrawToCanvas } from './internal/hooks';
 import { Dimensions } from './types';
 
 export interface CanvasProps
@@ -23,7 +20,7 @@ export interface CanvasProps
   height?: number;
   pixelRatio?: number;
   backgroundColor?: string;
-  children?: ReactElement | readonly ReactElement[];
+  children: ReactNode;
   ref?: ForwardedRef<HTMLCanvasElement>;
   onResize?: (dimensions: Dimensions) => void;
 }
@@ -40,7 +37,7 @@ export const Canvas = memo(
         children,
         ...props
       }: CanvasProps,
-      ref
+      ref: ForwardedRef<HTMLCanvasElement>
     ) => {
       const [canvasCtx, setCanvasCtx] = useState<{
         canvas: HTMLCanvasElement;
@@ -50,94 +47,33 @@ export const Canvas = memo(
         getDimensions(pixelRatio, width, height, canvasCtx?.canvas)
       );
 
-      const rootContainerRef = useRef<null | ReturnType<
-        typeof CanvasReconcilerPublic.render
-      >>(null);
-
-      useEffect(() => {
+      const canvasContextValue = useMemo(() => {
         if (!canvasCtx) {
-          rootContainerRef.current?.unmount();
-          rootContainerRef.current = null;
-          return;
+          return {
+            canvas: null,
+            ctx: null,
+            width: dimensions.width,
+            height: dimensions.height,
+            pixelRatio,
+          };
         }
 
-        if (!rootContainerRef.current) {
-          rootContainerRef.current = CanvasReconcilerPublic.render(
-            <>{children}</>
-          );
-        } else {
-          rootContainerRef.current.update(<>{children}</>);
-        }
-
-        const {
-          container: { containerInfo },
-        } = rootContainerRef.current;
-
-        const { canvas, ctx } = canvasCtx;
-
-        canvas.width = dimensions.width;
-        canvas.height = dimensions.height;
-
-        if (backgroundColor) {
-          ctx.fillStyle = backgroundColor;
-          ctx.fillRect(0, 0, dimensions.width, dimensions.height);
-        }
-
-        ctx.scale(pixelRatio, pixelRatio);
-
-        const drawChild = (child: CanvasChild | TextChild) => {
-          if (!isKeyOf(RENDERERS, child.type)) {
-            return;
-          }
-
-          const renderer = RENDERERS[child.type];
-
-          if (child.props?.restore) {
-            ctx.save();
-          }
-
-          renderer.drawBeforeChildren?.(
-            {
-              canvas,
-              ctx,
-              drawChild,
-              width: canvas.width / pixelRatio,
-              height: canvas.height / pixelRatio,
-              pixelRatio,
-            },
-            child.props
-          );
-
-          if (isArray(child.rendered)) {
-            child.rendered.forEach(drawChild);
-          }
-
-          renderer.drawAfterChildren?.(
-            {
-              canvas,
-              ctx,
-              drawChild,
-              width: canvas.width,
-              height: canvas.height,
-              pixelRatio,
-            },
-            child.props
-          );
-
-          if (child.props?.restore) {
-            ctx.restore();
-          }
+        return {
+          ...canvasCtx,
+          width: dimensions.width,
+          height: dimensions.height,
+          pixelRatio,
         };
+      }, [canvasCtx, dimensions.height, dimensions.width, pixelRatio]);
 
-        containerInfo.rendered.forEach(drawChild);
-      }, [
-        backgroundColor,
+      useDrawToCanvas(
+        canvasContextValue,
         canvasCtx,
-        children,
-        dimensions.height,
-        dimensions.width,
+        dimensions,
         pixelRatio,
-      ]);
+        backgroundColor,
+        children
+      );
 
       useEffect(() => {
         if (!canvasCtx) {
@@ -168,59 +104,15 @@ export const Canvas = memo(
         };
       }, [canvasCtx, height, onResize, pixelRatio, width]);
 
-      const refWrapper = useCallback(
-        (canvas: HTMLCanvasElement | null) => {
-          setCanvasCtx(() => {
-            if (!canvas) {
-              return null;
-            }
-
-            return {
-              canvas,
-              ctx: canvas.getContext('2d')!,
-            };
-          });
-          const nextDimensions = getDimensions(
-            pixelRatio,
-            width,
-            height,
-            canvas
-          );
-          setDimensions(nextDimensions);
-          onResize?.({
-            width: nextDimensions.width / pixelRatio,
-            height: nextDimensions.height / pixelRatio,
-          });
-
-          if (ref) {
-            if (typeof ref === 'object') {
-              ref.current = canvas;
-            } else if (typeof ref === 'function') {
-              ref(canvas);
-            }
-          }
-        },
-        [height, onResize, pixelRatio, ref, width]
+      const refWrapper = useCanvasRefWrapper(
+        setCanvasCtx,
+        setDimensions,
+        onResize,
+        ref,
+        width,
+        height,
+        pixelRatio
       );
-
-      const canvasContextValue = useMemo(() => {
-        if (!canvasCtx) {
-          return {
-            canvas: null,
-            ctx: null,
-            width: dimensions.width,
-            height: dimensions.height,
-            pixelRatio,
-          };
-        }
-
-        return {
-          ...canvasCtx,
-          width: dimensions.width,
-          height: dimensions.height,
-          pixelRatio,
-        };
-      }, [canvasCtx, dimensions.height, dimensions.width, pixelRatio]);
 
       return (
         <CanvasContext.Provider value={canvasContextValue}>

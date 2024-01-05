@@ -1,6 +1,7 @@
 import {
   BLACK,
   Canvas,
+  CanvasBuffer,
   clamp,
   ForEach,
   Line,
@@ -11,9 +12,11 @@ import {
   remapValue,
   roundSquareRoot,
   Scale,
+  Text,
   Translate,
   useAutoPixelRatio,
   useEventHandlers,
+  WHITE,
 } from '@bitmapland/react-bitmap-utils';
 import React, { useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -102,10 +105,10 @@ const App = () => {
               <Opacity
                 opacity={remapValue(zoom, MIN_ZOOM, MAX_ZOOM - 0.5, 0, 1)}
               >
-                <ForEach
-                  end={countEpochs * BLOCKS_PER_ROW}
-                  callback={({ index }) => (
+                <ForEach end={countEpochs * BLOCKS_PER_ROW}>
+                  {({ index }) => (
                     <Line
+                      key={index}
                       startX={index * BLOCK_SIZE}
                       startY={0}
                       endX={index * BLOCK_SIZE}
@@ -114,11 +117,11 @@ const App = () => {
                       strokeWidth={1 / mappedScale}
                     />
                   )}
-                />
-                <ForEach
-                  end={BLOCKS_PER_COLUMN}
-                  callback={({ index }) => (
+                </ForEach>
+                <ForEach end={BLOCKS_PER_COLUMN}>
+                  {({ index }) => (
                     <Line
+                      key={index}
                       startX={0}
                       startY={index * BLOCK_SIZE}
                       endX={countEpochs * BLOCKS_PER_ROW * BLOCK_SIZE}
@@ -127,13 +130,12 @@ const App = () => {
                       strokeWidth={1 / mappedScale}
                     />
                   )}
-                />
+                </ForEach>
               </Opacity>
-              <ForEach
-                start={1}
-                end={countEpochs}
-                callback={({ index }) => (
+              <ForEach start={1} end={countEpochs}>
+                {({ index }) => (
                   <Line
+                    key={index}
                     startX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
                     startY={0}
                     endX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
@@ -142,7 +144,7 @@ const App = () => {
                     strokeWidth={2 / mappedScale + Math.cos(mappedScale) * 4}
                   />
                 )}
-              />
+              </ForEach>
               <Rectangle
                 x={
                   ((countEpochs - 1) * BLOCKS_PER_ROW +
@@ -161,6 +163,35 @@ const App = () => {
                 height={(BLOCKS_PER_COLUMN - partiallyEmptyRow) * BLOCK_SIZE}
                 fill={BLACK}
               />
+              <Opacity opacity={remapValue(zoom, MIN_ZOOM, 1.01, 1, 0, true)}>
+                <ForEach end={countEpochs}>
+                  {({ index }) => (
+                    <CanvasBuffer
+                      key={index}
+                      width={1000}
+                      height={1000}
+                      drawX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
+                      drawY={
+                        BLOCKS_PER_COLUMN * BLOCK_SIZE * 0.5 -
+                        BLOCKS_PER_ROW * BLOCK_SIZE * 0.5
+                      }
+                      drawWidth={BLOCKS_PER_ROW * BLOCK_SIZE}
+                      drawHeight={BLOCKS_PER_ROW * BLOCK_SIZE}
+                    >
+                      <Text
+                        x={500}
+                        y={500}
+                        fontSize={300}
+                        textAlign="center"
+                        verticalAlign="middle"
+                        fill={WHITE}
+                      >
+                        {index + 1}
+                      </Text>
+                    </CanvasBuffer>
+                  )}
+                </ForEach>
+              </Opacity>
             </Translate>
           </Scale>
         </Translate>
