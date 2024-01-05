@@ -59,3 +59,19 @@ export interface Dimensions {
   width: number;
   height: number;
 }
+
+export interface CanvasContextValueUnpopulated {
+  canvas: null;
+  ctx: null;
+  width: number;
+  height: number;
+  pixelRatio: number;
+}
+
+export interface CanvasContextValuePopulated {
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  width: number;
+  height: number;
+  pixelRatio: number;
+}

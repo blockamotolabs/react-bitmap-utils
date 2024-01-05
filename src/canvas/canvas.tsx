@@ -6,11 +6,13 @@ import React, {
   ReactElement,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
 
 import { getDimensions, isArray, isKeyOf } from '../utils';
+import { CanvasContext } from './context';
 import CanvasReconcilerPublic, { CanvasChild, TextChild } from './reconciler';
 import { RENDERERS } from './renderers';
 import { Dimensions } from './types';
@@ -201,13 +203,34 @@ export const Canvas = memo(
         [height, onResize, pixelRatio, ref, width]
       );
 
+      const canvasContextValue = useMemo(() => {
+        if (!canvasCtx) {
+          return {
+            canvas: null,
+            ctx: null,
+            width: dimensions.width,
+            height: dimensions.height,
+            pixelRatio,
+          };
+        }
+
+        return {
+          ...canvasCtx,
+          width: dimensions.width,
+          height: dimensions.height,
+          pixelRatio,
+        };
+      }, [canvasCtx, dimensions.height, dimensions.width, pixelRatio]);
+
       return (
-        <canvas
-          width={dimensions.width}
-          height={dimensions.height}
-          {...props}
-          ref={refWrapper}
-        />
+        <CanvasContext.Provider value={canvasContextValue}>
+          <canvas
+            width={dimensions.width}
+            height={dimensions.height}
+            {...props}
+            ref={refWrapper}
+          />
+        </CanvasContext.Provider>
       );
     }
   )

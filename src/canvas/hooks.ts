@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { handlerNameToEventName } from '../utils';
+import { CanvasContext } from './context';
 
 export const useAutoPixelRatio = () =>
   globalThis.devicePixelRatio >= 2 ? 2 : 1;
@@ -105,4 +106,14 @@ export const useEventHandlers = (
       }
     };
   }, [canvas, handlers]);
+};
+
+export const useCanvasContext = () => {
+  const context = useContext(CanvasContext);
+
+  if (!context) {
+    throw new Error('Attempted to access CanvasContext outside of a Canvas');
+  }
+
+  return context;
 };
