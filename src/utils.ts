@@ -53,21 +53,21 @@ export const clamp = (value: number, min: number, max: number) => {
 
 export const remapValue = (
   value: number,
-  fromMin: number,
-  fromMax: number,
-  toMin: number,
-  toMax: number,
+  fromStart: number,
+  fromEnd: number,
+  toStart: number,
+  toEnd: number,
   shouldClamp?: boolean
 ) => {
-  const fromRange = fromMax - fromMin;
-  const toRange = toMax - toMin;
+  const fromRange = fromEnd - fromStart;
+  const toRange = toEnd - toStart;
   const scale = toRange / fromRange;
-  const dist = value - fromMin;
+  const dist = value - fromStart;
 
-  const result = toMin + dist * scale;
+  const result = toStart + dist * scale;
 
   if (shouldClamp) {
-    return clamp(result, toMin, toMax);
+    return clamp(result, toStart, toEnd);
   }
 
   return result;
