@@ -4,7 +4,6 @@ import React, {
   ReactNode,
   SetStateAction,
   useCallback,
-  useEffect,
   useRef,
 } from 'react';
 
@@ -26,7 +25,8 @@ export const useDrawToCanvas = (
   },
   pixelRatio: number,
   backgroundColor: string | undefined,
-  children: ReactNode
+  children: ReactNode,
+  useEffect: typeof React.useEffect
 ) => {
   const rootContainerRef = useRef<null | ReturnType<
     typeof CanvasReconcilerPublic.render

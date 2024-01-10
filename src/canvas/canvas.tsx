@@ -72,7 +72,8 @@ export const Canvas = memo(
         dimensions,
         pixelRatio,
         backgroundColor,
-        children
+        children,
+        useEffect
       );
 
       useEffect(() => {

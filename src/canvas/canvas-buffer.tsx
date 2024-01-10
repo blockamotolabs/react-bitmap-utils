@@ -3,6 +3,7 @@ import React, {
   forwardRef,
   memo,
   useEffect,
+  useLayoutEffect,
   useMemo,
 } from 'react';
 
@@ -84,7 +85,8 @@ export const CanvasBuffer = memo(
         dimensions,
         pixelRatioDefined,
         backgroundColor,
-        children
+        children,
+        useLayoutEffect
       );
 
       const refWrapper = useCanvasRefWrapper(
