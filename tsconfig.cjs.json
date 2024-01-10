@@ -9,5 +9,6 @@
     "outDir": "build/cjs",
     "rootDir": "src"
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["**/*.test.*"]
 }
