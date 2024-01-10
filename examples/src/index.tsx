@@ -29,6 +29,142 @@ const BLOCKS_PER_COLUMN = BLOCKS_PER_EPOCH / BLOCKS_PER_ROW;
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 2;
 
+const Grid = ({
+  countEpochs,
+  zoom,
+  mappedScale,
+}: {
+  countEpochs: number;
+  zoom: number;
+  mappedScale: number;
+}) => (
+  <Opacity opacity={remapValue(zoom, MIN_ZOOM, MAX_ZOOM - 0.5, 0, 1)}>
+    <ForEach end={countEpochs * BLOCKS_PER_ROW}>
+      {({ index }) => (
+        <Line
+          key={index}
+          startX={index * BLOCK_SIZE}
+          startY={0}
+          endX={index * BLOCK_SIZE}
+          endY={BLOCKS_PER_COLUMN * BLOCK_SIZE}
+          stroke={BLACK}
+          strokeWidth={1 / mappedScale}
+        />
+      )}
+    </ForEach>
+    <ForEach end={BLOCKS_PER_COLUMN}>
+      {({ index }) => (
+        <Line
+          key={index}
+          startX={0}
+          startY={index * BLOCK_SIZE}
+          endX={countEpochs * BLOCKS_PER_ROW * BLOCK_SIZE}
+          endY={index * BLOCK_SIZE}
+          stroke={BLACK}
+          strokeWidth={1 / mappedScale}
+        />
+      )}
+    </ForEach>
+  </Opacity>
+);
+
+const EpochSeparators = ({
+  countEpochs,
+  mappedScale,
+}: {
+  countEpochs: number;
+  mappedScale: number;
+}) => (
+  <ForEach start={1} end={countEpochs}>
+    {({ index }) => (
+      <Line
+        key={index}
+        startX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
+        startY={0}
+        endX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
+        endY={BLOCKS_PER_COLUMN * BLOCK_SIZE}
+        stroke={BLACK}
+        strokeWidth={2 / mappedScale + Math.cos(mappedScale) * 4}
+      />
+    )}
+  </ForEach>
+);
+
+const EpochLabels = ({
+  countEpochs,
+  zoom,
+}: {
+  countEpochs: number;
+  zoom: number;
+}) => (
+  <Opacity opacity={remapValue(zoom, MIN_ZOOM, 1.01, 1, 0, true)}>
+    <ForEach end={countEpochs}>
+      {({ index }) => (
+        <CanvasBuffer
+          key={index}
+          width={1000}
+          height={1000}
+          drawX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
+          drawY={
+            BLOCKS_PER_COLUMN * BLOCK_SIZE * 0.5 -
+            BLOCKS_PER_ROW * BLOCK_SIZE * 0.5
+          }
+          drawWidth={BLOCKS_PER_ROW * BLOCK_SIZE}
+          drawHeight={BLOCKS_PER_ROW * BLOCK_SIZE}
+        >
+          <Text
+            x={500}
+            y={500}
+            fontSize={300}
+            textAlign="center"
+            verticalAlign="middle"
+            fill={WHITE}
+          >
+            {index + 1}
+          </Text>
+        </CanvasBuffer>
+      )}
+    </ForEach>
+  </Opacity>
+);
+
+const EmptyMask = ({
+  countEpochs,
+  countTotalBlocks,
+}: {
+  countEpochs: number;
+  countTotalBlocks: number;
+}) => {
+  const partiallyEmptyRow = Math.floor(
+    (countTotalBlocks - (countEpochs - 1) * BLOCKS_PER_EPOCH) / BLOCKS_PER_ROW
+  );
+
+  const partiallyEmptyIndexInRow = countTotalBlocks % BLOCKS_PER_ROW;
+  const partiallyEmptyWidth = BLOCKS_PER_ROW - partiallyEmptyIndexInRow;
+
+  return (
+    <>
+      <Rectangle
+        x={
+          ((countEpochs - 1) * BLOCKS_PER_ROW + partiallyEmptyIndexInRow) *
+          BLOCK_SIZE
+        }
+        y={partiallyEmptyRow * BLOCK_SIZE}
+        width={(partiallyEmptyWidth + 1) * BLOCK_SIZE}
+        height={BLOCK_SIZE}
+        fill={BLACK}
+      />
+      <Rectangle
+        x={(countEpochs - 1) * BLOCKS_PER_ROW * BLOCK_SIZE}
+        y={(partiallyEmptyRow + 1) * BLOCK_SIZE}
+        width={(BLOCKS_PER_ROW + 1) * BLOCK_SIZE}
+        height={(BLOCKS_PER_COLUMN - partiallyEmptyRow) * BLOCK_SIZE}
+        fill={BLACK}
+      />
+    </>
+  );
+};
+
 const App = () => {
   const countTotalBlocks = 812345;
   const countEpochs = Math.ceil(countTotalBlocks / BLOCKS_PER_EPOCH);
@@ -76,13 +212,6 @@ const App = () => {
     canvas
   );
 
-  const partiallyEmptyRow = Math.floor(
-    (countTotalBlocks - (countEpochs - 1) * BLOCKS_PER_EPOCH) / BLOCKS_PER_ROW
-  );
-
-  const partiallyEmptyIndexInRow = countTotalBlocks % BLOCKS_PER_ROW;
-  const partiallyEmptyWidth = BLOCKS_PER_ROW - partiallyEmptyIndexInRow;
-
   return (
     <>
       <Canvas
@@ -102,96 +231,20 @@ const App = () => {
                 height={mapHeight}
                 fill={ORANGE}
               />
-              <Opacity
-                opacity={remapValue(zoom, MIN_ZOOM, MAX_ZOOM - 0.5, 0, 1)}
-              >
-                <ForEach end={countEpochs * BLOCKS_PER_ROW}>
-                  {({ index }) => (
-                    <Line
-                      key={index}
-                      startX={index * BLOCK_SIZE}
-                      startY={0}
-                      endX={index * BLOCK_SIZE}
-                      endY={BLOCKS_PER_COLUMN * BLOCK_SIZE}
-                      stroke={BLACK}
-                      strokeWidth={1 / mappedScale}
-                    />
-                  )}
-                </ForEach>
-                <ForEach end={BLOCKS_PER_COLUMN}>
-                  {({ index }) => (
-                    <Line
-                      key={index}
-                      startX={0}
-                      startY={index * BLOCK_SIZE}
-                      endX={countEpochs * BLOCKS_PER_ROW * BLOCK_SIZE}
-                      endY={index * BLOCK_SIZE}
-                      stroke={BLACK}
-                      strokeWidth={1 / mappedScale}
-                    />
-                  )}
-                </ForEach>
-              </Opacity>
-              <ForEach start={1} end={countEpochs}>
-                {({ index }) => (
-                  <Line
-                    key={index}
-                    startX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
-                    startY={0}
-                    endX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
-                    endY={BLOCKS_PER_COLUMN * BLOCK_SIZE}
-                    stroke={BLACK}
-                    strokeWidth={2 / mappedScale + Math.cos(mappedScale) * 4}
-                  />
-                )}
-              </ForEach>
-              <Rectangle
-                x={
-                  ((countEpochs - 1) * BLOCKS_PER_ROW +
-                    partiallyEmptyIndexInRow) *
-                  BLOCK_SIZE
-                }
-                y={partiallyEmptyRow * BLOCK_SIZE}
-                width={(partiallyEmptyWidth + 1) * BLOCK_SIZE}
-                height={BLOCK_SIZE}
-                fill={BLACK}
+              <Grid
+                countEpochs={countEpochs}
+                zoom={zoom}
+                mappedScale={mappedScale}
               />
-              <Rectangle
-                x={(countEpochs - 1) * BLOCKS_PER_ROW * BLOCK_SIZE}
-                y={(partiallyEmptyRow + 1) * BLOCK_SIZE}
-                width={(BLOCKS_PER_ROW + 1) * BLOCK_SIZE}
-                height={(BLOCKS_PER_COLUMN - partiallyEmptyRow) * BLOCK_SIZE}
-                fill={BLACK}
+              <EpochSeparators
+                countEpochs={countEpochs}
+                mappedScale={mappedScale}
               />
-              <Opacity opacity={remapValue(zoom, MIN_ZOOM, 1.01, 1, 0, true)}>
-                <ForEach end={countEpochs}>
-                  {({ index }) => (
-                    <CanvasBuffer
-                      key={index}
-                      width={1000}
-                      height={1000}
-                      drawX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
-                      drawY={
-                        BLOCKS_PER_COLUMN * BLOCK_SIZE * 0.5 -
-                        BLOCKS_PER_ROW * BLOCK_SIZE * 0.5
-                      }
-                      drawWidth={BLOCKS_PER_ROW * BLOCK_SIZE}
-                      drawHeight={BLOCKS_PER_ROW * BLOCK_SIZE}
-                    >
-                      <Text
-                        x={500}
-                        y={500}
-                        fontSize={300}
-                        textAlign="center"
-                        verticalAlign="middle"
-                        fill={WHITE}
-                      >
-                        {index + 1}
-                      </Text>
-                    </CanvasBuffer>
-                  )}
-                </ForEach>
-              </Opacity>
+              <EpochLabels countEpochs={countEpochs} zoom={zoom} />
+              <EmptyMask
+                countEpochs={countEpochs}
+                countTotalBlocks={countTotalBlocks}
+              />
             </Translate>
           </Scale>
         </Translate>
