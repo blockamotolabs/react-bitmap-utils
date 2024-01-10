@@ -17,6 +17,10 @@ export const isArray = <T>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): input is T extends readonly any[] ? T : never => Array.isArray(input);
 
+export const degreesToRadians = (degrees: number) => degrees * (Math.PI / 180);
+
+export const radiansToDegrees = (radians: number) => radians * (180 / Math.PI);
+
 export const percentageOf = (percentage: number, total: number) =>
   (percentage / 100) * total;
 
@@ -39,21 +43,34 @@ export const roundSquareRoot = (total: number) => {
   return idealX > idealY ? idealX : idealY;
 };
 
-export const clamp = (value: number, min: number, max: number) =>
-  Math.min(Math.max(value, min), max);
+export const clamp = (value: number, min: number, max: number) => {
+  if (min > max) {
+    return Math.min(Math.max(value, max), min);
+  }
+
+  return Math.min(Math.max(value, min), max);
+};
 
 export const remapValue = (
   value: number,
-  fromMin: number,
-  fromMax: number,
-  toMin: number,
-  toMax: number
+  fromStart: number,
+  fromEnd: number,
+  toStart: number,
+  toEnd: number,
+  shouldClamp?: boolean
 ) => {
-  const fromRange = fromMax - fromMin;
-  const toRange = toMax - toMin;
+  const fromRange = fromEnd - fromStart;
+  const toRange = toEnd - toStart;
   const scale = toRange / fromRange;
-  const dist = value - fromMin;
-  return toMin + dist * scale;
+  const dist = value - fromStart;
+
+  const result = toStart + dist * scale;
+
+  if (shouldClamp) {
+    return clamp(result, toStart, toEnd);
+  }
+
+  return result;
 };
 
 const MATCHES_ON_PREFIX = /^on/;
@@ -64,3 +81,21 @@ export const handlerNameToEventName = <const T extends string>(
   handlerName
     .replace(MATCHES_ON_PREFIX, '')
     .toLowerCase() as HandlerNameToEventName<T>;
+
+export const getDimensions = (
+  pixelRatio: number,
+  width: number | undefined,
+  height: number | undefined,
+  canvas: HTMLCanvasElement | null | undefined
+) => {
+  return {
+    width:
+      typeof width === 'number'
+        ? width * pixelRatio
+        : (canvas?.clientWidth ?? 0) * pixelRatio,
+    height:
+      typeof height === 'number'
+        ? height * pixelRatio
+        : (canvas?.clientHeight ?? 0) * pixelRatio,
+  };
+};

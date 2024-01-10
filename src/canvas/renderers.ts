@@ -1,7 +1,6 @@
-import { ForEachProps } from './for-each';
+import { ImageProps } from './image';
 import { LineProps } from './line';
 import { OpacityProps } from './opacity';
-import CanvasReconcilerPublic from './reconciler';
 import { RectangleProps } from './rectangle';
 import { RotateProps } from './rotate';
 import { ScaleProps } from './scale';
@@ -47,27 +46,6 @@ const lineRenderers: CanvasComponentRenderers<LineProps> = {
       ctx.strokeStyle = stroke;
       ctx.lineWidth = strokeWidth;
       ctx.stroke();
-    }
-  },
-};
-
-const forEachRenderers: CanvasComponentRenderers<ForEachProps> = {
-  drawBeforeChildren: (context, { start = 0, step = 1, end, callback }) => {
-    for (let index = start; index < end; index += step) {
-      const returned = callback({
-        ...context,
-        index,
-        start,
-        step,
-        end,
-      });
-
-      if (returned) {
-        const {
-          container: { containerInfo },
-        } = CanvasReconcilerPublic.render(returned);
-        containerInfo.rendered.forEach(context.drawChild);
-      }
     }
   },
 };
@@ -190,6 +168,12 @@ const opacityRenderers: CanvasComponentRenderers<OpacityProps> = {
   },
 };
 
+const imageRenderers: CanvasComponentRenderers<ImageProps> = {
+  drawBeforeChildren: ({ ctx }, { x, y, width, height, src }) => {
+    ctx.drawImage(src, x, y, width, height);
+  },
+};
+
 export const RENDERERS: Record<
   CanvasElementType,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -197,10 +181,10 @@ export const RENDERERS: Record<
 > = {
   [CanvasElementType.Rectangle]: rectangleRenderers,
   [CanvasElementType.Line]: lineRenderers,
-  [CanvasElementType.ForEach]: forEachRenderers,
   [CanvasElementType.Rotate]: rotateRenderers,
   [CanvasElementType.Translate]: translateRenderers,
   [CanvasElementType.Scale]: scaleRenderers,
   [CanvasElementType.Text]: textRenderers,
   [CanvasElementType.Opacity]: opacityRenderers,
+  [CanvasElementType.Image]: imageRenderers,
 };
