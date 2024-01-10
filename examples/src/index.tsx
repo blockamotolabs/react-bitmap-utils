@@ -32,11 +32,11 @@ const MAX_ZOOM = 2;
 const Grid = ({
   countEpochs,
   zoom,
-  mappedScale,
+  scale,
 }: {
   countEpochs: number;
   zoom: number;
-  mappedScale: number;
+  scale: number;
 }) => (
   <Opacity opacity={remapValue(zoom, MIN_ZOOM, MAX_ZOOM - 0.5, 0, 1)}>
     <ForEach end={countEpochs * BLOCKS_PER_ROW}>
@@ -48,7 +48,7 @@ const Grid = ({
           endX={index * BLOCK_SIZE}
           endY={BLOCKS_PER_COLUMN * BLOCK_SIZE}
           stroke={BLACK}
-          strokeWidth={1 / mappedScale}
+          strokeWidth={1 / scale}
         />
       )}
     </ForEach>
@@ -61,7 +61,7 @@ const Grid = ({
           endX={countEpochs * BLOCKS_PER_ROW * BLOCK_SIZE}
           endY={index * BLOCK_SIZE}
           stroke={BLACK}
-          strokeWidth={1 / mappedScale}
+          strokeWidth={1 / scale}
         />
       )}
     </ForEach>
@@ -70,10 +70,10 @@ const Grid = ({
 
 const EpochSeparators = ({
   countEpochs,
-  mappedScale,
+  scale,
 }: {
   countEpochs: number;
-  mappedScale: number;
+  scale: number;
 }) => (
   <ForEach start={1} end={countEpochs}>
     {({ index }) => (
@@ -84,7 +84,7 @@ const EpochSeparators = ({
         endX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
         endY={BLOCKS_PER_COLUMN * BLOCK_SIZE}
         stroke={BLACK}
-        strokeWidth={2 / mappedScale + Math.cos(mappedScale) * 4}
+        strokeWidth={2 / scale + Math.cos(scale) * 4}
       />
     )}
   </ForEach>
@@ -185,9 +185,11 @@ const App = () => {
 
   const fitWidth = innerAspectRatio < mapAspectRatio;
 
-  const scale = fitWidth ? innerWidth / mapWidth : innerHeight / mapHeight;
+  const distantScale = fitWidth
+    ? innerWidth / mapWidth
+    : innerHeight / mapHeight;
   const [zoom, setZoom] = useState(MIN_ZOOM);
-  const mappedScale = remapValue(zoom, MIN_ZOOM, MAX_ZOOM, scale, 1);
+  const scale = remapValue(zoom, MIN_ZOOM, MAX_ZOOM, distantScale, 1);
 
   useEventHandlers(
     useMemo(
@@ -222,7 +224,7 @@ const App = () => {
         onResize={setDimensions}
       >
         <Translate x={width * 0.5} y={height * 0.5}>
-          <Scale x={mappedScale} y={mappedScale}>
+          <Scale x={scale} y={scale}>
             <Translate x={mapWidth * -0.5} y={mapHeight * -0.5}>
               <Rectangle
                 x={0}
@@ -231,15 +233,8 @@ const App = () => {
                 height={mapHeight}
                 fill={ORANGE}
               />
-              <Grid
-                countEpochs={countEpochs}
-                zoom={zoom}
-                mappedScale={mappedScale}
-              />
-              <EpochSeparators
-                countEpochs={countEpochs}
-                mappedScale={mappedScale}
-              />
+              <Grid countEpochs={countEpochs} zoom={zoom} scale={scale} />
+              <EpochSeparators countEpochs={countEpochs} scale={scale} />
               <EpochLabels countEpochs={countEpochs} zoom={zoom} />
               <EmptyMask
                 countEpochs={countEpochs}
