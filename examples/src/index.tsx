@@ -1,169 +1,31 @@
 import {
   BLACK,
   Canvas,
-  CanvasBuffer,
   clamp,
-  ForEach,
-  Line,
-  Opacity,
   ORANGE,
   percentageOf,
   Rectangle,
   remapValue,
-  roundSquareRoot,
   Scale,
-  Text,
   Translate,
   useAutoPixelRatio,
   useEventHandlers,
-  WHITE,
 } from '@bitmapland/react-bitmap-utils';
 import React, { useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
-const BLOCK_SIZE = 100;
-const BLOCKS_PER_EPOCH = 210000;
-// const BLOCKS_PER_DIFFICULTY_PERIOD = 2016;
-const BLOCKS_PER_ROW = roundSquareRoot(BLOCKS_PER_EPOCH);
-const BLOCKS_PER_COLUMN = BLOCKS_PER_EPOCH / BLOCKS_PER_ROW;
-const MIN_ZOOM = 1;
-const MAX_ZOOM = 2;
-
-const Grid = ({
-  countEpochs,
-  zoom,
-  scale,
-}: {
-  countEpochs: number;
-  zoom: number;
-  scale: number;
-}) => (
-  <Opacity opacity={remapValue(zoom, MIN_ZOOM, MAX_ZOOM - 0.5, 0, 1)}>
-    <ForEach end={countEpochs * BLOCKS_PER_ROW}>
-      {({ index }) => (
-        <Line
-          key={index}
-          startX={index * BLOCK_SIZE}
-          startY={0}
-          endX={index * BLOCK_SIZE}
-          endY={BLOCKS_PER_COLUMN * BLOCK_SIZE}
-          stroke={BLACK}
-          strokeWidth={1 / scale}
-        />
-      )}
-    </ForEach>
-    <ForEach end={BLOCKS_PER_COLUMN}>
-      {({ index }) => (
-        <Line
-          key={index}
-          startX={0}
-          startY={index * BLOCK_SIZE}
-          endX={countEpochs * BLOCKS_PER_ROW * BLOCK_SIZE}
-          endY={index * BLOCK_SIZE}
-          stroke={BLACK}
-          strokeWidth={1 / scale}
-        />
-      )}
-    </ForEach>
-  </Opacity>
-);
-
-const EpochSeparators = ({
-  countEpochs,
-  scale,
-}: {
-  countEpochs: number;
-  scale: number;
-}) => (
-  <ForEach start={1} end={countEpochs}>
-    {({ index }) => (
-      <Line
-        key={index}
-        startX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
-        startY={0}
-        endX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
-        endY={BLOCKS_PER_COLUMN * BLOCK_SIZE}
-        stroke={BLACK}
-        strokeWidth={2 / scale + Math.cos(scale) * 4}
-      />
-    )}
-  </ForEach>
-);
-
-const EpochLabels = ({
-  countEpochs,
-  zoom,
-}: {
-  countEpochs: number;
-  zoom: number;
-}) => (
-  <Opacity opacity={remapValue(zoom, MIN_ZOOM, 1.01, 1, 0, true)}>
-    <ForEach end={countEpochs}>
-      {({ index }) => (
-        <CanvasBuffer
-          key={index}
-          width={1000}
-          height={1000}
-          drawX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
-          drawY={
-            BLOCKS_PER_COLUMN * BLOCK_SIZE * 0.5 -
-            BLOCKS_PER_ROW * BLOCK_SIZE * 0.5
-          }
-          drawWidth={BLOCKS_PER_ROW * BLOCK_SIZE}
-          drawHeight={BLOCKS_PER_ROW * BLOCK_SIZE}
-        >
-          <Text
-            x={500}
-            y={500}
-            fontSize={300}
-            textAlign="center"
-            verticalAlign="middle"
-            fill={WHITE}
-          >
-            {index + 1}
-          </Text>
-        </CanvasBuffer>
-      )}
-    </ForEach>
-  </Opacity>
-);
-
-const EmptyMask = ({
-  countEpochs,
-  countTotalBlocks,
-}: {
-  countEpochs: number;
-  countTotalBlocks: number;
-}) => {
-  const partiallyEmptyRow = Math.floor(
-    (countTotalBlocks - (countEpochs - 1) * BLOCKS_PER_EPOCH) / BLOCKS_PER_ROW
-  );
-
-  const partiallyEmptyIndexInRow = countTotalBlocks % BLOCKS_PER_ROW;
-  const partiallyEmptyWidth = BLOCKS_PER_ROW - partiallyEmptyIndexInRow;
-
-  return (
-    <>
-      <Rectangle
-        x={
-          ((countEpochs - 1) * BLOCKS_PER_ROW + partiallyEmptyIndexInRow) *
-          BLOCK_SIZE
-        }
-        y={partiallyEmptyRow * BLOCK_SIZE}
-        width={(partiallyEmptyWidth + 1) * BLOCK_SIZE}
-        height={BLOCK_SIZE}
-        fill={BLACK}
-      />
-      <Rectangle
-        x={(countEpochs - 1) * BLOCKS_PER_ROW * BLOCK_SIZE}
-        y={(partiallyEmptyRow + 1) * BLOCK_SIZE}
-        width={(BLOCKS_PER_ROW + 1) * BLOCK_SIZE}
-        height={(BLOCKS_PER_COLUMN - partiallyEmptyRow) * BLOCK_SIZE}
-        fill={BLACK}
-      />
-    </>
-  );
-};
+import {
+  BLOCK_SIZE,
+  BLOCKS_PER_COLUMN,
+  BLOCKS_PER_EPOCH,
+  BLOCKS_PER_ROW,
+  MAX_ZOOM,
+  MIN_ZOOM,
+} from './constants';
+import { EmptyMask } from './empty-mask';
+import { EpochLabels } from './epoch-labels';
+import { EpochSeparators } from './epoch-separators';
+import { Grid } from './grid';
 
 const App = () => {
   const countTotalBlocks = 812345;
