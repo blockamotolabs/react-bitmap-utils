@@ -13,6 +13,80 @@ import CanvasReconcilerPublic, { CanvasChild, TextChild } from '../reconciler';
 import { RENDERERS } from '../renderers';
 import { CanvasContextValue } from '../types';
 
+export const drawToCanvas = (
+  canvas: HTMLCanvasElement,
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  pixelRatio: number,
+  backgroundColor: string | undefined,
+  rendered: string | readonly (string | CanvasChild | TextChild)[]
+) => {
+  canvas.width = width;
+  canvas.height = height;
+
+  if (backgroundColor) {
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, width, height);
+  }
+
+  ctx.scale(pixelRatio, pixelRatio);
+
+  const drawChild = (child: string | CanvasChild | TextChild) => {
+    if (typeof child === 'string') {
+      return;
+    }
+
+    if (!isKeyOf(RENDERERS, child.type)) {
+      return;
+    }
+
+    const renderer = RENDERERS[child.type];
+
+    if (child.props?.restore) {
+      ctx.save();
+    }
+
+    renderer.drawBeforeChildren?.(
+      {
+        canvas,
+        ctx,
+        drawChild,
+        width: canvas.width / pixelRatio,
+        height: canvas.height / pixelRatio,
+        pixelRatio,
+      },
+      child.props,
+      child.rendered
+    );
+
+    if (!renderer.handlesChildren && isArray(child.rendered)) {
+      child.rendered.forEach(drawChild);
+    }
+
+    renderer.drawAfterChildren?.(
+      {
+        canvas,
+        ctx,
+        drawChild,
+        width: canvas.width,
+        height: canvas.height,
+        pixelRatio,
+      },
+      child.props,
+      child.rendered
+    );
+
+    if (child.props?.restore) {
+      ctx.restore();
+    }
+  };
+
+  if (isArray(rendered)) {
+    rendered.forEach(drawChild);
+  }
+};
+
 export const useDrawToCanvas = (
   canvasContextValue: CanvasContextValue,
   canvasCtx: null | {
@@ -54,74 +128,30 @@ export const useDrawToCanvas = (
     }
 
     const {
-      container: { containerInfo },
+      container: {
+        containerInfo: { rendered },
+      },
     } = rootContainerRef.current;
 
     const { canvas, ctx } = canvasCtx;
 
-    canvas.width = dimensions.width;
-    canvas.height = dimensions.height;
-
-    if (backgroundColor) {
-      ctx.fillStyle = backgroundColor;
-      ctx.fillRect(0, 0, dimensions.width, dimensions.height);
-    }
-
-    ctx.scale(pixelRatio, pixelRatio);
-
-    const drawChild = (child: CanvasChild | TextChild) => {
-      if (!isKeyOf(RENDERERS, child.type)) {
-        return;
-      }
-
-      const renderer = RENDERERS[child.type];
-
-      if (child.props?.restore) {
-        ctx.save();
-      }
-
-      renderer.drawBeforeChildren?.(
-        {
-          canvas,
-          ctx,
-          drawChild,
-          width: canvas.width / pixelRatio,
-          height: canvas.height / pixelRatio,
-          pixelRatio,
-        },
-        child.props
-      );
-
-      if (isArray(child.rendered)) {
-        child.rendered.forEach(drawChild);
-      }
-
-      renderer.drawAfterChildren?.(
-        {
-          canvas,
-          ctx,
-          drawChild,
-          width: canvas.width,
-          height: canvas.height,
-          pixelRatio,
-        },
-        child.props
-      );
-
-      if (child.props?.restore) {
-        ctx.restore();
-      }
-    };
-
-    containerInfo.rendered.forEach(drawChild);
+    drawToCanvas(
+      canvas,
+      ctx,
+      dimensions.width,
+      dimensions.height,
+      pixelRatio,
+      backgroundColor,
+      rendered
+    );
   }, [
     backgroundColor,
-    canvasContextValue,
     canvasCtx,
     dimensions.height,
     dimensions.width,
     pixelRatio,
     children,
+    canvasContextValue,
   ]);
 };
 

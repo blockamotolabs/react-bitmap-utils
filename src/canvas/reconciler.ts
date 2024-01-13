@@ -4,23 +4,27 @@ import Reconciler, { HostConfig } from 'react-reconciler';
 import { DefaultEventPriority } from 'react-reconciler/constants';
 
 import { AnyObject } from '../types';
-import { CanvasElementType } from './types';
+import {
+  CanvasElementType,
+  CommonCanvasComponentProps,
+  InternalCanvasElementType,
+} from './types';
 
 export interface TextChild {
-  type: 'text';
+  type: InternalCanvasElementType.Text;
   props?: never;
   rendered: string;
 }
 
-export interface CanvasChild {
+export interface CanvasChild<P extends CommonCanvasComponentProps = AnyObject> {
   type: CanvasElementType;
-  props: AnyObject;
+  props: P;
   rendered: (TextChild | CanvasChild)[];
 }
 
 export interface Container {
-  type: 'root';
-  rendered: (TextChild | CanvasChild)[];
+  type: InternalCanvasElementType.Root;
+  rendered: (string | TextChild | CanvasChild)[];
 }
 
 interface HostContext {}
@@ -55,13 +59,27 @@ const HOST_CONFIG: HostConfig<
   resetAfterCommit: () => {},
   shouldSetTextContent: (_type, props) =>
     typeof props.children === 'string' || typeof props.children === 'number',
-  createInstance: (type, props, _rootContainer, _hostContext) => ({
-    type,
-    props,
-    rendered: [],
-  }),
+  createInstance: (type, props, _rootContainer, _hostContext) => {
+    const rendered = [];
+
+    if (
+      typeof props.children === 'string' ||
+      typeof props.children === 'number'
+    ) {
+      rendered.push({
+        type: InternalCanvasElementType.Text,
+        rendered: props.children.toString(),
+      } as const);
+    }
+
+    return {
+      type,
+      props,
+      rendered,
+    };
+  },
   createTextInstance: (text, _rootContainer, _hostContext) => ({
-    type: 'text',
+    type: InternalCanvasElementType.Text,
     rendered: text,
   }),
   appendChildToContainer: (parent, child) => parent.rendered.push(child),
@@ -78,8 +96,9 @@ const HOST_CONFIG: HostConfig<
   ) => true,
   commitUpdate: (instance, _updatePayload, _type, _oldProps, newProps) =>
     (instance.props = newProps),
-  commitTextUpdate: (textInstance, _oldText, newText) =>
-    (textInstance.rendered = newText),
+  commitTextUpdate: (textInstance, _oldText, newText) => {
+    textInstance.rendered = newText;
+  },
   getPublicInstance: (instance) => instance,
   preparePortalMount: () => {},
   scheduleTimeout: globalThis.setTimeout,
@@ -91,7 +110,9 @@ const HOST_CONFIG: HostConfig<
   prepareScopeUpdate: () => {},
   getInstanceFromScope: () => null,
   detachDeletedInstance: () => {},
-  clearContainer: (container) => (container.rendered = []),
+  clearContainer: (container) => {
+    container.rendered = [];
+  },
   removeChildFromContainer: (container, child) => {
     const index = container.rendered.indexOf(child);
 
@@ -113,7 +134,7 @@ const CanvasReconciler = Reconciler(HOST_CONFIG);
 const CanvasReconcilerPublic = {
   render: (reactElement: ReactNode) => {
     const container = CanvasReconciler.createContainer(
-      { type: 'root', rendered: [] },
+      { type: InternalCanvasElementType.Root, rendered: [] },
       0,
       null,
       false,

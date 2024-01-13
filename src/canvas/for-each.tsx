@@ -24,7 +24,7 @@ export const ForEach = ({
 }: ForEachProps) => {
   const rendered = [];
 
-  for (let index = start || 0; index < end; index += step || 1) {
+  for (let index = start; index < end; index += step) {
     rendered.push(
       children({
         index,
