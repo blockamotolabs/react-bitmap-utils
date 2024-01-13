@@ -1,12 +1,19 @@
+import { IntrinsicCanvasBufferProps } from './canvas-buffer';
 import { ImageProps } from './image';
+import { drawToCanvas } from './internal/hooks';
 import { LineProps } from './line';
 import { OpacityProps } from './opacity';
+import { CanvasChild, TextChild } from './reconciler';
 import { RectangleProps } from './rectangle';
 import { RotateProps } from './rotate';
 import { ScaleProps } from './scale';
 import { TextProps } from './text';
 import { TranslateProps } from './translate';
-import { CanvasComponentRenderers, CanvasElementType } from './types';
+import {
+  CanvasComponentRenderers,
+  CanvasElementType,
+  InternalCanvasElementType,
+} from './types';
 
 const rectangleRenderers: CanvasComponentRenderers<RectangleProps> = {
   drawBeforeChildren: (
@@ -51,61 +58,61 @@ const lineRenderers: CanvasComponentRenderers<LineProps> = {
 };
 
 const rotateRenderers: CanvasComponentRenderers<RotateProps> = {
-  drawBeforeChildren: ({ ctx }, { radians, children, restore }) => {
-    if (children && restore !== false) {
+  drawBeforeChildren: ({ ctx }, { radians, restore }, rendered) => {
+    if (rendered.length && restore !== false) {
       ctx.save();
     }
 
     ctx.rotate(radians);
   },
-  drawAfterChildren: ({ ctx }, { children, restore }) => {
-    if (children && restore !== false) {
+  drawAfterChildren: ({ ctx }, { restore }, rendered) => {
+    if (rendered.length && restore !== false) {
       ctx.restore();
     }
   },
 };
 
 const translateRenderers: CanvasComponentRenderers<TranslateProps> = {
-  drawBeforeChildren: ({ ctx }, { x = 0, y = 0, children, restore }) => {
-    if (children && restore !== false) {
+  drawBeforeChildren: ({ ctx }, { x = 0, y = 0, restore }, rendered) => {
+    if (rendered.length && restore !== false) {
       ctx.save();
     }
 
     ctx.translate(x, y);
   },
-  drawAfterChildren: ({ ctx }, { children, restore }) => {
-    if (children && restore !== false) {
+  drawAfterChildren: ({ ctx }, { restore }, rendered) => {
+    if (rendered.length && restore !== false) {
       ctx.restore();
     }
   },
 };
 
 const scaleRenderers: CanvasComponentRenderers<ScaleProps> = {
-  drawBeforeChildren: ({ ctx }, { x = 1, y = 1, children, restore }) => {
-    if (children && restore !== false) {
+  drawBeforeChildren: ({ ctx }, { x = 1, y = 1, restore }, rendered) => {
+    if (rendered.length && restore !== false) {
       ctx.save();
     }
 
     ctx.scale(x, y);
   },
 
-  drawAfterChildren: ({ ctx }, { children, restore }) => {
-    if (children && restore !== false) {
+  drawAfterChildren: ({ ctx }, { restore }, rendered) => {
+    if (rendered.length && restore !== false) {
       ctx.restore();
     }
   },
 };
 
-const stringify = (children: TextProps['children']) => {
-  if (typeof children === 'string') {
-    return children;
+const stringify = (rendered: string | readonly (CanvasChild | TextChild)[]) => {
+  if (typeof rendered === 'string') {
+    return rendered;
   }
 
-  if (typeof children === 'number') {
-    return children.toString();
-  }
-
-  return children.join('');
+  return rendered
+    .map((node) =>
+      node.type === InternalCanvasElementType.Text ? node.rendered : ''
+    )
+    .join('');
 };
 
 const textRenderers: CanvasComponentRenderers<TextProps> = {
@@ -124,8 +131,8 @@ const textRenderers: CanvasComponentRenderers<TextProps> = {
       fill,
       stroke,
       strokeWidth = 1,
-      children,
-    }
+    },
+    rendered
   ) => {
     if (verticalAlign) {
       ctx.textBaseline = verticalAlign;
@@ -141,28 +148,28 @@ const textRenderers: CanvasComponentRenderers<TextProps> = {
 
     if (fill) {
       ctx.fillStyle = fill;
-      ctx.fillText(stringify(children), x, y);
+      ctx.fillText(stringify(rendered), x, y);
     }
 
     if (stroke && strokeWidth) {
       ctx.strokeStyle = stroke;
       ctx.lineWidth = strokeWidth;
-      ctx.strokeText(stringify(children), x, y);
+      ctx.strokeText(stringify(rendered), x, y);
     }
   },
 };
 
 const opacityRenderers: CanvasComponentRenderers<OpacityProps> = {
-  drawBeforeChildren: ({ ctx }, { opacity = 1, children, restore }) => {
-    if (children && restore !== false) {
+  drawBeforeChildren: ({ ctx }, { opacity = 1, restore }, rendered) => {
+    if (rendered.length && restore !== false) {
       ctx.save();
     }
 
     ctx.globalAlpha = opacity;
   },
 
-  drawAfterChildren: ({ ctx }, { children, restore }) => {
-    if (children && restore !== false) {
+  drawAfterChildren: ({ ctx }, { restore }, rendered) => {
+    if (rendered.length && restore !== false) {
       ctx.restore();
     }
   },
@@ -173,6 +180,44 @@ const imageRenderers: CanvasComponentRenderers<ImageProps> = {
     ctx.drawImage(src, x, y, width, height);
   },
 };
+
+const canvasBufferRenderers: CanvasComponentRenderers<IntrinsicCanvasBufferProps> =
+  {
+    handlesChildren: true,
+    drawBeforeChildren: (
+      { ctx: parentCtx },
+      {
+        width,
+        height,
+        drawX,
+        drawY,
+        drawWidth,
+        drawHeight,
+        backgroundColor,
+        pixelRatio,
+        canvas,
+        ctx,
+      },
+      rendered
+    ) => {
+      const dimensions = {
+        width: width * pixelRatio,
+        height: height * pixelRatio,
+      };
+
+      drawToCanvas(
+        canvas,
+        ctx,
+        dimensions.width,
+        dimensions.height,
+        pixelRatio,
+        backgroundColor,
+        rendered
+      );
+
+      parentCtx.drawImage(canvas, drawX, drawY, drawWidth, drawHeight);
+    },
+  };
 
 export const RENDERERS: Record<
   CanvasElementType,
@@ -187,4 +232,5 @@ export const RENDERERS: Record<
   [CanvasElementType.Text]: textRenderers,
   [CanvasElementType.Opacity]: opacityRenderers,
   [CanvasElementType.Image]: imageRenderers,
+  [CanvasElementType.CanvasBuffer]: canvasBufferRenderers,
 };

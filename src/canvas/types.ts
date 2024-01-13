@@ -1,3 +1,4 @@
+import { IntrinsicCanvasBufferProps } from './canvas-buffer';
 import { ImageProps } from './image';
 import { LineProps } from './line';
 import { OpacityProps } from './opacity';
@@ -17,6 +18,12 @@ export enum CanvasElementType {
   Rotate = 'Canvas.Rotate',
   Opacity = 'Canvas.Opacity',
   Image = 'Canvas.Image',
+  CanvasBuffer = 'Canvas.CanvasBuffer',
+}
+
+export enum InternalCanvasElementType {
+  Root = 'Canvas.Internal.Root',
+  Text = 'Canvas.Internal.Text',
 }
 
 declare global {
@@ -31,6 +38,7 @@ declare global {
       [CanvasElementType.Text]: TextProps;
       [CanvasElementType.Opacity]: OpacityProps;
       [CanvasElementType.Image]: ImageProps;
+      [CanvasElementType.CanvasBuffer]: IntrinsicCanvasBufferProps;
     }
   }
 }
@@ -47,8 +55,17 @@ export interface DrawContext {
 export interface CanvasComponentRenderers<
   P extends CommonCanvasComponentProps,
 > {
-  drawBeforeChildren?: (canvasContext: DrawContext, props: P) => void;
-  drawAfterChildren?: (canvasContext: DrawContext, props: P) => void;
+  handlesChildren?: boolean;
+  drawBeforeChildren?: (
+    canvasContext: DrawContext,
+    props: P,
+    rendered: string | readonly (CanvasChild | TextChild)[]
+  ) => void;
+  drawAfterChildren?: (
+    canvasContext: DrawContext,
+    props: P,
+    rendered: string | readonly (CanvasChild | TextChild)[]
+  ) => void;
 }
 
 export interface CommonCanvasComponentProps {

@@ -10,7 +10,6 @@ import React, {
 } from 'react';
 
 import { getDimensions } from '../utils';
-import { CanvasContext } from './context';
 import { useCanvasRefWrapper, useDrawToCanvas } from './internal/hooks';
 import { Dimensions } from './types';
 
@@ -116,14 +115,12 @@ export const Canvas = memo(
       );
 
       return (
-        <CanvasContext.Provider value={canvasContextValue}>
-          <canvas
-            width={dimensions.width}
-            height={dimensions.height}
-            {...props}
-            ref={refWrapper}
-          />
-        </CanvasContext.Provider>
+        <canvas
+          width={dimensions.width}
+          height={dimensions.height}
+          {...props}
+          ref={refWrapper}
+        />
       );
     }
   )

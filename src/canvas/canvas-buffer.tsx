@@ -3,53 +3,57 @@ import React, {
   forwardRef,
   memo,
   useEffect,
-  useLayoutEffect,
   useMemo,
 } from 'react';
 
 import { CanvasProps } from './canvas';
 import { CanvasContext } from './context';
 import { useCanvasContext } from './hooks';
-import { Image } from './image';
-import { useCanvasRefWrapper, useDrawToCanvas } from './internal/hooks';
+import { useCanvasRefWrapper } from './internal/hooks';
+import { CanvasElementType, CommonCanvasComponentProps } from './types';
 
 export interface CanvasBufferProps
-  extends Omit<CanvasProps, 'width' | 'height'> {
-  width: number;
-  height: number;
+  extends CanvasProps,
+    CommonCanvasComponentProps {
   drawX: number;
   drawY: number;
   drawWidth: number;
   drawHeight: number;
 }
 
+export interface IntrinsicCanvasBufferProps
+  extends Required<Pick<CanvasBufferProps, 'pixelRatio' | 'width' | 'height'>>,
+    Omit<CanvasBufferProps, 'pixelRatio' | 'width' | 'height' | 'onResize'> {
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+}
+
 export const CanvasBuffer = memo(
   forwardRef(
     (
       {
+        pixelRatio,
         width,
         height,
-        pixelRatio,
-        backgroundColor,
         onResize,
-        drawX,
-        drawY,
-        drawWidth,
-        drawHeight,
+        backgroundColor,
         children,
+        ...props
       }: CanvasBufferProps,
       ref: ForwardedRef<HTMLCanvasElement>
     ) => {
       const parentCanvasContextValue = useCanvasContext();
+      const widthDefined = width ?? parentCanvasContextValue?.width;
+      const heightDefined = height ?? parentCanvasContextValue?.height;
       const pixelRatioDefined =
         pixelRatio ?? parentCanvasContextValue?.pixelRatio ?? 1;
 
       const dimensions = useMemo(
         () => ({
-          width: width * pixelRatioDefined,
-          height: height * pixelRatioDefined,
+          width: widthDefined * pixelRatioDefined,
+          height: heightDefined * pixelRatioDefined,
         }),
-        [height, width, pixelRatioDefined]
+        [heightDefined, widthDefined, pixelRatioDefined]
       );
 
       const canvasCtx = useMemo(() => {
@@ -79,16 +83,6 @@ export const CanvasBuffer = memo(
         ]
       );
 
-      useDrawToCanvas(
-        canvasContextValue,
-        canvasCtx,
-        dimensions,
-        pixelRatioDefined,
-        backgroundColor,
-        children,
-        useLayoutEffect
-      );
-
       const refWrapper = useCanvasRefWrapper(
         undefined,
         undefined,
@@ -101,17 +95,25 @@ export const CanvasBuffer = memo(
 
       useEffect(() => {
         refWrapper(canvasCtx.canvas);
+
+        return () => {
+          refWrapper(null);
+        };
       }, [canvasCtx.canvas, refWrapper]);
 
       return (
         <CanvasContext.Provider value={canvasContextValue}>
-          <Image
-            x={drawX}
-            y={drawY}
-            width={drawWidth}
-            height={drawHeight}
-            src={canvasCtx.canvas}
-          />
+          <CanvasElementType.CanvasBuffer
+            {...props}
+            width={widthDefined}
+            height={heightDefined}
+            pixelRatio={pixelRatioDefined}
+            backgroundColor={backgroundColor}
+            canvas={canvasCtx.canvas}
+            ctx={canvasCtx.ctx}
+          >
+            {children}
+          </CanvasElementType.CanvasBuffer>
         </CanvasContext.Provider>
       );
     }
