@@ -4,12 +4,14 @@ import {
   clamp,
   ORANGE,
   percentageOf,
+  PointerLocation,
   Rectangle,
   remapValue,
   Scale,
   Translate,
   useAutoPixelRatio,
   useEventHandlers,
+  usePointerStateWithinElement,
 } from '@bitmapland/react-bitmap-utils';
 import React, { useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -52,6 +54,10 @@ const App = () => {
     ? innerWidth / mapWidth
     : innerHeight / mapHeight;
   const [zoom, setZoom] = useState(MIN_ZOOM);
+  const [location, setLocation] = useState({
+    x: mapWidth * 0.5,
+    y: mapHeight * 0.5,
+  });
   const scale = remapValue(zoom, MIN_ZOOM, MAX_ZOOM, distantScale, 1);
 
   useEventHandlers(
@@ -77,6 +83,48 @@ const App = () => {
     canvas
   );
 
+  const [drag, setDrag] = useState<PointerLocation | null>(null);
+
+  usePointerStateWithinElement(
+    useMemo(
+      () => ({
+        onPointerMove: (pointers) => {
+          if (pointers.dragged) {
+            setDrag(pointers.dragged);
+          }
+        },
+        onPointerUp: (_pointers, prevPointers) => {
+          setDrag(null);
+          setLocation((prev) => {
+            if (!prevPointers.dragged) {
+              return prev;
+            }
+
+            return {
+              x: clamp(prev.x - prevPointers.dragged.x / scale, 0, mapWidth),
+              y: clamp(prev.y - prevPointers.dragged.y / scale, 0, mapHeight),
+            };
+          });
+        },
+      }),
+      [scale, mapWidth, mapHeight]
+    ),
+    canvas
+  );
+
+  const locationWithDrag = useMemo(() => {
+    if (!drag) {
+      return location;
+    }
+
+    const { x, y } = drag;
+
+    return {
+      x: clamp(location.x - x / scale, 0, mapWidth),
+      y: clamp(location.y - y / scale, 0, mapHeight),
+    };
+  }, [drag, scale, location, mapWidth, mapHeight]);
+
   return (
     <>
       <Canvas
@@ -88,7 +136,7 @@ const App = () => {
       >
         <Translate x={width * 0.5} y={height * 0.5}>
           <Scale x={scale} y={scale}>
-            <Translate x={mapWidth * -0.5} y={mapHeight * -0.5}>
+            <Translate x={-locationWithDrag.x} y={-locationWithDrag.y}>
               <Rectangle
                 x={0}
                 y={0}

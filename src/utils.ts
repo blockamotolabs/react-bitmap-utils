@@ -99,3 +99,15 @@ export const getDimensions = (
         : (canvas?.clientHeight ?? 0) * pixelRatio,
   };
 };
+
+export const getLocationWithinElement = (
+  client: { clientX: number; clientY: number },
+  element: HTMLElement
+) => {
+  const rect = element.getBoundingClientRect();
+
+  return {
+    x: client.clientX - rect.left,
+    y: client.clientY - rect.top,
+  };
+};
