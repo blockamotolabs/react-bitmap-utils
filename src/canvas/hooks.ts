@@ -7,17 +7,16 @@ import { Handlers, PointerHandlers, PointerStateWithinElement } from './types';
 export const useAutoPixelRatio = () =>
   globalThis.devicePixelRatio >= 2 ? 2 : 1;
 
-export const useFrameTimes = (lastXFrames = 5) => {
-  const [frames, setFrames] = useState<readonly number[]>([]);
+export const useFrameTimes = (lastXFrames = 60) => {
+  const [frames, setFrames] = useState<number[]>([]);
 
   useEffect(() => {
     const raf = globalThis.requestAnimationFrame(() => {
       const now = Date.now();
 
       setFrames((prev) => {
-        const next = [...prev];
-        next.unshift(now);
-        return next.splice(0, lastXFrames);
+        prev.unshift(now);
+        return prev.slice(0, lastXFrames);
       });
     });
 
@@ -29,7 +28,7 @@ export const useFrameTimes = (lastXFrames = 5) => {
   return frames;
 };
 
-export const useAverageFrameRate = (lastXFrames = 5) => {
+export const useAverageFrameRate = (lastXFrames = 60) => {
   const frames = useFrameTimes(lastXFrames);
 
   const sum = frames.reduce((acc, num, index, context) => {
