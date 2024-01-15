@@ -8,8 +8,10 @@ import {
   Rectangle,
   remapValue,
   Scale,
+  Text,
   Translate,
   useAutoPixelRatio,
+  useAverageFrameRate,
   useEventHandlers,
   usePointerStateWithinElement,
 } from '@bitmapland/react-bitmap-utils';
@@ -31,6 +33,7 @@ import { EpochSeparators } from './epoch-separators';
 import { Grid } from './grid';
 
 const App = () => {
+  const averageFrameRate = useAverageFrameRate(60);
   const countTotalBlocks = 812345;
   const countEpochs = Math.ceil(countTotalBlocks / BLOCKS_PER_EPOCH);
 
@@ -158,6 +161,9 @@ const App = () => {
             </Translate>
           </Scale>
         </Translate>
+        <Text x={4} y={4} fontSize={12} fill="white">
+          {averageFrameRate.toFixed(0)} FPS
+        </Text>
       </Canvas>
     </>
   );
