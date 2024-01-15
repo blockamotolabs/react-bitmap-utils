@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { memo, ReactElement } from 'react';
 
 import { CommonCanvasComponentProps } from './types';
 
@@ -16,24 +16,23 @@ export interface ForEachProps extends CommonCanvasComponentProps {
   children: (context: ForEachCallbackContext) => ReactElement;
 }
 
-export const ForEach = ({
-  start = 0,
-  step = 1,
-  end,
-  children,
-}: ForEachProps) => {
-  const rendered = [];
+export const ForEach = memo(
+  ({ start = 0, step = 1, end, children }: ForEachProps) => {
+    const rendered = [];
 
-  for (let index = start; index < end; index += step) {
-    rendered.push(
-      children({
-        index,
-        start,
-        step,
-        end,
-      })
-    );
+    for (let index = start; index < end; index += step) {
+      rendered.push(
+        children({
+          index,
+          start,
+          step,
+          end,
+        })
+      );
+    }
+
+    return <>{rendered}</>;
   }
+);
 
-  return <>{rendered}</>;
-};
+ForEach.displayName = 'ForEach';
