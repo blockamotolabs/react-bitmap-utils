@@ -7,52 +7,30 @@ import { Handlers, PointerHandlers, PointerStateWithinElement } from './types';
 export const useAutoPixelRatio = () =>
   globalThis.devicePixelRatio >= 2 ? 2 : 1;
 
-export const useFrameNow = () => {
-  const [now, setNow] = useState(Date.now());
+export const useFrameTimes = (lastXFrames = 5) => {
+  const [frames, setFrames] = useState<readonly number[]>([]);
 
   useEffect(() => {
-    const setDateNow = () => {
-      setNow(Date.now());
-    };
+    const raf = globalThis.requestAnimationFrame(() => {
+      const now = Date.now();
 
-    const raf = globalThis.requestAnimationFrame(setDateNow);
+      setFrames((prev) => {
+        const next = [...prev];
+        next.unshift(now);
+        return next.splice(0, lastXFrames);
+      });
+    });
 
     return () => {
       globalThis.cancelAnimationFrame(raf);
     };
-  }, [now]);
+  }, [lastXFrames, frames]);
 
-  return now;
+  return frames;
 };
 
-export const useDelta = () => {
-  const now = useFrameNow();
-  const [{ delta }, setLastDelta] = useState({
-    last: now,
-    delta: 0,
-  });
-
-  useEffect(() => {
-    setLastDelta(({ last }) => ({
-      last: now,
-      delta: now - last,
-    }));
-  }, [now]);
-
-  return delta;
-};
-
-export const useFrameRate = (lastXFrames = 5) => {
-  const now = useFrameNow();
-  const [frames, setFrames] = useState<readonly number[]>([]);
-
-  useEffect(() => {
-    setFrames((prev) => {
-      const next = [...prev];
-      next.unshift(now);
-      return next.splice(0, lastXFrames);
-    });
-  }, [lastXFrames, now]);
+export const useAverageFrameRate = (lastXFrames = 5) => {
+  const frames = useFrameTimes(lastXFrames);
 
   const sum = frames.reduce((acc, num, index, context) => {
     const num2 = context[index + 1];
@@ -69,6 +47,30 @@ export const useFrameRate = (lastXFrames = 5) => {
   }
 
   return 1000 / (sum / (frames.length || 1));
+};
+
+export const useDelta = () => {
+  const [lastDelta, setLastDelta] = useState({
+    last: Date.now(),
+    delta: 0,
+  });
+
+  useEffect(() => {
+    const raf = globalThis.requestAnimationFrame(() => {
+      const now = Date.now();
+
+      setLastDelta(({ last }) => ({
+        last: now,
+        delta: now - last,
+      }));
+    });
+
+    return () => {
+      globalThis.cancelAnimationFrame(raf);
+    };
+  }, [lastDelta]);
+
+  return lastDelta.delta;
 };
 
 const MATCHES_WINDOW_LISTENER = /(Up|End|Cancel)$/;
