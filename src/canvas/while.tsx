@@ -1,6 +1,6 @@
 import React, { memo, ReactElement } from 'react';
 
-import { AnyObject } from '../types';
+import { AnyObject } from '../internal/types';
 import { CommonCanvasComponentProps } from './types';
 
 export interface WhileProps<T extends AnyObject>

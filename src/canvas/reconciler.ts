@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 import Reconciler, { HostConfig } from 'react-reconciler';
 import { DefaultEventPriority } from 'react-reconciler/constants';
 
-import { AnyObject } from '../types';
+import { AnyObject } from '../internal/types';
 import {
   CanvasElementType,
   CommonCanvasComponentProps,

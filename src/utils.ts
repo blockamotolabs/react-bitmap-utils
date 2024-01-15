@@ -1,4 +1,5 @@
-import { AnyObject, HandlerNameToEventName } from './types';
+import { AnyObject } from './internal/types';
+import { HandlerNameToEventName } from './types';
 
 export const hasKey = <T extends AnyObject, K extends string>(
   obj: T,
