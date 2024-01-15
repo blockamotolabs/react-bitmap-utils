@@ -10,10 +10,10 @@ import {
   Scale,
   Text,
   Translate,
-  useAutoPixelRatio,
   useAverageFrameRate,
   useEventHandlers,
   usePointerStateWithinElement,
+  useRecommendedPixelRatio,
 } from '@bitmapland/react-bitmap-utils';
 import React, { useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -38,7 +38,7 @@ const App = () => {
   const countEpochs = Math.ceil(countTotalBlocks / BLOCKS_PER_EPOCH);
 
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
-  const pixelRatio = useAutoPixelRatio();
+  const pixelRatio = useRecommendedPixelRatio();
   const [{ width, height }, setDimensions] = useState({ width: 0, height: 0 });
 
   const padding = Math.min(percentageOf(5, width), percentageOf(5, height));

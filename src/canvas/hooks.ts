@@ -4,8 +4,16 @@ import { getLocationWithinElement, handlerNameToEventName } from '../utils';
 import { CanvasContext } from './context';
 import { Handlers, PointerHandlers, PointerStateWithinElement } from './types';
 
-export const useAutoPixelRatio = () =>
-  globalThis.devicePixelRatio >= 2 ? 2 : 1;
+const MATCHES_ANDROID = /android/i;
+
+export const useRecommendedPixelRatio = () => {
+  if (MATCHES_ANDROID.test(globalThis.navigator.userAgent)) {
+    // Android has some really bad performance with up-scaled canvases
+    return 1;
+  }
+
+  return globalThis.devicePixelRatio >= 2 ? 2 : 1;
+};
 
 export const useFrameTimes = (lastXFrames = 60) => {
   const [frames, setFrames] = useState<number[]>([]);
