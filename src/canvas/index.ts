@@ -10,4 +10,5 @@ export * from './scale';
 export * from './rotate';
 export * from './opacity';
 export * from './for-each';
+export * from './while';
 export * from './types';
