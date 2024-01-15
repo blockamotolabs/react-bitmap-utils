@@ -22,6 +22,7 @@ import {
   MAX_ZOOM,
   MIN_ZOOM,
 } from './constants';
+import { DifficultyPeriods } from './difficulty-periods';
 import { EmptyMask } from './empty-mask';
 import { EpochLabels } from './epoch-labels';
 import { EpochSeparators } from './epoch-separators';
@@ -94,6 +95,10 @@ const App = () => {
                 width={mapWidth}
                 height={mapHeight}
                 fill={ORANGE}
+              />
+              <DifficultyPeriods
+                countEpochs={countEpochs}
+                countTotalBlocks={countTotalBlocks}
               />
               <Grid countEpochs={countEpochs} zoom={zoom} scale={scale} />
               <EpochSeparators countEpochs={countEpochs} scale={scale} />
