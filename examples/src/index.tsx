@@ -63,8 +63,8 @@ const App = () => {
 
           setZoom((prevZoom) =>
             clamp(
-              prevZoom +
-                -deltaY *
+              prevZoom -
+                deltaY *
                   remapValue(prevZoom, MIN_ZOOM, MAX_ZOOM, 0.00001, 0.002),
               MIN_ZOOM,
               MAX_ZOOM
