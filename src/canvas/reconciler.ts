@@ -82,6 +82,13 @@ const HOST_CONFIG: HostConfig<
     type: InternalCanvasElementType.Text,
     rendered: text,
   }),
+  insertBefore: (parent, child, beforeChild) => {
+    const index = parent.rendered.indexOf(beforeChild);
+
+    if (index >= 0) {
+      parent.rendered.splice(index, 0, child);
+    }
+  },
   appendChildToContainer: (parent, child) => parent.rendered.push(child),
   appendChild: (parent, child) => parent.rendered.push(child),
   appendInitialChild: (parent, child) => parent.rendered.push(child),
