@@ -169,6 +169,7 @@ const App = () => {
                 height={mapHeight}
                 fill={ORANGE}
               />
+              {/* This adds the orange striping for the difficulty adjustment periods */}
               <DifficultyPeriods
                 countEpochs={countEpochs}
                 countTotalBlocks={countTotalBlocks}
@@ -183,6 +184,7 @@ const App = () => {
                 location={locationWithDrag}
               />
               <EpochLabels countEpochs={countEpochs} zoom={zoom} />
+              {/* This is used to mask the end of the chain where an epoch is not complete */}
               <EmptyMask
                 countEpochs={countEpochs}
                 countTotalBlocks={countTotalBlocks}
