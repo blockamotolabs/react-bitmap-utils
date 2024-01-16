@@ -1,4 +1,10 @@
-import { ForEach, Opacity, Text, WHITE } from '@bitmapland/react-bitmap-utils';
+import {
+  Coordinates,
+  ForEach,
+  Opacity,
+  Text,
+  WHITE,
+} from '@bitmapland/react-bitmap-utils';
 import React, { memo } from 'react';
 
 import { BLOCK_SIZE, BLOCK_WINDOW_SIZE } from './constants';
@@ -42,7 +48,7 @@ export const BlockNumbers = memo(
   }: {
     zoom: number;
     countTotalBlocks: number;
-    location: { x: number; y: number };
+    location: Coordinates;
   }) => {
     // We only want to begin drawing individual blocks once we're zoomed in
     // Drawing 800k+ blocks would be super slow

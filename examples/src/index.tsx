@@ -2,9 +2,9 @@ import {
   BLACK,
   Canvas,
   clamp,
+  Coordinates,
   ORANGE,
   percentageOf,
-  PointerLocation,
   Rectangle,
   remapValue,
   Scale,
@@ -32,6 +32,7 @@ import { EmptyMask } from './empty-mask';
 import { EpochLabels } from './epoch-labels';
 import { EpochSeparators } from './epoch-separators';
 import { Grid } from './grid';
+import { getHighlightOpacity, getTargetBlock } from './utils';
 
 const App = () => {
   // The average frame rate hook causes the map to re-render every frame
@@ -66,8 +67,8 @@ const App = () => {
   });
   const scale = remapValue(zoom, MIN_ZOOM, MAX_ZOOM, distantScale, 1);
 
-  const [drag, setDrag] = useState<PointerLocation | null>(null);
-  const [pointer, setPointer] = useState<PointerLocation | null>(null);
+  const [drag, setDrag] = useState<Coordinates | null>(null);
+  const [pointer, setPointer] = useState<Coordinates | null>(null);
 
   const locationWithDrag = useMemo(() => {
     if (!drag) {
@@ -82,18 +83,10 @@ const App = () => {
     };
   }, [drag, scale, location, mapWidth, mapHeight]);
 
-  const pointerRelativeToMap = useMemo(() => {
-    if (!pointer) {
-      return null;
-    }
-
-    const { x, y } = pointer;
-
-    return {
-      x: (x - width * 0.5 + locationWithDrag.x * scale) / scale,
-      y: (y - height * 0.5 + locationWithDrag.y * scale) / scale,
-    };
-  }, [pointer, width, height, locationWithDrag.x, locationWithDrag.y, scale]);
+  const highlightedBlock = useMemo(
+    () => getTargetBlock(pointer, locationWithDrag, width, height, scale),
+    [height, locationWithDrag, pointer, scale, width]
+  );
 
   useEventHandlers(
     useMemo(
@@ -131,6 +124,26 @@ const App = () => {
           }
         },
         onPointerUp: (pointers, prevPointers) => {
+          if (prevPointers.isTap) {
+            const index = getTargetBlock(
+              prevPointers.now,
+              locationWithDrag,
+              width,
+              height,
+              scale
+            )?.index;
+            const highlightOpacity = getHighlightOpacity(zoom);
+
+            if (
+              highlightOpacity &&
+              typeof index === 'number' &&
+              index >= 0 &&
+              index <= countTotalBlocks
+            ) {
+              alert(`You tapped block ${index}`);
+            }
+          }
+
           setDrag(null);
           setLocation((prev) => {
             if (!prevPointers.dragged || pointers.dragged2) {
@@ -144,7 +157,7 @@ const App = () => {
           });
         },
       }),
-      [scale, mapWidth, mapHeight]
+      [locationWithDrag, width, height, scale, zoom, mapWidth, mapHeight]
     ),
     canvas
   );
@@ -190,7 +203,7 @@ const App = () => {
                 countTotalBlocks={countTotalBlocks}
               />
               <BlockHighlight
-                pointerRelativeToMap={pointerRelativeToMap}
+                highlightedBlock={highlightedBlock}
                 countTotalBlocks={countTotalBlocks}
                 scale={scale}
                 zoom={zoom}

@@ -1,5 +1,7 @@
-import { remapValue } from '../../src/utils';
+import { Coordinates, remapValue } from '@bitmapland/react-bitmap-utils';
+
 import {
+  BLOCK_SIZE,
   BLOCKS_PER_COLUMN,
   BLOCKS_PER_EPOCH,
   BLOCKS_PER_ROW,
@@ -34,3 +36,36 @@ export const getBlockOpacity = (zoom: number) =>
 
 export const getHighlightOpacity = (zoom: number) =>
   remapValue(zoom, MIN_ZOOM + 0.3, MAX_ZOOM - 0.65, 0, 1, true);
+
+export interface TargetBlock extends Coordinates {
+  index: number;
+}
+
+export const getTargetBlock = (
+  pointer: Coordinates | null,
+  location: Coordinates,
+  width: number,
+  height: number,
+  scale: number
+): TargetBlock | null => {
+  if (!pointer) {
+    return null;
+  }
+
+  const pointerRelativeToMap = {
+    x: (pointer.x - width * 0.5 + location.x * scale) / scale,
+    y: (pointer.y - height * 0.5 + location.y * scale) / scale,
+  };
+
+  const coordinates = {
+    x: Math.floor(pointerRelativeToMap.x / BLOCK_SIZE),
+    y: Math.floor(pointerRelativeToMap.y / BLOCK_SIZE),
+  };
+
+  const index = getIndexFromCoords(coordinates.x, coordinates.y);
+
+  return {
+    ...coordinates,
+    index,
+  };
+};
