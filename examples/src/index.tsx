@@ -127,8 +127,22 @@ const App = () => {
             setPointer(pointers.now);
           }
 
-          if (pointers.dragged && !pointers.dragged2) {
+          if (pointers.dragged) {
             setDrag(pointers.dragged);
+          }
+
+          const { pinchedDelta } = pointers;
+
+          if (typeof pinchedDelta === 'number') {
+            setZoom((prevZoom) =>
+              clamp(
+                prevZoom -
+                  pinchedDelta *
+                    remapValue(prevZoom, MIN_ZOOM, MAX_ZOOM, 0.00001, 0.01),
+                MIN_ZOOM,
+                MAX_ZOOM
+              )
+            );
           }
         },
         onPointerUp: (pointers, prevPointers) => {
