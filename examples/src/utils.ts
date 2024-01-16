@@ -44,6 +44,7 @@ export interface TargetBlock extends Coordinates {
 export const getTargetBlock = (
   pointer: Coordinates | null,
   location: Coordinates,
+  countTotalBlocks: number,
   width: number,
   height: number,
   scale: number
@@ -52,20 +53,32 @@ export const getTargetBlock = (
     return null;
   }
 
+  const countEpochs = Math.ceil(countTotalBlocks / BLOCKS_PER_EPOCH);
+
   const pointerRelativeToMap = {
     x: (pointer.x - width * 0.5 + location.x * scale) / scale,
     y: (pointer.y - height * 0.5 + location.y * scale) / scale,
   };
 
-  const coordinates = {
+  const { x, y } = {
     x: Math.floor(pointerRelativeToMap.x / BLOCK_SIZE),
     y: Math.floor(pointerRelativeToMap.y / BLOCK_SIZE),
   };
 
-  const index = getIndexFromCoords(coordinates.x, coordinates.y);
+  if (
+    x < 0 ||
+    y < 0 ||
+    x >= countEpochs * BLOCKS_PER_ROW ||
+    y >= BLOCKS_PER_COLUMN
+  ) {
+    return null;
+  }
+
+  const index = getIndexFromCoords(x, y);
 
   return {
-    ...coordinates,
+    x,
+    y,
     index,
   };
 };

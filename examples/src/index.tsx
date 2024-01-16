@@ -84,7 +84,15 @@ const App = () => {
   }, [drag, scale, location, mapWidth, mapHeight]);
 
   const highlightedBlock = useMemo(
-    () => getTargetBlock(pointer, locationWithDrag, width, height, scale),
+    () =>
+      getTargetBlock(
+        pointer,
+        locationWithDrag,
+        countTotalBlocks,
+        width,
+        height,
+        scale
+      ),
     [height, locationWithDrag, pointer, scale, width]
   );
 
@@ -128,10 +136,12 @@ const App = () => {
             const index = getTargetBlock(
               prevPointers.now,
               locationWithDrag,
+              countTotalBlocks,
               width,
               height,
               scale
             )?.index;
+
             const highlightOpacity = getHighlightOpacity(zoom);
 
             if (
