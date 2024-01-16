@@ -1,4 +1,5 @@
 import {
+  clamp,
   Coordinates,
   ForEach,
   Opacity,
@@ -7,7 +8,13 @@ import {
 } from '@bitmapland/react-bitmap-utils';
 import React, { memo } from 'react';
 
-import { BLOCK_SIZE, BLOCK_WINDOW_SIZE } from './constants';
+import {
+  BLOCK_SIZE,
+  BLOCK_WINDOW_SIZE,
+  BLOCKS_PER_COLUMN,
+  BLOCKS_PER_EPOCH,
+  BLOCKS_PER_ROW,
+} from './constants';
 import { getBlockOpacity, getIndexFromCoords } from './utils';
 
 const Block = ({
@@ -50,15 +57,26 @@ export const BlockNumbers = memo(
     countTotalBlocks: number;
     location: Coordinates;
   }) => {
+    const countEpochs = Math.ceil(countTotalBlocks / BLOCKS_PER_EPOCH);
+    const minX = 0;
+    const minY = 0;
+    const maxX = countEpochs * BLOCKS_PER_ROW;
+    const maxY = BLOCKS_PER_COLUMN;
     // We only want to begin drawing individual blocks once we're zoomed in
     // Drawing 800k+ blocks would be super slow
     // We're going to select an area around the center of the screen to draw block numbers
-    const windowStartX =
-      Math.floor(location.x / BLOCK_SIZE) - BLOCK_WINDOW_SIZE * 0.5;
-    const windowStartY =
-      Math.floor(location.y / BLOCK_SIZE) - BLOCK_WINDOW_SIZE * 0.5;
-    const windowEndX = windowStartX + BLOCK_WINDOW_SIZE;
-    const windowEndY = windowStartY + BLOCK_WINDOW_SIZE;
+    const windowStartX = clamp(
+      Math.floor(location.x / BLOCK_SIZE) - BLOCK_WINDOW_SIZE * 0.5,
+      minX,
+      maxX
+    );
+    const windowStartY = clamp(
+      Math.floor(location.y / BLOCK_SIZE) - BLOCK_WINDOW_SIZE * 0.5,
+      minY,
+      maxY
+    );
+    const windowEndX = clamp(windowStartX + BLOCK_WINDOW_SIZE, minX, maxX);
+    const windowEndY = clamp(windowStartY + BLOCK_WINDOW_SIZE, minY, maxY);
 
     const opacity = getBlockOpacity(zoom);
 
