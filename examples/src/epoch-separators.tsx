@@ -14,6 +14,7 @@ export const EpochSeparators = memo(
           endX={index * BLOCKS_PER_ROW * BLOCK_SIZE}
           endY={BLOCKS_PER_COLUMN * BLOCK_SIZE}
           stroke={BLACK}
+          // We do some fancy scaling here so that the epoch separators always stand out from block borders, but aren't too thick/thin when zoomed out
           strokeWidth={2 / scale + Math.cos(scale) * 4}
         />
       )}

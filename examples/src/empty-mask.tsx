@@ -10,6 +10,7 @@ import {
 
 // Using an actual clipping mask is far less performant than just drawing over the areas we've already plotted.
 // So this component just draws a few rectangles over the empty area.
+// The rectangles are slightly enlarged to cover gaps between them thick or borders that would hang outside of them.
 
 export const EmptyMask = memo(
   ({

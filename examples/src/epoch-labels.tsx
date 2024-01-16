@@ -21,6 +21,9 @@ export const EpochLabels = memo(
       <Opacity opacity={remapValue(zoom, MIN_ZOOM, 1.01, 1, 0, true)}>
         <ForEach end={countEpochs}>
           {({ index }) => (
+            // We draw our epoch labels to an off-screen canvas that is then rendered to the main canvas.
+            // This is because some browsers do not handle very large text well.
+            // Instead we draw the text at a reasonable size, and scale it like an image.
             <CanvasBuffer
               key={index}
               width={1000}

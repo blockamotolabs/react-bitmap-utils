@@ -13,6 +13,8 @@ import {
   BLOCKS_PER_ROW,
 } from './constants';
 
+// We use a while loop here as each difficulty period's position will be relative to the last
+
 export const DifficultyPeriods = memo(
   ({ countTotalBlocks }: { countEpochs: number; countTotalBlocks: number }) => (
     <While
