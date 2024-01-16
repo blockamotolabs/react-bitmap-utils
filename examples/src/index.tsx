@@ -34,7 +34,7 @@ import { EpochSeparators } from './epoch-separators';
 import { Grid } from './grid';
 
 const App = () => {
-  const averageFrameRate = useAverageFrameRate(60);
+  const averageFrameRate = useAverageFrameRate();
   const countTotalBlocks = 812345;
   const countEpochs = Math.ceil(countTotalBlocks / BLOCKS_PER_EPOCH);
 
