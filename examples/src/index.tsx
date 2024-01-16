@@ -92,14 +92,14 @@ const App = () => {
     useMemo(
       () => ({
         onPointerMove: (pointers) => {
-          if (pointers.dragged) {
+          if (pointers.dragged && !pointers.dragged2) {
             setDrag(pointers.dragged);
           }
         },
-        onPointerUp: (_pointers, prevPointers) => {
+        onPointerUp: (pointers, prevPointers) => {
           setDrag(null);
           setLocation((prev) => {
-            if (!prevPointers.dragged) {
+            if (!prevPointers.dragged || pointers.dragged2) {
               return prev;
             }
 
