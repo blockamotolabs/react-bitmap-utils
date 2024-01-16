@@ -1,14 +1,8 @@
-import {
-  ForEach,
-  Opacity,
-  remapValue,
-  Text,
-  WHITE,
-} from '@bitmapland/react-bitmap-utils';
+import { ForEach, Opacity, Text, WHITE } from '@bitmapland/react-bitmap-utils';
 import React, { memo } from 'react';
 
-import { BLOCK_SIZE, BLOCK_WINDOW_SIZE, MAX_ZOOM, MIN_ZOOM } from './constants';
-import { getIndexFromCoords } from './utils';
+import { BLOCK_SIZE, BLOCK_WINDOW_SIZE } from './constants';
+import { getBlockOpacity, getIndexFromCoords } from './utils';
 
 const Block = ({
   countTotalBlocks,
@@ -60,14 +54,7 @@ export const BlockNumbers = memo(
     const windowEndX = windowStartX + BLOCK_WINDOW_SIZE;
     const windowEndY = windowStartY + BLOCK_WINDOW_SIZE;
 
-    const opacity = remapValue(
-      zoom,
-      MIN_ZOOM + 0.3,
-      MAX_ZOOM - 0.5,
-      0,
-      1,
-      true
-    );
+    const opacity = getBlockOpacity(zoom);
 
     // If we're not zoomed in enough, don't draw anything
     if (!opacity) {

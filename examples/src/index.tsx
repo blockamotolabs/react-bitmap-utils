@@ -8,9 +8,7 @@ import {
   Rectangle,
   remapValue,
   Scale,
-  Text,
   Translate,
-  useAverageFrameRate,
   useEventHandlers,
   usePointerStateWithinElement,
   useRecommendedPixelRatio,
@@ -18,6 +16,7 @@ import {
 import React, { useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
+import { BlockHighlight } from './block-highlight';
 import { BlockNumbers } from './block-numbers';
 import {
   BLOCK_SIZE,
@@ -35,7 +34,9 @@ import { EpochSeparators } from './epoch-separators';
 import { Grid } from './grid';
 
 const App = () => {
-  const averageFrameRate = useAverageFrameRate();
+  // The average frame rate hook causes the map to re-render every frame
+  // This is only used when we're testing performance of the map on various devices
+  // const averageFrameRate = useAverageFrameRate();
   const countTotalBlocks = 812345;
   const countEpochs = Math.ceil(countTotalBlocks / BLOCKS_PER_EPOCH);
 
@@ -65,6 +66,35 @@ const App = () => {
   });
   const scale = remapValue(zoom, MIN_ZOOM, MAX_ZOOM, distantScale, 1);
 
+  const [drag, setDrag] = useState<PointerLocation | null>(null);
+  const [pointer, setPointer] = useState<PointerLocation | null>(null);
+
+  const locationWithDrag = useMemo(() => {
+    if (!drag) {
+      return location;
+    }
+
+    const { x, y } = drag;
+
+    return {
+      x: clamp(location.x - x / scale, 0, mapWidth),
+      y: clamp(location.y - y / scale, 0, mapHeight),
+    };
+  }, [drag, scale, location, mapWidth, mapHeight]);
+
+  const pointerRelativeToMap = useMemo(() => {
+    if (!pointer) {
+      return null;
+    }
+
+    const { x, y } = pointer;
+
+    return {
+      x: (x - width * 0.5 + locationWithDrag.x * scale) / scale,
+      y: (y - height * 0.5 + locationWithDrag.y * scale) / scale,
+    };
+  }, [pointer, width, height, locationWithDrag.x, locationWithDrag.y, scale]);
+
   useEventHandlers(
     useMemo(
       () => ({
@@ -88,12 +118,14 @@ const App = () => {
     canvas
   );
 
-  const [drag, setDrag] = useState<PointerLocation | null>(null);
-
   usePointerStateWithinElement(
     useMemo(
       () => ({
         onPointerMove: (pointers) => {
+          if (pointers.now) {
+            setPointer(pointers.now);
+          }
+
           if (pointers.dragged && !pointers.dragged2) {
             setDrag(pointers.dragged);
           }
@@ -117,31 +149,19 @@ const App = () => {
     canvas
   );
 
-  const locationWithDrag = useMemo(() => {
-    if (!drag) {
-      return location;
-    }
-
-    const { x, y } = drag;
-
-    return {
-      x: clamp(location.x - x / scale, 0, mapWidth),
-      y: clamp(location.y - y / scale, 0, mapHeight),
-    };
-  }, [drag, scale, location, mapWidth, mapHeight]);
-
   return (
     <>
       <Canvas
         ref={setCanvas}
         pixelRatio={pixelRatio}
         backgroundColor={BLACK}
-        style={{ width: '100%', height: '100%' }}
+        style={{ width: '100%', height: '100%', cursor: 'move' }}
         onResize={setDimensions}
       >
         <Translate x={width * 0.5} y={height * 0.5}>
           <Scale x={scale} y={scale}>
             <Translate x={-locationWithDrag.x} y={-locationWithDrag.y}>
+              {/* This just helps us to visualize the area of the map while constructing the visuals */}
               <Rectangle
                 x={0}
                 y={0}
@@ -167,13 +187,19 @@ const App = () => {
                 countEpochs={countEpochs}
                 countTotalBlocks={countTotalBlocks}
               />
+              <BlockHighlight
+                pointerRelativeToMap={pointerRelativeToMap}
+                countTotalBlocks={countTotalBlocks}
+                scale={scale}
+                zoom={zoom}
+              />
             </Translate>
             <Crosshair scale={scale} />
           </Scale>
         </Translate>
-        <Text x={4} y={4} fontSize={12} fill="white">
+        {/* <Text x={4} y={4} fontSize={12} fill="white">
           {averageFrameRate.toFixed(0)} FPS
-        </Text>
+        </Text> */}
       </Canvas>
     </>
   );

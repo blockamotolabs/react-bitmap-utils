@@ -1,7 +1,10 @@
+import { remapValue } from '../../src/utils';
 import {
   BLOCKS_PER_COLUMN,
   BLOCKS_PER_EPOCH,
   BLOCKS_PER_ROW,
+  MAX_ZOOM,
+  MIN_ZOOM,
 } from './constants';
 
 export const getIndexFromCoords = (x: number, y: number) => {
@@ -22,3 +25,12 @@ export const getCoordsFromIndex = (index: number) => {
     y: row,
   };
 };
+
+export const getEpochSeparatorWidth = (scale: number) =>
+  2 / scale + Math.cos(scale) * 4;
+
+export const getBlockOpacity = (zoom: number) =>
+  remapValue(zoom, MIN_ZOOM + 0.3, MAX_ZOOM - 0.5, 0, 1, true);
+
+export const getHighlightOpacity = (zoom: number) =>
+  remapValue(zoom, MIN_ZOOM + 0.3, MAX_ZOOM - 0.65, 0, 1, true);
