@@ -146,7 +146,17 @@ const INITIAL_POINTER_STATE = {
   delta2: null,
   pinched: null,
   pinchedDelta: null,
+  primaryPointer: null,
 } as const satisfies PointerStateWithinElement;
+
+const getTouches = (event: TouchEvent) => {
+  const touches = [...event.touches];
+
+  const one = touches.find((touch) => touch.identifier === 0);
+  const two = touches.find((touch) => touch.identifier === 1);
+
+  return [one, two];
+};
 
 export const usePointerStateWithinElement = (
   handlers: PointerHandlers,
@@ -164,7 +174,7 @@ export const usePointerStateWithinElement = (
       const onTouchEndOrCancel = (event: TouchEvent) => {
         const prev = { ...stateRef.current };
 
-        const [one, two] = event.touches;
+        const [one, two] = getTouches(event);
 
         if (!one) {
           stateRef.current.isTouch = true;
@@ -172,6 +182,7 @@ export const usePointerStateWithinElement = (
           stateRef.current.down = null;
           stateRef.current.now = null;
           stateRef.current.dragged = null;
+          stateRef.current.primaryPointer = two ? 1 : null;
         }
 
         if (!two) {
@@ -182,9 +193,10 @@ export const usePointerStateWithinElement = (
           stateRef.current.dragged2 = null;
           stateRef.current.pinched = null;
           stateRef.current.pinchedDelta = null;
+          stateRef.current.primaryPointer = one ? 0 : null;
         }
 
-        onPointerUp?.({ ...stateRef.current }, prev);
+        onPointerUp?.({ ...stateRef.current }, prev, event);
       };
 
       return {
@@ -206,8 +218,9 @@ export const usePointerStateWithinElement = (
           stateRef.current.isTap = true;
           stateRef.current.down = loc;
           stateRef.current.now = loc;
+          stateRef.current.primaryPointer = 0;
 
-          onPointerDown?.({ ...stateRef.current }, prev);
+          onPointerDown?.({ ...stateRef.current }, prev, event);
         },
         onMouseUp: (event) => {
           if (event.button !== 0) {
@@ -223,8 +236,9 @@ export const usePointerStateWithinElement = (
           stateRef.current.dragged = null;
           stateRef.current.pinched = null;
           stateRef.current.pinchedDelta = null;
+          stateRef.current.primaryPointer = null;
 
-          onPointerUp?.({ ...stateRef.current }, prev);
+          onPointerUp?.({ ...stateRef.current }, prev, event);
         },
         onMouseMove: (event) => {
           if (!canvas) {
@@ -257,8 +271,10 @@ export const usePointerStateWithinElement = (
           stateRef.current.now = loc;
           stateRef.current.dragged = dragged;
           stateRef.current.delta = delta;
+          stateRef.current.primaryPointer =
+            stateRef.current.primaryPointer ?? 0;
 
-          onPointerMove?.({ ...stateRef.current }, prev);
+          onPointerMove?.({ ...stateRef.current }, prev, event);
         },
         onTouchStart: (event) => {
           event.preventDefault();
@@ -269,27 +285,47 @@ export const usePointerStateWithinElement = (
 
           const prev = { ...stateRef.current };
 
-          const [one, two] = event.touches;
+          const [one, two] = getTouches(event);
 
           if (one) {
             const loc = getLocationWithinElement(one, canvas);
             stateRef.current.isTouch = true;
             stateRef.current.isTap = true;
-            stateRef.current.down = loc;
+            stateRef.current.down = stateRef.current.down ?? loc;
             stateRef.current.now = loc;
+            stateRef.current.dragged = stateRef.current.dragged ?? {
+              x: 0,
+              y: 0,
+            };
+            stateRef.current.delta = stateRef.current.delta ?? {
+              x: 0,
+              y: 0,
+            };
+            stateRef.current.primaryPointer =
+              stateRef.current.primaryPointer ?? 0;
           }
 
           if (two) {
             const loc = getLocationWithinElement(two, canvas);
             stateRef.current.isTouch2 = true;
             stateRef.current.isTap2 = true;
-            stateRef.current.down2 = loc;
+            stateRef.current.down2 = stateRef.current.down2 ?? loc;
             stateRef.current.now2 = loc;
+            stateRef.current.dragged2 = stateRef.current.dragged2 ?? {
+              x: 0,
+              y: 0,
+            };
+            stateRef.current.delta2 = stateRef.current.delta2 ?? {
+              x: 0,
+              y: 0,
+            };
             stateRef.current.pinched = 0;
             stateRef.current.pinchedDelta = 0;
+            stateRef.current.primaryPointer =
+              stateRef.current.primaryPointer ?? 1;
           }
 
-          onPointerDown?.({ ...stateRef.current }, prev);
+          onPointerDown?.({ ...stateRef.current }, prev, event);
         },
         onTouchEnd: onTouchEndOrCancel,
         onTouchCancel: onTouchEndOrCancel,
@@ -300,7 +336,7 @@ export const usePointerStateWithinElement = (
 
           const prev = { ...stateRef.current };
 
-          const [one, two] = event.touches;
+          const [one, two] = getTouches(event);
 
           const loc1 = one ? getLocationWithinElement(one, canvas) : null;
 
@@ -379,7 +415,7 @@ export const usePointerStateWithinElement = (
                 : null;
           }
 
-          onPointerMove?.({ ...stateRef.current }, prev);
+          onPointerMove?.({ ...stateRef.current }, prev, event);
         },
       };
     }, [canvas, handlers, tapThreshold]),

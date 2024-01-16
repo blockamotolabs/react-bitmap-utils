@@ -132,19 +132,23 @@ export interface PointerStateWithinElement {
   delta2: Coordinates | null;
   pinched: number | null;
   pinchedDelta: number | null;
+  primaryPointer: 0 | 1 | null;
 }
 
 export interface PointerHandlers {
   onPointerDown?: (
     state: PointerStateWithinElement,
-    prev: PointerStateWithinElement
+    prev: PointerStateWithinElement,
+    event: MouseEvent | TouchEvent
   ) => void;
   onPointerMove?: (
     state: PointerStateWithinElement,
-    prev: PointerStateWithinElement
+    prev: PointerStateWithinElement,
+    event: MouseEvent | TouchEvent
   ) => void;
   onPointerUp?: (
     state: PointerStateWithinElement,
-    prev: PointerStateWithinElement
+    prev: PointerStateWithinElement,
+    event: MouseEvent | TouchEvent
   ) => void;
 }
