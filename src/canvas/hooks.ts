@@ -1,6 +1,10 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 
-import { getLocationWithinElement, handlerNameToEventName } from '../utils';
+import {
+  getDistance,
+  getLocationWithinElement,
+  handlerNameToEventName,
+} from '../utils';
 import { CanvasContext } from './context';
 import { Handlers, PointerHandlers, PointerStateWithinElement } from './types';
 
@@ -127,10 +131,14 @@ export const useEventHandlers = (
 };
 
 const INITIAL_POINTER_STATE = {
+  isTouch: null,
+  isTap: null,
   down: null,
   now: null,
   dragged: null,
   delta: null,
+  isTouch2: null,
+  isTap2: null,
   down2: null,
   now2: null,
   dragged2: null,
@@ -139,7 +147,8 @@ const INITIAL_POINTER_STATE = {
 
 export const usePointerStateWithinElement = (
   handlers: PointerHandlers,
-  canvas: HTMLCanvasElement | null | undefined
+  canvas: HTMLCanvasElement | null | undefined,
+  tapThreshold = 10
 ) => {
   const stateRef = useRef<PointerStateWithinElement>({
     ...INITIAL_POINTER_STATE,
@@ -155,12 +164,16 @@ export const usePointerStateWithinElement = (
         const [one, two] = event.touches;
 
         if (!one) {
+          stateRef.current.isTouch = true;
+          stateRef.current.isTap = null;
           stateRef.current.down = null;
           stateRef.current.now = null;
           stateRef.current.dragged = null;
         }
 
         if (!two) {
+          stateRef.current.isTouch2 = true;
+          stateRef.current.isTap = null;
           stateRef.current.down2 = null;
           stateRef.current.now2 = null;
           stateRef.current.dragged2 = null;
@@ -184,6 +197,8 @@ export const usePointerStateWithinElement = (
           const prev = { ...stateRef.current };
 
           const loc = getLocationWithinElement(event, canvas);
+          stateRef.current.isTouch = false;
+          stateRef.current.isTap = true;
           stateRef.current.down = loc;
           stateRef.current.now = loc;
 
@@ -196,6 +211,8 @@ export const usePointerStateWithinElement = (
 
           const prev = { ...stateRef.current };
 
+          stateRef.current.isTouch = false;
+          stateRef.current.isTap = null;
           stateRef.current.down = null;
           stateRef.current.now = null;
           stateRef.current.dragged = null;
@@ -223,6 +240,13 @@ export const usePointerStateWithinElement = (
               }
             : null;
 
+          stateRef.current.isTouch = false;
+          if (stateRef.current.isTap !== false) {
+            stateRef.current.isTap = prev.down
+              ? getDistance(loc.x, loc.y, prev.down.x, prev.down.y) <
+                tapThreshold
+              : null;
+          }
           stateRef.current.now = loc;
           stateRef.current.dragged = dragged;
           stateRef.current.delta = delta;
@@ -242,12 +266,16 @@ export const usePointerStateWithinElement = (
 
           if (one) {
             const loc = getLocationWithinElement(one, canvas);
+            stateRef.current.isTouch = true;
+            stateRef.current.isTap = true;
             stateRef.current.down = loc;
             stateRef.current.now = loc;
           }
 
           if (two) {
             const loc = getLocationWithinElement(two, canvas);
+            stateRef.current.isTouch2 = true;
+            stateRef.current.isTap2 = true;
             stateRef.current.down2 = loc;
             stateRef.current.now2 = loc;
           }
@@ -279,6 +307,13 @@ export const usePointerStateWithinElement = (
                   y: loc.y - prev.now.y,
                 }
               : null;
+            stateRef.current.isTouch = true;
+            if (stateRef.current.isTap !== false) {
+              stateRef.current.isTap = prev.down
+                ? getDistance(loc.x, loc.y, prev.down.x, prev.down.y) <
+                  tapThreshold
+                : null;
+            }
             stateRef.current.now = loc;
             stateRef.current.dragged = dragged;
             stateRef.current.delta = delta;
@@ -298,6 +333,13 @@ export const usePointerStateWithinElement = (
                   y: loc.y - prev.now2.y,
                 }
               : null;
+            stateRef.current.isTouch = true;
+            if (stateRef.current.isTap2 !== false) {
+              stateRef.current.isTap2 = prev.down
+                ? getDistance(loc.x, loc.y, prev.down.x, prev.down.y) <
+                  tapThreshold
+                : null;
+            }
             stateRef.current.now2 = loc;
             stateRef.current.dragged2 = dragged;
             stateRef.current.delta2 = delta;
@@ -306,7 +348,7 @@ export const usePointerStateWithinElement = (
           onPointerMove?.({ ...stateRef.current }, prev);
         },
       };
-    }, [canvas, handlers]),
+    }, [canvas, handlers, tapThreshold]),
     canvas
   );
 

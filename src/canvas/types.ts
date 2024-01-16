@@ -112,20 +112,24 @@ export interface Handlers {
   onTouchCancel?: (event: TouchEvent) => void;
 }
 
-export interface PointerLocation {
+export interface Coordinates {
   x: number;
   y: number;
 }
 
 export interface PointerStateWithinElement {
-  down: PointerLocation | null;
-  now: PointerLocation | null;
-  dragged: PointerLocation | null;
-  delta: PointerLocation | null;
-  down2: PointerLocation | null;
-  now2: PointerLocation | null;
-  dragged2: PointerLocation | null;
-  delta2: PointerLocation | null;
+  isTouch: boolean | null;
+  isTap: boolean | null;
+  down: Coordinates | null;
+  now: Coordinates | null;
+  dragged: Coordinates | null;
+  delta: Coordinates | null;
+  isTouch2: boolean | null;
+  isTap2: boolean | null;
+  down2: Coordinates | null;
+  now2: Coordinates | null;
+  dragged2: Coordinates | null;
+  delta2: Coordinates | null;
 }
 
 export interface PointerHandlers {
