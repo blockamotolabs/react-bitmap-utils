@@ -18,6 +18,7 @@ import {
 import React, { useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
+import { BlockNumbers } from './block-numbers';
 import {
   BLOCK_SIZE,
   BLOCKS_PER_COLUMN,
@@ -152,8 +153,15 @@ const App = () => {
                 countEpochs={countEpochs}
                 countTotalBlocks={countTotalBlocks}
               />
+              {/* Instead of drawing as many rectangles as there are blocks, it's far more performant to draw vertical and horizontal lines */}
               <Grid countEpochs={countEpochs} zoom={zoom} scale={scale} />
               <EpochSeparators countEpochs={countEpochs} scale={scale} />
+              {/* If you look inside the BlockNumbers component you'll see we only ever draw a limited set of blocks */}
+              <BlockNumbers
+                countTotalBlocks={countTotalBlocks}
+                zoom={zoom}
+                location={locationWithDrag}
+              />
               <EpochLabels countEpochs={countEpochs} zoom={zoom} />
               <EmptyMask
                 countEpochs={countEpochs}
