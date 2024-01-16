@@ -47,16 +47,19 @@ const App = () => {
 
   const padding = Math.min(percentageOf(5, width), percentageOf(5, height));
 
+  // The actual area for drawing the map (when zoomed out)
   const innerWidth = width - padding * 2;
   const innerHeight = height - padding * 2;
   const innerAspectRatio = innerWidth / innerHeight;
 
+  // The total size of the map (when zoomed in)
   const mapWidth = countEpochs * BLOCK_SIZE * BLOCKS_PER_ROW;
   const mapHeight = BLOCKS_PER_COLUMN * BLOCK_SIZE;
   const mapAspectRatio = mapWidth / mapHeight;
 
   const fitWidth = innerAspectRatio < mapAspectRatio;
 
+  // The scale of the map when zoomed out (to best fit inside the aspect ratio)
   const distantScale = fitWidth
     ? innerWidth / mapWidth
     : innerHeight / mapHeight;
