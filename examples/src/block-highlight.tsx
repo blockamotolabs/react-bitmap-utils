@@ -11,23 +11,16 @@ import {
 export const BlockHighlight = memo(
   ({
     highlightedBlock,
-    countTotalBlocks,
     scale,
     zoom,
   }: {
     highlightedBlock: TargetBlock | null;
-    countTotalBlocks: number;
     scale: number;
     zoom: number;
   }) => {
     const opacity = getHighlightOpacity(zoom);
 
-    if (
-      !opacity ||
-      !highlightedBlock ||
-      highlightedBlock.index < 0 ||
-      highlightedBlock.index > countTotalBlocks
-    ) {
+    if (!opacity || !highlightedBlock) {
       return null;
     }
 

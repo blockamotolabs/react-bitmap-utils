@@ -76,6 +76,10 @@ export const getTargetBlock = (
 
   const index = getIndexFromCoords(x, y);
 
+  if (index < 0 || index > countTotalBlocks) {
+    return null;
+  }
+
   return {
     x,
     y,

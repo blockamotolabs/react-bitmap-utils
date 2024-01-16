@@ -144,12 +144,7 @@ const App = () => {
 
             const highlightOpacity = getHighlightOpacity(zoom);
 
-            if (
-              highlightOpacity &&
-              typeof index === 'number' &&
-              index >= 0 &&
-              index <= countTotalBlocks
-            ) {
+            if (highlightOpacity && typeof index === 'number') {
               alert(`You tapped block ${index}`);
             }
           }
@@ -214,7 +209,6 @@ const App = () => {
               />
               <BlockHighlight
                 highlightedBlock={highlightedBlock}
-                countTotalBlocks={countTotalBlocks}
                 scale={scale}
                 zoom={zoom}
               />
