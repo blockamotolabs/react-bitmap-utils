@@ -26,6 +26,7 @@ import {
   MAX_ZOOM,
   MIN_ZOOM,
 } from './constants';
+import { Crosshair } from './crosshair';
 import { DifficultyPeriods } from './difficulty-periods';
 import { EmptyMask } from './empty-mask';
 import { EpochLabels } from './epoch-labels';
@@ -159,6 +160,7 @@ const App = () => {
                 countTotalBlocks={countTotalBlocks}
               />
             </Translate>
+            <Crosshair scale={scale} />
           </Scale>
         </Translate>
         <Text x={4} y={4} fontSize={12} fill="white">
