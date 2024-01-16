@@ -101,8 +101,18 @@ const HOST_CONFIG: HostConfig<
     _rootContainer,
     _hostContext
   ) => true,
-  commitUpdate: (instance, _updatePayload, _type, _oldProps, newProps) =>
-    (instance.props = newProps),
+  commitUpdate: (instance, _updatePayload, type, _oldProps, newProps) => {
+    instance.props = newProps;
+
+    if (HOST_CONFIG.shouldSetTextContent(type, newProps)) {
+      instance.rendered = [
+        {
+          type: InternalCanvasElementType.Text,
+          rendered: newProps.children.toString(),
+        },
+      ];
+    }
+  },
   commitTextUpdate: (textInstance, _oldText, newText) => {
     textInstance.rendered = newText;
   },
