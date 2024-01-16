@@ -8,6 +8,9 @@ import {
   BLOCKS_PER_ROW,
 } from './constants';
 
+// Using an actual clipping mask is far less performant than just drawing over the areas we've already plotted.
+// So this component just draws a few rectangles over the empty area.
+
 export const EmptyMask = memo(
   ({
     countEpochs,
@@ -17,10 +20,11 @@ export const EmptyMask = memo(
     countTotalBlocks: number;
   }) => {
     const partiallyEmptyRow = Math.floor(
-      (countTotalBlocks - (countEpochs - 1) * BLOCKS_PER_EPOCH) / BLOCKS_PER_ROW
+      (countTotalBlocks + 1 - (countEpochs - 1) * BLOCKS_PER_EPOCH) /
+        BLOCKS_PER_ROW
     );
 
-    const partiallyEmptyIndexInRow = countTotalBlocks % BLOCKS_PER_ROW;
+    const partiallyEmptyIndexInRow = (countTotalBlocks + 1) % BLOCKS_PER_ROW;
     const partiallyEmptyWidth = BLOCKS_PER_ROW - partiallyEmptyIndexInRow;
 
     return (
