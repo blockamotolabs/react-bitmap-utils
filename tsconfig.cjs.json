@@ -4,7 +4,7 @@
     "declaration": true,
     "sourceMap": true,
     "noEmit": false,
-    "target": "ES5",
+    "target": "ES2015",
     "module": "CommonJS",
     "outDir": "build/cjs",
     "rootDir": "src"

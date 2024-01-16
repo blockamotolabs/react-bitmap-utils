@@ -1,4 +1,5 @@
-import { AnyObject, HandlerNameToEventName } from './types';
+import { AnyObject } from './internal/types';
+import { HandlerNameToEventName } from './types';
 
 export const hasKey = <T extends AnyObject, K extends string>(
   obj: T,
@@ -97,5 +98,17 @@ export const getDimensions = (
       typeof height === 'number'
         ? height * pixelRatio
         : (canvas?.clientHeight ?? 0) * pixelRatio,
+  };
+};
+
+export const getLocationWithinElement = (
+  client: { clientX: number; clientY: number },
+  element: HTMLElement
+) => {
+  const rect = element.getBoundingClientRect();
+
+  return {
+    x: client.clientX - rect.left,
+    y: client.clientY - rect.top,
   };
 };

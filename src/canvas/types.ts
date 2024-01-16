@@ -98,3 +98,47 @@ export interface CanvasContextValuePopulated {
 export type CanvasContextValue =
   | CanvasContextValueUnpopulated
   | CanvasContextValuePopulated;
+
+export interface Handlers {
+  onWheel?: (event: WheelEvent) => void;
+  onMouseDown?: (event: MouseEvent) => void;
+  onMouseMove?: (event: MouseEvent) => void;
+  onMouseUp?: (event: MouseEvent) => void;
+  onMouseEnter?: (event: MouseEvent) => void;
+  onMouseLeave?: (event: MouseEvent) => void;
+  onTouchStart?: (event: TouchEvent) => void;
+  onTouchMove?: (event: TouchEvent) => void;
+  onTouchEnd?: (event: TouchEvent) => void;
+  onTouchCancel?: (event: TouchEvent) => void;
+}
+
+export interface PointerLocation {
+  x: number;
+  y: number;
+}
+
+export interface PointerStateWithinElement {
+  down: PointerLocation | null;
+  now: PointerLocation | null;
+  dragged: PointerLocation | null;
+  delta: PointerLocation | null;
+  down2: PointerLocation | null;
+  now2: PointerLocation | null;
+  dragged2: PointerLocation | null;
+  delta2: PointerLocation | null;
+}
+
+export interface PointerHandlers {
+  onPointerDown?: (
+    state: PointerStateWithinElement,
+    prev: PointerStateWithinElement
+  ) => void;
+  onPointerMove?: (
+    state: PointerStateWithinElement,
+    prev: PointerStateWithinElement
+  ) => void;
+  onPointerUp?: (
+    state: PointerStateWithinElement,
+    prev: PointerStateWithinElement
+  ) => void;
+}

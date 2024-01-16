@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 import Reconciler, { HostConfig } from 'react-reconciler';
 import { DefaultEventPriority } from 'react-reconciler/constants';
 
-import { AnyObject } from '../types';
+import { AnyObject } from '../internal/types';
 import {
   CanvasElementType,
   CommonCanvasComponentProps,
@@ -62,10 +62,7 @@ const HOST_CONFIG: HostConfig<
   createInstance: (type, props, _rootContainer, _hostContext) => {
     const rendered = [];
 
-    if (
-      typeof props.children === 'string' ||
-      typeof props.children === 'number'
-    ) {
+    if (HOST_CONFIG.shouldSetTextContent(type, props)) {
       rendered.push({
         type: InternalCanvasElementType.Text,
         rendered: props.children.toString(),
@@ -82,6 +79,13 @@ const HOST_CONFIG: HostConfig<
     type: InternalCanvasElementType.Text,
     rendered: text,
   }),
+  insertBefore: (parent, child, beforeChild) => {
+    const index = parent.rendered.indexOf(beforeChild);
+
+    if (index >= 0) {
+      parent.rendered.splice(index, 0, child);
+    }
+  },
   appendChildToContainer: (parent, child) => parent.rendered.push(child),
   appendChild: (parent, child) => parent.rendered.push(child),
   appendInitialChild: (parent, child) => parent.rendered.push(child),
@@ -94,8 +98,18 @@ const HOST_CONFIG: HostConfig<
     _rootContainer,
     _hostContext
   ) => true,
-  commitUpdate: (instance, _updatePayload, _type, _oldProps, newProps) =>
-    (instance.props = newProps),
+  commitUpdate: (instance, _updatePayload, type, _oldProps, newProps) => {
+    instance.props = newProps;
+
+    if (HOST_CONFIG.shouldSetTextContent(type, newProps)) {
+      instance.rendered = [
+        {
+          type: InternalCanvasElementType.Text,
+          rendered: newProps.children.toString(),
+        },
+      ];
+    }
+  },
   commitTextUpdate: (textInstance, _oldText, newText) => {
     textInstance.rendered = newText;
   },

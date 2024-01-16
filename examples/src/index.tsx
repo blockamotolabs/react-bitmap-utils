@@ -4,16 +4,21 @@ import {
   clamp,
   ORANGE,
   percentageOf,
+  PointerLocation,
   Rectangle,
   remapValue,
   Scale,
+  Text,
   Translate,
-  useAutoPixelRatio,
+  useAverageFrameRate,
   useEventHandlers,
+  usePointerStateWithinElement,
+  useRecommendedPixelRatio,
 } from '@bitmapland/react-bitmap-utils';
 import React, { useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
+import { BlockNumbers } from './block-numbers';
 import {
   BLOCK_SIZE,
   BLOCKS_PER_COLUMN,
@@ -22,17 +27,20 @@ import {
   MAX_ZOOM,
   MIN_ZOOM,
 } from './constants';
+import { Crosshair } from './crosshair';
+import { DifficultyPeriods } from './difficulty-periods';
 import { EmptyMask } from './empty-mask';
 import { EpochLabels } from './epoch-labels';
 import { EpochSeparators } from './epoch-separators';
 import { Grid } from './grid';
 
 const App = () => {
+  const averageFrameRate = useAverageFrameRate();
   const countTotalBlocks = 812345;
   const countEpochs = Math.ceil(countTotalBlocks / BLOCKS_PER_EPOCH);
 
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
-  const pixelRatio = useAutoPixelRatio();
+  const pixelRatio = useRecommendedPixelRatio();
   const [{ width, height }, setDimensions] = useState({ width: 0, height: 0 });
 
   const padding = Math.min(percentageOf(5, width), percentageOf(5, height));
@@ -51,6 +59,10 @@ const App = () => {
     ? innerWidth / mapWidth
     : innerHeight / mapHeight;
   const [zoom, setZoom] = useState(MIN_ZOOM);
+  const [location, setLocation] = useState({
+    x: mapWidth * 0.5,
+    y: mapHeight * 0.5,
+  });
   const scale = remapValue(zoom, MIN_ZOOM, MAX_ZOOM, distantScale, 1);
 
   useEventHandlers(
@@ -62,8 +74,8 @@ const App = () => {
 
           setZoom((prevZoom) =>
             clamp(
-              prevZoom +
-                -deltaY *
+              prevZoom -
+                deltaY *
                   remapValue(prevZoom, MIN_ZOOM, MAX_ZOOM, 0.00001, 0.002),
               MIN_ZOOM,
               MAX_ZOOM
@@ -76,6 +88,48 @@ const App = () => {
     canvas
   );
 
+  const [drag, setDrag] = useState<PointerLocation | null>(null);
+
+  usePointerStateWithinElement(
+    useMemo(
+      () => ({
+        onPointerMove: (pointers) => {
+          if (pointers.dragged && !pointers.dragged2) {
+            setDrag(pointers.dragged);
+          }
+        },
+        onPointerUp: (pointers, prevPointers) => {
+          setDrag(null);
+          setLocation((prev) => {
+            if (!prevPointers.dragged || pointers.dragged2) {
+              return prev;
+            }
+
+            return {
+              x: clamp(prev.x - prevPointers.dragged.x / scale, 0, mapWidth),
+              y: clamp(prev.y - prevPointers.dragged.y / scale, 0, mapHeight),
+            };
+          });
+        },
+      }),
+      [scale, mapWidth, mapHeight]
+    ),
+    canvas
+  );
+
+  const locationWithDrag = useMemo(() => {
+    if (!drag) {
+      return location;
+    }
+
+    const { x, y } = drag;
+
+    return {
+      x: clamp(location.x - x / scale, 0, mapWidth),
+      y: clamp(location.y - y / scale, 0, mapHeight),
+    };
+  }, [drag, scale, location, mapWidth, mapHeight]);
+
   return (
     <>
       <Canvas
@@ -87,7 +141,7 @@ const App = () => {
       >
         <Translate x={width * 0.5} y={height * 0.5}>
           <Scale x={scale} y={scale}>
-            <Translate x={mapWidth * -0.5} y={mapHeight * -0.5}>
+            <Translate x={-locationWithDrag.x} y={-locationWithDrag.y}>
               <Rectangle
                 x={0}
                 y={0}
@@ -95,16 +149,31 @@ const App = () => {
                 height={mapHeight}
                 fill={ORANGE}
               />
+              <DifficultyPeriods
+                countEpochs={countEpochs}
+                countTotalBlocks={countTotalBlocks}
+              />
+              {/* Instead of drawing as many rectangles as there are blocks, it's far more performant to draw vertical and horizontal lines */}
               <Grid countEpochs={countEpochs} zoom={zoom} scale={scale} />
               <EpochSeparators countEpochs={countEpochs} scale={scale} />
+              {/* If you look inside the BlockNumbers component you'll see we only ever draw a limited set of blocks */}
+              <BlockNumbers
+                countTotalBlocks={countTotalBlocks}
+                zoom={zoom}
+                location={locationWithDrag}
+              />
               <EpochLabels countEpochs={countEpochs} zoom={zoom} />
               <EmptyMask
                 countEpochs={countEpochs}
                 countTotalBlocks={countTotalBlocks}
               />
             </Translate>
+            <Crosshair scale={scale} />
           </Scale>
         </Translate>
+        <Text x={4} y={4} fontSize={12} fill="white">
+          {averageFrameRate.toFixed(0)} FPS
+        </Text>
       </Canvas>
     </>
   );
