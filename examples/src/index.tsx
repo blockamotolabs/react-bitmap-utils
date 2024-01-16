@@ -145,7 +145,7 @@ const App = () => {
             const highlightOpacity = getHighlightOpacity(zoom);
 
             if (highlightOpacity && typeof index === 'number') {
-              alert(`You tapped block ${index}`);
+              alert(`You clicked block ${index}`);
             }
           }
 
