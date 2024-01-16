@@ -127,10 +127,12 @@ export const useEventHandlers = (
 };
 
 const INITIAL_POINTER_STATE = {
+  isTouch: null,
   down: null,
   now: null,
   dragged: null,
   delta: null,
+  isTouch2: null,
   down2: null,
   now2: null,
   dragged2: null,
@@ -155,12 +157,14 @@ export const usePointerStateWithinElement = (
         const [one, two] = event.touches;
 
         if (!one) {
+          stateRef.current.isTouch = true;
           stateRef.current.down = null;
           stateRef.current.now = null;
           stateRef.current.dragged = null;
         }
 
         if (!two) {
+          stateRef.current.isTouch2 = true;
           stateRef.current.down2 = null;
           stateRef.current.now2 = null;
           stateRef.current.dragged2 = null;
@@ -184,6 +188,7 @@ export const usePointerStateWithinElement = (
           const prev = { ...stateRef.current };
 
           const loc = getLocationWithinElement(event, canvas);
+          stateRef.current.isTouch = false;
           stateRef.current.down = loc;
           stateRef.current.now = loc;
 
@@ -196,6 +201,7 @@ export const usePointerStateWithinElement = (
 
           const prev = { ...stateRef.current };
 
+          stateRef.current.isTouch = false;
           stateRef.current.down = null;
           stateRef.current.now = null;
           stateRef.current.dragged = null;
@@ -223,6 +229,7 @@ export const usePointerStateWithinElement = (
               }
             : null;
 
+          stateRef.current.isTouch = false;
           stateRef.current.now = loc;
           stateRef.current.dragged = dragged;
           stateRef.current.delta = delta;
@@ -242,12 +249,14 @@ export const usePointerStateWithinElement = (
 
           if (one) {
             const loc = getLocationWithinElement(one, canvas);
+            stateRef.current.isTouch = true;
             stateRef.current.down = loc;
             stateRef.current.now = loc;
           }
 
           if (two) {
             const loc = getLocationWithinElement(two, canvas);
+            stateRef.current.isTouch2 = true;
             stateRef.current.down2 = loc;
             stateRef.current.now2 = loc;
           }
@@ -279,6 +288,7 @@ export const usePointerStateWithinElement = (
                   y: loc.y - prev.now.y,
                 }
               : null;
+            stateRef.current.isTouch = true;
             stateRef.current.now = loc;
             stateRef.current.dragged = dragged;
             stateRef.current.delta = delta;
@@ -298,6 +308,7 @@ export const usePointerStateWithinElement = (
                   y: loc.y - prev.now2.y,
                 }
               : null;
+            stateRef.current.isTouch = true;
             stateRef.current.now2 = loc;
             stateRef.current.dragged2 = dragged;
             stateRef.current.delta2 = delta;

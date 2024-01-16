@@ -118,10 +118,12 @@ export interface PointerLocation {
 }
 
 export interface PointerStateWithinElement {
+  isTouch: boolean | null;
   down: PointerLocation | null;
   now: PointerLocation | null;
   dragged: PointerLocation | null;
   delta: PointerLocation | null;
+  isTouch2: boolean | null;
   down2: PointerLocation | null;
   now2: PointerLocation | null;
   dragged2: PointerLocation | null;

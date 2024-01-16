@@ -122,7 +122,7 @@ const App = () => {
     useMemo(
       () => ({
         onPointerMove: (pointers) => {
-          if (pointers.now) {
+          if (pointers.isTouch === false && pointers.now) {
             setPointer(pointers.now);
           }
 
