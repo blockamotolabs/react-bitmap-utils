@@ -1,4 +1,4 @@
-import { roundSquareRoot } from '../../src/utils';
+import { roundSquareRoot } from '@bitmapland/react-bitmap-utils';
 
 export const BLOCK_SIZE = 100;
 export const BLOCKS_PER_EPOCH = 210000;
