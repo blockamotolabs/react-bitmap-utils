@@ -132,7 +132,7 @@ const App = () => {
           }
         },
         onPointerUp: (pointers, prevPointers) => {
-          if (prevPointers.isTap) {
+          if (prevPointers.isTap && !prevPointers.down2) {
             const index = getTargetBlock(
               prevPointers.now,
               locationWithDrag,
