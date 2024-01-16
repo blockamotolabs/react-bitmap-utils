@@ -130,6 +130,8 @@ export interface PointerStateWithinElement {
   now2: Coordinates | null;
   dragged2: Coordinates | null;
   delta2: Coordinates | null;
+  pinched: number | null;
+  pinchedDelta: number | null;
 }
 
 export interface PointerHandlers {
