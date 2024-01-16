@@ -32,14 +32,14 @@ export const EmptyMask = memo(
           }
           y={partiallyEmptyRow * BLOCK_SIZE}
           width={(partiallyEmptyWidth + 1) * BLOCK_SIZE}
-          height={BLOCK_SIZE}
+          height={BLOCK_SIZE * 2}
           fill={BLACK}
         />
         <Rectangle
           x={(countEpochs - 1) * BLOCKS_PER_ROW * BLOCK_SIZE}
           y={(partiallyEmptyRow + 1) * BLOCK_SIZE}
           width={(BLOCKS_PER_ROW + 1) * BLOCK_SIZE}
-          height={(BLOCKS_PER_COLUMN - partiallyEmptyRow) * BLOCK_SIZE}
+          height={(BLOCKS_PER_COLUMN - partiallyEmptyRow + 1) * BLOCK_SIZE}
           fill={BLACK}
         />
       </>
