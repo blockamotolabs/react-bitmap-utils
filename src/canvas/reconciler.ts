@@ -62,10 +62,7 @@ const HOST_CONFIG: HostConfig<
   createInstance: (type, props, _rootContainer, _hostContext) => {
     const rendered = [];
 
-    if (
-      typeof props.children === 'string' ||
-      typeof props.children === 'number'
-    ) {
+    if (HOST_CONFIG.shouldSetTextContent(type, props)) {
       rendered.push({
         type: InternalCanvasElementType.Text,
         rendered: props.children.toString(),
