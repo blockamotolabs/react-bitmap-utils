@@ -14,3 +14,5 @@ export const MAX_ZOOM = 2;
 // The width/height of the selection of block numbers we'll actually render around the center of the screen
 // 50 x 50 means we'll only ever be rendering 2500 blocks at a time
 export const BLOCK_WINDOW_SIZE = 50;
+// If we're even closer, let's render less block numbers again
+export const BLOCK_WINDOW_SIZE_ZOOMED = 30;
