@@ -3,6 +3,7 @@ import {
   Canvas,
   clamp,
   Coordinates,
+  getDistance,
   getLocationWithinElement,
   ORANGE,
   percentageOf,
@@ -98,6 +99,7 @@ const App = () => {
   );
 
   const mouseDownRef = useRef<Coordinates | null>(null);
+  const mouseThresholdBrokenRef = useRef(false);
 
   useEventHandlers(
     useMemo(
@@ -141,6 +143,10 @@ const App = () => {
           });
 
           if (mouseDownRef.current) {
+            if (getDistance(loc, mouseDownRef.current) > 10) {
+              mouseThresholdBrokenRef.current = true;
+            }
+
             setDrag({
               x: (loc.x - mouseDownRef.current.x) / scale,
               y: (loc.y - mouseDownRef.current.y) / scale,
@@ -153,10 +159,35 @@ const App = () => {
             x: clamp(prev.x - (drag?.x ?? 0), 0, mapWidth),
             y: clamp(prev.y - (drag?.y ?? 0), 0, mapHeight),
           }));
+
+          const index = getTargetBlock(
+            mouseDownRef.current,
+            locationWithDrag,
+            countTotalBlocks,
+            width,
+            height,
+            scale
+          )?.index;
+
+          if (!mouseThresholdBrokenRef.current && typeof index === 'number') {
+            alert(`You clicked block ${index}`);
+          }
+
           mouseDownRef.current = null;
+          mouseThresholdBrokenRef.current = false;
         },
       }),
-      [canvas, scale, drag, mapHeight, mapWidth]
+      [
+        canvas,
+        scale,
+        drag?.x,
+        drag?.y,
+        mapWidth,
+        mapHeight,
+        locationWithDrag,
+        width,
+        height,
+      ]
     ),
     canvas
   );

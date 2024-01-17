@@ -26,7 +26,7 @@ const Block = ({
   x: number;
   y: number;
 }) => {
-  const index = getIndexFromCoords(x, y);
+  const index = getIndexFromCoords({ x, y });
 
   // Don't draw blocks outside of the available blocks
   if (index < 0 || index > countTotalBlocks) {

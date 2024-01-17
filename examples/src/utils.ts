@@ -9,7 +9,7 @@ import {
   MIN_ZOOM,
 } from './constants';
 
-export const getIndexFromCoords = (x: number, y: number) => {
+export const getIndexFromCoords = ({ x, y }: Coordinates) => {
   const epochIndex = Math.floor(x / BLOCKS_PER_ROW);
   const column = x % BLOCKS_PER_ROW;
   const row = y % BLOCKS_PER_COLUMN;
@@ -74,7 +74,7 @@ export const getTargetBlock = (
     return null;
   }
 
-  const index = getIndexFromCoords(x, y);
+  const index = getIndexFromCoords({ x, y });
 
   if (index < 0 || index > countTotalBlocks) {
     return null;
