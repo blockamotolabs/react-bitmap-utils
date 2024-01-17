@@ -1,3 +1,4 @@
+import { Coordinates } from './canvas';
 import { AnyObject } from './internal/types';
 import { HandlerNameToEventName } from './types';
 
@@ -113,9 +114,9 @@ export const getLocationWithinElement = (
   };
 };
 
-export const getDistance = (x1: number, y1: number, x2: number, y2: number) => {
-  const a = x1 - x2;
-  const b = y1 - y2;
+export const getDistance = (start: Coordinates, end: Coordinates) => {
+  const a = start.x - end.x;
+  const b = start.y - end.y;
 
   return Math.sqrt(a * a + b * b);
 };

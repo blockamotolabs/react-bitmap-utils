@@ -3,6 +3,8 @@ import {
   Canvas,
   clamp,
   Coordinates,
+  getDistance,
+  getLocationWithinElement,
   ORANGE,
   percentageOf,
   Rectangle,
@@ -10,10 +12,9 @@ import {
   Scale,
   Translate,
   useEventHandlers,
-  usePointerStateWithinElement,
   useRecommendedPixelRatio,
 } from '@bitmapland/react-bitmap-utils';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { BlockHighlight } from './block-highlight';
@@ -32,7 +33,7 @@ import { EmptyMask } from './empty-mask';
 import { EpochLabels } from './epoch-labels';
 import { EpochSeparators } from './epoch-separators';
 import { Grid } from './grid';
-import { getHighlightOpacity, getTargetBlock } from './utils';
+import { getBlockOpacity, getTargetBlock } from './utils';
 
 const App = () => {
   // The average frame rate hook causes the map to re-render every frame
@@ -47,16 +48,19 @@ const App = () => {
 
   const padding = Math.min(percentageOf(5, width), percentageOf(5, height));
 
+  // The actual area for drawing the map (when zoomed out)
   const innerWidth = width - padding * 2;
   const innerHeight = height - padding * 2;
   const innerAspectRatio = innerWidth / innerHeight;
 
+  // The total size of the map (when zoomed in)
   const mapWidth = countEpochs * BLOCK_SIZE * BLOCKS_PER_ROW;
   const mapHeight = BLOCKS_PER_COLUMN * BLOCK_SIZE;
   const mapAspectRatio = mapWidth / mapHeight;
 
   const fitWidth = innerAspectRatio < mapAspectRatio;
 
+  // The scale of the map when zoomed out (to best fit inside the aspect ratio)
   const distantScale = fitWidth
     ? innerWidth / mapWidth
     : innerHeight / mapHeight;
@@ -75,13 +79,11 @@ const App = () => {
       return location;
     }
 
-    const { x, y } = drag;
-
     return {
-      x: clamp(location.x - x / scale, 0, mapWidth),
-      y: clamp(location.y - y / scale, 0, mapHeight),
+      x: clamp(location.x - drag.x, 0, mapWidth),
+      y: clamp(location.y - drag.y, 0, mapHeight),
     };
-  }, [drag, scale, location, mapWidth, mapHeight]);
+  }, [drag, location, mapWidth, mapHeight]);
 
   const highlightedBlock = useMemo(
     () =>
@@ -96,10 +98,20 @@ const App = () => {
     [height, locationWithDrag, pointer, scale, width]
   );
 
+  const mouseDownRef = useRef<Coordinates | null>(null);
+  const mouseThresholdBrokenRef = useRef(false);
+  const downTouchesRef = useRef<readonly Coordinates[] | null>(null);
+  const lastTouchesRef = useRef<readonly Coordinates[] | null>(null);
+  const touchThresholdBrokenRef = useRef(false);
+
   useEventHandlers(
     useMemo(
       () => ({
         onWheel: (event) => {
+          if (!canvas) {
+            return;
+          }
+
           event.preventDefault();
           const { deltaY } = event;
 
@@ -113,28 +125,181 @@ const App = () => {
             )
           );
         },
-      }),
-      []
-    ),
-    canvas
-  );
-
-  usePointerStateWithinElement(
-    useMemo(
-      () => ({
-        onPointerMove: (pointers) => {
-          if (pointers.isTouch === false && pointers.now) {
-            setPointer(pointers.now);
+        onMouseDown: (event) => {
+          if (!canvas) {
+            return;
           }
 
-          if (pointers.dragged && !pointers.dragged2) {
-            setDrag(pointers.dragged);
+          event.preventDefault();
+
+          const loc = getLocationWithinElement(event, canvas);
+
+          mouseDownRef.current = {
+            x: loc.x,
+            y: loc.y,
+          };
+        },
+        onMouseMove: (event) => {
+          if (!canvas) {
+            return;
+          }
+
+          const loc = getLocationWithinElement(event, canvas);
+
+          setPointer({
+            x: loc.x,
+            y: loc.y,
+          });
+
+          if (mouseDownRef.current) {
+            if (getDistance(loc, mouseDownRef.current) > 10) {
+              mouseThresholdBrokenRef.current = true;
+            }
+
+            setDrag({
+              x: (loc.x - mouseDownRef.current.x) / scale,
+              y: (loc.y - mouseDownRef.current.y) / scale,
+            });
           }
         },
-        onPointerUp: (pointers, prevPointers) => {
-          if (prevPointers.isTap) {
+        onMouseUp: () => {
+          setDrag(null);
+          setLocation((prev) => ({
+            x: clamp(prev.x - (drag?.x ?? 0), 0, mapWidth),
+            y: clamp(prev.y - (drag?.y ?? 0), 0, mapHeight),
+          }));
+
+          const index = getTargetBlock(
+            mouseDownRef.current,
+            locationWithDrag,
+            countTotalBlocks,
+            width,
+            height,
+            scale
+          )?.index;
+
+          if (
+            !mouseThresholdBrokenRef.current &&
+            typeof index === 'number' &&
+            getBlockOpacity(zoom)
+          ) {
+            alert(`You clicked block ${index}`);
+          }
+
+          mouseDownRef.current = null;
+          mouseThresholdBrokenRef.current = false;
+        },
+        onTouchStart: (event) => {
+          if (!canvas) {
+            return;
+          }
+
+          event.preventDefault();
+
+          const oneOrTwoTouches = [...event.touches]
+            .slice(0, 2)
+            .map((touch) => getLocationWithinElement(touch, canvas));
+
+          downTouchesRef.current = oneOrTwoTouches;
+          lastTouchesRef.current = downTouchesRef.current;
+
+          if (oneOrTwoTouches.length > 1) {
+            touchThresholdBrokenRef.current = true;
+          }
+        },
+        onTouchMove: (event) => {
+          if (!canvas) {
+            return;
+          }
+
+          const downTouches = downTouchesRef.current ?? [];
+          const lastTouches = lastTouchesRef.current ?? [];
+          const oneOrTwoTouches = [...event.touches]
+            .slice(0, 2)
+            .map((touch) => getLocationWithinElement(touch, canvas));
+
+          if (oneOrTwoTouches.length > 1) {
+            touchThresholdBrokenRef.current = true;
+
+            if (lastTouches.length > 1) {
+              const lastDistance = getDistance(
+                lastTouches[0]!,
+                lastTouches[1]!
+              );
+
+              const nowDistance = getDistance(
+                oneOrTwoTouches[0]!,
+                oneOrTwoTouches[1]!
+              );
+
+              const delta = lastDistance - nowDistance;
+
+              setZoom((prevZoom) =>
+                clamp(
+                  prevZoom -
+                    delta *
+                      remapValue(prevZoom, MIN_ZOOM, MAX_ZOOM, 0.00002, 0.008),
+                  MIN_ZOOM,
+                  MAX_ZOOM
+                )
+              );
+            }
+          }
+
+          if (lastTouches.length === oneOrTwoTouches.length) {
+            const combinedDeltas = oneOrTwoTouches.reduce(
+              (acc, touch, index) => {
+                const prev = lastTouchesRef.current?.[index];
+
+                if (!prev) {
+                  return acc;
+                }
+
+                return {
+                  x: acc.x + touch.x - prev.x,
+                  y: acc.y + touch.y - prev.y,
+                };
+              },
+              { x: 0, y: 0 }
+            );
+
+            const averageDelta = {
+              x: combinedDeltas.x / oneOrTwoTouches.length,
+              y: combinedDeltas.y / oneOrTwoTouches.length,
+            };
+
+            setDrag((prev) => ({
+              x: (prev?.x ?? 0) + averageDelta.x / scale,
+              y: (prev?.y ?? 0) + averageDelta.y / scale,
+            }));
+          }
+
+          downTouches.forEach((touch, index) => {
+            const current = oneOrTwoTouches[index];
+            if (!current) {
+              return;
+            }
+            const distance = getDistance(touch, current);
+
+            if (distance > 10) {
+              touchThresholdBrokenRef.current = true;
+            }
+          });
+
+          lastTouchesRef.current = oneOrTwoTouches;
+        },
+        onTouchEnd: (event) => {
+          if (!canvas) {
+            return;
+          }
+
+          const zeroOrOneTouches = [...event.touches]
+            .slice(0, 2)
+            .map((touch) => getLocationWithinElement(touch, canvas));
+
+          if (zeroOrOneTouches.length === 0) {
             const index = getTargetBlock(
-              prevPointers.now,
+              lastTouchesRef.current?.[0],
               locationWithDrag,
               countTotalBlocks,
               width,
@@ -142,27 +307,39 @@ const App = () => {
               scale
             )?.index;
 
-            const highlightOpacity = getHighlightOpacity(zoom);
-
-            if (highlightOpacity && typeof index === 'number') {
+            if (
+              !touchThresholdBrokenRef.current &&
+              typeof index === 'number' &&
+              getBlockOpacity(zoom)
+            ) {
               alert(`You tapped block ${index}`);
             }
+
+            touchThresholdBrokenRef.current = false;
           }
 
           setDrag(null);
-          setLocation((prev) => {
-            if (!prevPointers.dragged || pointers.dragged2) {
-              return prev;
-            }
+          setLocation((prev) => ({
+            x: clamp(prev.x - (drag?.x ?? 0), 0, mapWidth),
+            y: clamp(prev.y - (drag?.y ?? 0), 0, mapHeight),
+          }));
 
-            return {
-              x: clamp(prev.x - prevPointers.dragged.x / scale, 0, mapWidth),
-              y: clamp(prev.y - prevPointers.dragged.y / scale, 0, mapHeight),
-            };
-          });
+          downTouchesRef.current = null;
+          lastTouchesRef.current = null;
         },
       }),
-      [locationWithDrag, width, height, scale, zoom, mapWidth, mapHeight]
+      [
+        canvas,
+        scale,
+        locationWithDrag,
+        width,
+        height,
+        zoom,
+        drag?.x,
+        drag?.y,
+        mapWidth,
+        mapHeight,
+      ]
     ),
     canvas
   );

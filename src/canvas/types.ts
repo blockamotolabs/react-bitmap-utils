@@ -116,33 +116,3 @@ export interface Coordinates {
   x: number;
   y: number;
 }
-
-export interface PointerStateWithinElement {
-  isTouch: boolean | null;
-  isTap: boolean | null;
-  down: Coordinates | null;
-  now: Coordinates | null;
-  dragged: Coordinates | null;
-  delta: Coordinates | null;
-  isTouch2: boolean | null;
-  isTap2: boolean | null;
-  down2: Coordinates | null;
-  now2: Coordinates | null;
-  dragged2: Coordinates | null;
-  delta2: Coordinates | null;
-}
-
-export interface PointerHandlers {
-  onPointerDown?: (
-    state: PointerStateWithinElement,
-    prev: PointerStateWithinElement
-  ) => void;
-  onPointerMove?: (
-    state: PointerStateWithinElement,
-    prev: PointerStateWithinElement
-  ) => void;
-  onPointerUp?: (
-    state: PointerStateWithinElement,
-    prev: PointerStateWithinElement
-  ) => void;
-}
