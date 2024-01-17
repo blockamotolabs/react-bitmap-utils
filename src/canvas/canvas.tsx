@@ -11,7 +11,8 @@ import React, {
 
 import { getDimensions } from '../utils';
 import { useCanvasRefWrapper, useDrawToCanvas } from './internal/hooks';
-import { Dimensions } from './types';
+import { RENDERERS } from './renderers';
+import { CanvasComponentRenderers, Dimensions } from './types';
 
 export interface CanvasProps
   extends Omit<HTMLAttributes<HTMLCanvasElement>, 'onResize'> {
@@ -19,6 +20,8 @@ export interface CanvasProps
   height?: number;
   pixelRatio?: number;
   backgroundColor?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  renderers?: Record<string, CanvasComponentRenderers<any>>;
   children: ReactNode;
   ref?: ForwardedRef<HTMLCanvasElement>;
   onResize?: (dimensions: Dimensions) => void;
@@ -34,6 +37,7 @@ export const Canvas = memo(
         onResize,
         backgroundColor,
         children,
+        renderers: rendererOverrides,
         ...props
       }: CanvasProps,
       ref: ForwardedRef<HTMLCanvasElement>
@@ -46,6 +50,14 @@ export const Canvas = memo(
         getDimensions(pixelRatio, width, height, canvasCtx?.canvas)
       );
 
+      const renderers = useMemo(
+        () => ({
+          ...RENDERERS,
+          ...rendererOverrides,
+        }),
+        [rendererOverrides]
+      );
+
       const canvasContextValue = useMemo(() => {
         if (!canvasCtx) {
           return {
@@ -54,6 +66,7 @@ export const Canvas = memo(
             width: dimensions.width,
             height: dimensions.height,
             pixelRatio,
+            renderers,
           };
         }
 
@@ -62,8 +75,15 @@ export const Canvas = memo(
           width: dimensions.width,
           height: dimensions.height,
           pixelRatio,
+          renderers,
         };
-      }, [canvasCtx, dimensions.height, dimensions.width, pixelRatio]);
+      }, [
+        canvasCtx,
+        dimensions.height,
+        dimensions.width,
+        pixelRatio,
+        renderers,
+      ]);
 
       useDrawToCanvas(
         canvasContextValue,
@@ -72,7 +92,8 @@ export const Canvas = memo(
         pixelRatio,
         backgroundColor,
         children,
-        useEffect
+        useEffect,
+        renderers
       );
 
       useEffect(() => {

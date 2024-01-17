@@ -28,6 +28,7 @@ import {
   MIN_ZOOM,
 } from './constants';
 import { Crosshair } from './crosshair';
+import { CUSTOM_RENDERERS } from './custom-renderers';
 import { DifficultyPeriods } from './difficulty-periods';
 import { EmptyMask } from './empty-mask';
 import { EpochLabels } from './epoch-labels';
@@ -352,6 +353,7 @@ const App = () => {
         backgroundColor={BLACK}
         style={{ width: '100%', height: '100%', cursor: 'move' }}
         onResize={setDimensions}
+        renderers={CUSTOM_RENDERERS}
       >
         <Translate x={width * 0.5} y={height * 0.5}>
           <Scale x={scale} y={scale}>

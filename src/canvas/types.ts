@@ -83,6 +83,8 @@ export interface CanvasContextValueUnpopulated {
   width: number;
   height: number;
   pixelRatio: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  renderers: Record<string, CanvasComponentRenderers<any>>;
   parent?: CanvasContextValue | null;
 }
 
@@ -92,6 +94,8 @@ export interface CanvasContextValuePopulated {
   width: number;
   height: number;
   pixelRatio: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  renderers: Record<string, CanvasComponentRenderers<any>>;
   parent?: CanvasContextValue | null;
 }
 

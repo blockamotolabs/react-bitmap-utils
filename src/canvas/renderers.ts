@@ -197,6 +197,7 @@ const canvasBufferRenderers: CanvasComponentRenderers<IntrinsicCanvasBufferProps
         pixelRatio,
         canvas,
         ctx,
+        renderers,
       },
       rendered
     ) => {
@@ -212,7 +213,8 @@ const canvasBufferRenderers: CanvasComponentRenderers<IntrinsicCanvasBufferProps
         dimensions.height,
         pixelRatio,
         backgroundColor,
-        rendered
+        rendered,
+        renderers
       );
 
       parentCtx.drawImage(canvas, drawX, drawY, drawWidth, drawHeight);
