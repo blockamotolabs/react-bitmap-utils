@@ -33,7 +33,7 @@ import { EmptyMask } from './empty-mask';
 import { EpochLabels } from './epoch-labels';
 import { EpochSeparators } from './epoch-separators';
 import { Grid } from './grid';
-import { getTargetBlock } from './utils';
+import { getBlockOpacity, getTargetBlock } from './utils';
 
 const App = () => {
   // The average frame rate hook causes the map to re-render every frame
@@ -175,7 +175,11 @@ const App = () => {
             scale
           )?.index;
 
-          if (!mouseThresholdBrokenRef.current && typeof index === 'number') {
+          if (
+            !mouseThresholdBrokenRef.current &&
+            typeof index === 'number' &&
+            getBlockOpacity(zoom)
+          ) {
             alert(`You clicked block ${index}`);
           }
 
@@ -186,13 +190,14 @@ const App = () => {
       [
         canvas,
         scale,
+        locationWithDrag,
+        width,
+        height,
+        zoom,
         drag?.x,
         drag?.y,
         mapWidth,
         mapHeight,
-        locationWithDrag,
-        width,
-        height,
       ]
     ),
     canvas
