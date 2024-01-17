@@ -11,7 +11,7 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
     interface IntrinsicElements {
-      // Here's we're adding our custom component to the JSX.IntrinsicElements interface.
+      // Here we're adding our custom component to the JSX.IntrinsicElements interface.
       // Now we can include the imported <Circle /> in our JSX.
       'Custom.Circle': CircleProps;
     }
