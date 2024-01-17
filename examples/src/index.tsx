@@ -127,6 +127,8 @@ const App = () => {
             return;
           }
 
+          event.preventDefault();
+
           const loc = getLocationWithinElement(event, canvas);
 
           mouseDownRef.current = {
