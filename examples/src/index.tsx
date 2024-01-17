@@ -105,6 +105,10 @@ const App = () => {
     useMemo(
       () => ({
         onWheel: (event) => {
+          if (!canvas) {
+            return;
+          }
+
           event.preventDefault();
           const { deltaY } = event;
 
