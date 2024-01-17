@@ -10,9 +10,12 @@ import {
   Rectangle,
   remapValue,
   Scale,
+  Text,
   Translate,
+  useAverageFrameRate,
   useEventHandlers,
   useRecommendedPixelRatio,
+  WHITE,
 } from '@bitmapland/react-bitmap-utils';
 import React, { useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -39,7 +42,7 @@ import { getBlockOpacity, getTargetBlock } from './utils';
 const App = () => {
   // The average frame rate hook causes the map to re-render every frame
   // This is only used when we're testing performance of the map on various devices
-  // const averageFrameRate = useAverageFrameRate();
+  const averageFrameRate = useAverageFrameRate();
   const countTotalBlocks = 812345;
   const countEpochs = Math.ceil(countTotalBlocks / BLOCKS_PER_EPOCH);
 
@@ -395,9 +398,9 @@ const App = () => {
             <Crosshair scale={scale} />
           </Scale>
         </Translate>
-        {/* <Text x={4} y={4} fontSize={12} fill="white">
+        <Text x={4} y={4} fontSize={12} fill={WHITE}>
           {averageFrameRate.toFixed(0)} FPS
-        </Text> */}
+        </Text>
       </Canvas>
     </>
   );
