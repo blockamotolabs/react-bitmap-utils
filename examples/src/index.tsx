@@ -3,6 +3,7 @@ import {
   Canvas,
   clamp,
   Coordinates,
+  getLocationWithinElement,
   ORANGE,
   percentageOf,
   Rectangle,
@@ -10,10 +11,9 @@ import {
   Scale,
   Translate,
   useEventHandlers,
-  usePointerStateWithinElement,
   useRecommendedPixelRatio,
 } from '@bitmapland/react-bitmap-utils';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { BlockHighlight } from './block-highlight';
@@ -32,7 +32,7 @@ import { EmptyMask } from './empty-mask';
 import { EpochLabels } from './epoch-labels';
 import { EpochSeparators } from './epoch-separators';
 import { Grid } from './grid';
-import { getHighlightOpacity, getTargetBlock } from './utils';
+import { getTargetBlock } from './utils';
 
 const App = () => {
   // The average frame rate hook causes the map to re-render every frame
@@ -78,13 +78,11 @@ const App = () => {
       return location;
     }
 
-    const { x, y } = drag;
-
     return {
-      x: clamp(location.x - x / scale, 0, mapWidth),
-      y: clamp(location.y - y / scale, 0, mapHeight),
+      x: clamp(location.x - drag.x, 0, mapWidth),
+      y: clamp(location.y - drag.y, 0, mapHeight),
     };
-  }, [drag, scale, location, mapWidth, mapHeight]);
+  }, [drag, location, mapWidth, mapHeight]);
 
   const highlightedBlock = useMemo(
     () =>
@@ -98,6 +96,8 @@ const App = () => {
       ),
     [height, locationWithDrag, pointer, scale, width]
   );
+
+  const mouseDownRef = useRef<Coordinates | null>(null);
 
   useEventHandlers(
     useMemo(
@@ -116,70 +116,47 @@ const App = () => {
             )
           );
         },
-      }),
-      []
-    ),
-    canvas
-  );
-
-  usePointerStateWithinElement(
-    useMemo(
-      () => ({
-        onPointerMove: (pointers) => {
-          if (pointers.isTouch === false && pointers.now) {
-            setPointer(pointers.now);
+        onMouseDown: (event) => {
+          if (!canvas) {
+            return;
           }
 
-          if (pointers.dragged) {
-            setDrag(pointers.dragged);
-          }
+          const loc = getLocationWithinElement(event, canvas);
 
-          const { pinchedDelta } = pointers;
-
-          if (typeof pinchedDelta === 'number') {
-            setZoom((prevZoom) =>
-              clamp(
-                prevZoom -
-                  pinchedDelta *
-                    remapValue(prevZoom, MIN_ZOOM, MAX_ZOOM, 0.00001, 0.01),
-                MIN_ZOOM,
-                MAX_ZOOM
-              )
-            );
-          }
+          mouseDownRef.current = {
+            x: loc.x,
+            y: loc.y,
+          };
         },
-        onPointerUp: (pointers, prevPointers) => {
-          if (prevPointers.isTap && !prevPointers.down2) {
-            const index = getTargetBlock(
-              prevPointers.now,
-              locationWithDrag,
-              countTotalBlocks,
-              width,
-              height,
-              scale
-            )?.index;
-
-            const highlightOpacity = getHighlightOpacity(zoom);
-
-            if (highlightOpacity && typeof index === 'number') {
-              alert(`You clicked block ${index}`);
-            }
+        onMouseMove: (event) => {
+          if (!canvas) {
+            return;
           }
 
-          setDrag(null);
-          setLocation((prev) => {
-            if (!prevPointers.dragged || pointers.dragged2) {
-              return prev;
-            }
+          const loc = getLocationWithinElement(event, canvas);
 
-            return {
-              x: clamp(prev.x - prevPointers.dragged.x / scale, 0, mapWidth),
-              y: clamp(prev.y - prevPointers.dragged.y / scale, 0, mapHeight),
-            };
+          setPointer({
+            x: loc.x,
+            y: loc.y,
           });
+
+          if (mouseDownRef.current) {
+            setDrag({
+              x: (loc.x - mouseDownRef.current.x) / scale,
+              y: (loc.y - mouseDownRef.current.y) / scale,
+            });
+          }
+        },
+        onMouseUp: () => {
+          setDrag(null);
+          setLocation((prev) => ({
+            x: clamp(prev.x - (drag?.x ?? 0), 0, mapWidth),
+            y: clamp(prev.y - (drag?.y ?? 0), 0, mapHeight),
+          }));
+          mouseDownRef.current = null;
         },
       }),
-      [locationWithDrag, width, height, scale, zoom, mapWidth, mapHeight]
+      [canvas, scale, drag, mapHeight, mapWidth]
     ),
     canvas
   );
