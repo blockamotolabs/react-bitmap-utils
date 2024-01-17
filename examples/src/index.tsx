@@ -100,6 +100,9 @@ const App = () => {
 
   const mouseDownRef = useRef<Coordinates | null>(null);
   const mouseThresholdBrokenRef = useRef(false);
+  const downTouchesRef = useRef<readonly Coordinates[] | null>(null);
+  const lastTouchesRef = useRef<readonly Coordinates[] | null>(null);
+  const touchThresholdBrokenRef = useRef(false);
 
   useEventHandlers(
     useMemo(
@@ -185,6 +188,144 @@ const App = () => {
 
           mouseDownRef.current = null;
           mouseThresholdBrokenRef.current = false;
+        },
+        onTouchStart: (event) => {
+          if (!canvas) {
+            return;
+          }
+
+          event.preventDefault();
+
+          const oneOrTwoTouches = [...event.touches]
+            .slice(0, 2)
+            .map((touch) => getLocationWithinElement(touch, canvas));
+
+          downTouchesRef.current = oneOrTwoTouches;
+          lastTouchesRef.current = downTouchesRef.current;
+
+          if (oneOrTwoTouches.length > 1) {
+            touchThresholdBrokenRef.current = true;
+          }
+        },
+        onTouchMove: (event) => {
+          if (!canvas) {
+            return;
+          }
+
+          const downTouches = downTouchesRef.current ?? [];
+          const lastTouches = lastTouchesRef.current ?? [];
+          const oneOrTwoTouches = [...event.touches]
+            .slice(0, 2)
+            .map((touch) => getLocationWithinElement(touch, canvas));
+
+          if (oneOrTwoTouches.length > 1) {
+            touchThresholdBrokenRef.current = true;
+
+            if (lastTouches.length > 1) {
+              const lastDistance = getDistance(
+                lastTouches[0]!,
+                lastTouches[1]!
+              );
+
+              const nowDistance = getDistance(
+                oneOrTwoTouches[0]!,
+                oneOrTwoTouches[1]!
+              );
+
+              const delta = lastDistance - nowDistance;
+
+              setZoom((prevZoom) =>
+                clamp(
+                  prevZoom -
+                    delta *
+                      remapValue(prevZoom, MIN_ZOOM, MAX_ZOOM, 0.00002, 0.008),
+                  MIN_ZOOM,
+                  MAX_ZOOM
+                )
+              );
+            }
+          }
+
+          if (lastTouches.length === oneOrTwoTouches.length) {
+            const combinedDeltas = oneOrTwoTouches.reduce(
+              (acc, touch, index) => {
+                const prev = lastTouchesRef.current?.[index];
+
+                if (!prev) {
+                  return acc;
+                }
+
+                return {
+                  x: acc.x + touch.x - prev.x,
+                  y: acc.y + touch.y - prev.y,
+                };
+              },
+              { x: 0, y: 0 }
+            );
+
+            const averageDelta = {
+              x: combinedDeltas.x / oneOrTwoTouches.length,
+              y: combinedDeltas.y / oneOrTwoTouches.length,
+            };
+
+            setDrag((prev) => ({
+              x: (prev?.x ?? 0) + averageDelta.x / scale,
+              y: (prev?.y ?? 0) + averageDelta.y / scale,
+            }));
+          }
+
+          downTouches.forEach((touch, index) => {
+            const current = oneOrTwoTouches[index];
+            if (!current) {
+              return;
+            }
+            const distance = getDistance(touch, current);
+
+            if (distance > 10) {
+              touchThresholdBrokenRef.current = true;
+            }
+          });
+
+          lastTouchesRef.current = oneOrTwoTouches;
+        },
+        onTouchEnd: (event) => {
+          if (!canvas) {
+            return;
+          }
+
+          const zeroOrOneTouches = [...event.touches]
+            .slice(0, 2)
+            .map((touch) => getLocationWithinElement(touch, canvas));
+
+          if (zeroOrOneTouches.length === 0) {
+            const index = getTargetBlock(
+              lastTouchesRef.current?.[0],
+              locationWithDrag,
+              countTotalBlocks,
+              width,
+              height,
+              scale
+            )?.index;
+
+            if (
+              !touchThresholdBrokenRef.current &&
+              typeof index === 'number' &&
+              getBlockOpacity(zoom)
+            ) {
+              alert(`You tapped block ${index}`);
+            }
+
+            touchThresholdBrokenRef.current = false;
+          }
+
+          setDrag(null);
+          setLocation((prev) => ({
+            x: clamp(prev.x - (drag?.x ?? 0), 0, mapWidth),
+            y: clamp(prev.y - (drag?.y ?? 0), 0, mapHeight),
+          }));
+
+          downTouchesRef.current = null;
+          lastTouchesRef.current = null;
         },
       }),
       [

@@ -42,7 +42,7 @@ export interface TargetBlock extends Coordinates {
 }
 
 export const getTargetBlock = (
-  pointer: Coordinates | null,
+  pointer: Coordinates | null | undefined,
   location: Coordinates,
   countTotalBlocks: number,
   width: number,
