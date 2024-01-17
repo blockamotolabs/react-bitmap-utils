@@ -395,6 +395,8 @@ const App = () => {
                 zoom={zoom}
               />
             </Translate>
+            {/* This helps to pinpoint the center of the screen during development */}
+            {/* The Crosshair component uses a custom component/renderer - have a look in crosshair.tsx and custom-renderers.tsx */}
             <Crosshair scale={scale} />
           </Scale>
         </Translate>

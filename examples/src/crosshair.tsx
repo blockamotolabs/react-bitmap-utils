@@ -8,6 +8,7 @@ import { Circle } from './custom-renderers';
 export const Crosshair = memo(({ scale }: { scale: number }) => {
   return (
     <Scale x={1 / scale} y={1 / scale}>
+      {/* This is a custom component defined in custom-renderers.tsx */}
       <Circle x={0} y={0} radius={20} stroke="cyan" lineWidth={1} />
       <Line
         startX={0}
