@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 
 import { CanvasProps } from './canvas';
-import { CanvasContext } from './context';
+import { CanvasContext } from './internal/context';
 import { useCanvasContext } from './hooks';
 import { useCanvasRefWrapper } from './internal/hooks';
 import { CanvasElementType, CommonCanvasComponentProps } from './types';

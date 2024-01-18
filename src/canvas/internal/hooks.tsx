@@ -7,8 +7,8 @@ import React, {
   useRef,
 } from 'react';
 
-import { CanvasContext } from '../context';
-import CanvasReconcilerPublic from '../reconciler';
+import { CanvasContext } from './context';
+import CanvasReconcilerPublic from './reconciler';
 import { CanvasComponentRenderers, CanvasContextValue } from '../types';
 import { getDimensions } from '../utils';
 import { drawToCanvas } from './utils';

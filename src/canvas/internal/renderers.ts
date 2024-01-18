@@ -1,20 +1,20 @@
-import { IntrinsicCanvasBufferProps } from './canvas-buffer';
-import { ImageProps } from './image';
-import { drawToCanvas } from './internal/utils';
-import { LineProps } from './line';
-import { OpacityProps } from './opacity';
-import { RectangleProps } from './rectangle';
-import { RotateProps } from './rotate';
-import { ScaleProps } from './scale';
-import { TextProps } from './text';
-import { TranslateProps } from './translate';
+import { IntrinsicCanvasBufferProps } from '../canvas-buffer';
+import { ImageProps } from '../image';
+import { LineProps } from '../line';
+import { OpacityProps } from '../opacity';
+import { RectangleProps } from '../rectangle';
+import { RotateProps } from '../rotate';
+import { ScaleProps } from '../scale';
+import { TextProps } from '../text';
+import { TranslateProps } from '../translate';
 import {
   CanvasComponentRenderers,
   CanvasElementType,
   InternalCanvasElementType,
   ReconciledCanvasChild,
   ReconciledTextChild,
-} from './types';
+} from '../types';
+import { drawToCanvas } from './utils';
 
 const rectangleRenderers: CanvasComponentRenderers<RectangleProps> = {
   drawBeforeChildren: (

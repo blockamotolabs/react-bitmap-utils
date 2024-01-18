@@ -10,7 +10,7 @@ import React, {
 } from 'react';
 
 import { useCanvasRefWrapper, useDrawToCanvas } from './internal/hooks';
-import { RENDERERS } from './renderers';
+import { RENDERERS } from './internal/renderers';
 import { CanvasComponentRenderers, Dimensions } from './types';
 import { getDimensions } from './utils';
 
