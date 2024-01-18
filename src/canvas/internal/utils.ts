@@ -1,4 +1,4 @@
-import { isArray } from '../../utils';
+import { isArray } from '../../internal/utils';
 import {
   CanvasComponentRenderers,
   ReconciledCanvasChild,

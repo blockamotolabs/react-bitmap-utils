@@ -7,10 +7,10 @@ import React, {
   useRef,
 } from 'react';
 
-import { getDimensions } from '../../utils';
 import { CanvasContext } from '../context';
 import CanvasReconcilerPublic from '../reconciler';
 import { CanvasComponentRenderers, CanvasContextValue } from '../types';
+import { getDimensions } from '../utils';
 import { drawToCanvas } from './utils';
 
 export const useDrawToCanvas = (

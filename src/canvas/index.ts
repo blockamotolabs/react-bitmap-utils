@@ -12,3 +12,4 @@ export * from './opacity';
 export * from './for-each';
 export * from './while';
 export * from './types';
+export * from './utils';
