@@ -434,6 +434,8 @@ If your branch is out of date from the `main` branch please update it and fix an
 
 If you add any dependencies please justify why the dependency was necessary.
 
+If your change affects the public API please update the documentation ([readme](README.md)) to reflect this.
+
 We reserve the right to deny any pull requests that do not meet any of the aforementioned standards, or that we do not believe are in the best interest of the project.
 
 ### Setup
