@@ -1,6 +1,6 @@
 import {
   CanvasBuffer,
-  ForEach,
+  For,
   Opacity,
   remapValue,
   Text,
@@ -19,7 +19,7 @@ export const EpochLabels = memo(
   ({ countEpochs, zoom }: { countEpochs: number; zoom: number }) => {
     return (
       <Opacity opacity={remapValue(zoom, MIN_ZOOM, 1.01, 1, 0, true)}>
-        <ForEach end={countEpochs}>
+        <For end={countEpochs}>
           {({ index }) => (
             // We draw our epoch labels to an off-screen canvas that is then rendered to the main canvas.
             // This is because some browsers do not handle very large text well.
@@ -48,7 +48,7 @@ export const EpochLabels = memo(
               </Text>
             </CanvasBuffer>
           )}
-        </ForEach>
+        </For>
       </Opacity>
     );
   }
