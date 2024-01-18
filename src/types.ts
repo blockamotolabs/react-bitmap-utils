@@ -1,6 +1,6 @@
-import { AnyObject } from './internal/types';
 import { IntrinsicCanvasBufferProps } from './canvas-buffer';
 import { ImageProps } from './image';
+import { AnyObject } from './internal/types';
 import { LineProps } from './line';
 import { OpacityProps } from './opacity';
 import { RectangleProps } from './rectangle';
