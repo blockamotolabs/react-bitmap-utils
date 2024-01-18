@@ -5,7 +5,7 @@ import {
   Opacity,
   Text,
   WHITE,
-} from '@bitmapland/react-bitmap-utils';
+} from '@blockamotolabs/react-bitmap-utils';
 import React, { memo } from 'react';
 
 import {

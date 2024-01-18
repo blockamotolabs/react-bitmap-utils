@@ -20,7 +20,7 @@
     "moduleResolution": "Node",
     "jsx": "react",
     "paths": {
-      "@bitmapland/react-bitmap-utils": ["./src/index.ts"]
+      "@blockamotolabs/react-bitmap-utils": ["./src/index.ts"]
     }
   },
   "include": ["src/**/*", "examples/src/**/*"]

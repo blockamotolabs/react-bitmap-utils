@@ -1,7 +1,7 @@
 import {
   CanvasComponentRenderers,
   CommonCanvasComponentProps,
-} from '@bitmapland/react-bitmap-utils';
+} from '@blockamotolabs/react-bitmap-utils';
 
 // This is our custom component. You can see it being used in the crosshair.tsx component.
 // It is an "intrinsic" element (not a function/class), and so has to be added to JSX.IntrinsicElements if you're using TypeScript.
