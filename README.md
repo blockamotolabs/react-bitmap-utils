@@ -119,7 +119,7 @@ If the `restore` prop were not provided it would draw a `20px` by `20px` red rec
 </>
 ```
 
-The below example will draw `20px` by `20px`` red and blue rectangles next to each other because the `Scale` did not have any children, and therefore it is assumed that everything following it should be scaled.
+The below example will draw `20px` by `20px` red and blue rectangles next to each other because the `Scale` did not have any children, and therefore it is assumed that everything following it should be scaled.
 
 ```tsx
 <>
