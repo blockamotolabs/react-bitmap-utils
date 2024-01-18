@@ -1,8 +1,8 @@
+import { AnyObject } from '../internal/types';
 import { IntrinsicCanvasBufferProps } from './canvas-buffer';
 import { ImageProps } from './image';
 import { LineProps } from './line';
 import { OpacityProps } from './opacity';
-import { CanvasChild, TextChild } from './reconciler';
 import { RectangleProps } from './rectangle';
 import { RotateProps } from './rotate';
 import { ScaleProps } from './scale';
@@ -43,13 +43,27 @@ declare global {
   }
 }
 
+export interface ReconciledTextChild {
+  type: InternalCanvasElementType.Text;
+  props?: never;
+  rendered: string;
+}
+
+export interface ReconciledCanvasChild<
+  P extends CommonCanvasComponentProps = AnyObject,
+> {
+  type: CanvasElementType;
+  props: P;
+  rendered: (ReconciledTextChild | ReconciledCanvasChild)[];
+}
+
 export interface DrawContext {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   width: number;
   height: number;
   pixelRatio: number;
-  drawChild: (child: CanvasChild | TextChild) => void;
+  drawChild: (child: ReconciledCanvasChild | ReconciledTextChild) => void;
 }
 
 export interface CanvasComponentRenderers<
@@ -59,12 +73,12 @@ export interface CanvasComponentRenderers<
   drawBeforeChildren?: (
     canvasContext: DrawContext,
     props: P,
-    rendered: string | readonly (CanvasChild | TextChild)[]
+    rendered: string | readonly (ReconciledCanvasChild | ReconciledTextChild)[]
   ) => void;
   drawAfterChildren?: (
     canvasContext: DrawContext,
     props: P,
-    rendered: string | readonly (CanvasChild | TextChild)[]
+    rendered: string | readonly (ReconciledCanvasChild | ReconciledTextChild)[]
   ) => void;
 }
 

@@ -3,7 +3,6 @@ import { ImageProps } from './image';
 import { drawToCanvas } from './internal/utils';
 import { LineProps } from './line';
 import { OpacityProps } from './opacity';
-import { CanvasChild, TextChild } from './reconciler';
 import { RectangleProps } from './rectangle';
 import { RotateProps } from './rotate';
 import { ScaleProps } from './scale';
@@ -13,6 +12,8 @@ import {
   CanvasComponentRenderers,
   CanvasElementType,
   InternalCanvasElementType,
+  ReconciledCanvasChild,
+  ReconciledTextChild,
 } from './types';
 
 const rectangleRenderers: CanvasComponentRenderers<RectangleProps> = {
@@ -103,7 +104,9 @@ const scaleRenderers: CanvasComponentRenderers<ScaleProps> = {
   },
 };
 
-const stringify = (rendered: string | readonly (CanvasChild | TextChild)[]) => {
+const stringify = (
+  rendered: string | readonly (ReconciledCanvasChild | ReconciledTextChild)[]
+) => {
   if (typeof rendered === 'string') {
     return rendered;
   }

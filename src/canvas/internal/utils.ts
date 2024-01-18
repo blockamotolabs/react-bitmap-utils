@@ -1,6 +1,9 @@
 import { isArray } from '../../utils';
-import { CanvasChild, TextChild } from '../reconciler';
-import { CanvasComponentRenderers } from '../types';
+import {
+  CanvasComponentRenderers,
+  ReconciledCanvasChild,
+  ReconciledTextChild,
+} from '../types';
 
 export const drawToCanvas = (
   canvas: HTMLCanvasElement,
@@ -9,7 +12,9 @@ export const drawToCanvas = (
   height: number,
   pixelRatio: number,
   backgroundColor: string | undefined,
-  rendered: string | readonly (string | CanvasChild | TextChild)[],
+  rendered:
+    | string
+    | readonly (string | ReconciledCanvasChild | ReconciledTextChild)[],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   renderers: Record<string, CanvasComponentRenderers<any>>
 ) => {
@@ -23,7 +28,9 @@ export const drawToCanvas = (
 
   ctx.scale(pixelRatio, pixelRatio);
 
-  const drawChild = (child: string | CanvasChild | TextChild) => {
+  const drawChild = (
+    child: string | ReconciledCanvasChild | ReconciledTextChild
+  ) => {
     if (typeof child === 'string') {
       return;
     }
