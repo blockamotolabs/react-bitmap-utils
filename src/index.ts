@@ -10,7 +10,7 @@ export * from './translate';
 export * from './scale';
 export * from './rotate';
 export * from './opacity';
-export * from './for-each';
+export * from './for';
 export * from './while';
 export * from './types';
 export * from './utils';

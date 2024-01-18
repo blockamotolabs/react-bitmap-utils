@@ -1,7 +1,7 @@
 import {
   clamp,
   Coordinates,
-  ForEach,
+  For,
   Opacity,
   Text,
   WHITE,
@@ -91,9 +91,9 @@ export const BlockNumbers = memo(
 
     return (
       <Opacity opacity={opacity}>
-        <ForEach start={windowStartX} end={windowEndX}>
+        <For start={windowStartX} end={windowEndX}>
           {({ index: x }) => (
-            <ForEach key={x} start={windowStartY} end={windowEndY}>
+            <For key={x} start={windowStartY} end={windowEndY}>
               {({ index: y }) => (
                 <Block
                   key={`${x},${y}`}
@@ -102,9 +102,9 @@ export const BlockNumbers = memo(
                   y={y}
                 />
               )}
-            </ForEach>
+            </For>
           )}
-        </ForEach>
+        </For>
       </Opacity>
     );
   }
