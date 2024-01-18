@@ -1,6 +1,6 @@
 import { IntrinsicCanvasBufferProps } from './canvas-buffer';
 import { ImageProps } from './image';
-import { drawToCanvas } from './internal/hooks';
+import { drawToCanvas } from './internal/utils';
 import { LineProps } from './line';
 import { OpacityProps } from './opacity';
 import { CanvasChild, TextChild } from './reconciler';

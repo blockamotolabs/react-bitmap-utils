@@ -1,6 +1,5 @@
 import { Coordinates } from './canvas';
 import { AnyObject } from './internal/types';
-import { HandlerNameToEventName } from './types';
 
 export const hasKey = <T extends AnyObject, K extends string>(
   obj: T,
@@ -74,15 +73,6 @@ export const remapValue = (
 
   return result;
 };
-
-const MATCHES_ON_PREFIX = /^on/;
-
-export const handlerNameToEventName = <const T extends string>(
-  handlerName: T
-) =>
-  handlerName
-    .replace(MATCHES_ON_PREFIX, '')
-    .toLowerCase() as HandlerNameToEventName<T>;
 
 export const getDimensions = (
   pixelRatio: number,

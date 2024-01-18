@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 
-import { handlerNameToEventName } from '../utils';
+import { handlerNameToEventName } from '../internal/utils';
 import { CanvasContext } from './context';
 import { Handlers } from './types';
 
