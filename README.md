@@ -12,7 +12,7 @@ You can find examples that demonstrate most of the library's features and some p
 
 A live version of these examples is published [here](https://blockamotolabs.github.io/react-bitmap-utils/).
 
-![Image of example map](https://github.com/blockamotolabs/react-bitmap-utils/tree/main/images/screenshot.png)
+[![Image of example map](https://github.com/blockamotolabs/react-bitmap-utils/tree/main/images/screenshot.png)](https://blockamotolabs.github.io/react-bitmap-utils/)
 
 ## Documentation
 
