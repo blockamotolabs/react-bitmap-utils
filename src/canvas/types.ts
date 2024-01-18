@@ -86,6 +86,11 @@ export interface CommonCanvasComponentProps {
   restore?: boolean;
 }
 
+export interface Coordinates {
+  x: number;
+  y: number;
+}
+
 export interface Dimensions {
   width: number;
   height: number;
@@ -128,9 +133,4 @@ export interface Handlers {
   onTouchMove?: (event: TouchEvent) => void;
   onTouchEnd?: (event: TouchEvent) => void;
   onTouchCancel?: (event: TouchEvent) => void;
-}
-
-export interface Coordinates {
-  x: number;
-  y: number;
 }
