@@ -7,11 +7,10 @@ import React, {
   useRef,
 } from 'react';
 
-import { getDimensions, isArray, isKeyOf } from '../../utils';
+import { getDimensions, isArray } from '../../utils';
 import { CanvasContext } from '../context';
 import CanvasReconcilerPublic, { CanvasChild, TextChild } from '../reconciler';
-import { RENDERERS } from '../renderers';
-import { CanvasContextValue } from '../types';
+import { CanvasComponentRenderers, CanvasContextValue } from '../types';
 
 export const drawToCanvas = (
   canvas: HTMLCanvasElement,
@@ -20,7 +19,9 @@ export const drawToCanvas = (
   height: number,
   pixelRatio: number,
   backgroundColor: string | undefined,
-  rendered: string | readonly (string | CanvasChild | TextChild)[]
+  rendered: string | readonly (string | CanvasChild | TextChild)[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  renderers: Record<string, CanvasComponentRenderers<any>>
 ) => {
   canvas.width = width;
   canvas.height = height;
@@ -37,11 +38,11 @@ export const drawToCanvas = (
       return;
     }
 
-    if (!isKeyOf(RENDERERS, child.type)) {
+    const renderer = renderers[child.type];
+
+    if (!renderer) {
       return;
     }
-
-    const renderer = RENDERERS[child.type];
 
     if (child.props?.restore) {
       ctx.save();
@@ -100,7 +101,9 @@ export const useDrawToCanvas = (
   pixelRatio: number,
   backgroundColor: string | undefined,
   children: ReactNode,
-  useEffect: typeof React.useEffect
+  useEffect: typeof React.useEffect,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  renderers: Record<string, CanvasComponentRenderers<any>>
 ) => {
   const rootContainerRef = useRef<null | ReturnType<
     typeof CanvasReconcilerPublic.render
@@ -142,7 +145,8 @@ export const useDrawToCanvas = (
       dimensions.height,
       pixelRatio,
       backgroundColor,
-      rendered
+      rendered,
+      renderers
     );
   }, [
     backgroundColor,
@@ -152,6 +156,7 @@ export const useDrawToCanvas = (
     pixelRatio,
     children,
     canvasContextValue,
+    renderers,
   ]);
 };
 

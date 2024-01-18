@@ -11,9 +11,11 @@ import React, { memo } from 'react';
 import {
   BLOCK_SIZE,
   BLOCK_WINDOW_SIZE,
+  BLOCK_WINDOW_SIZE_ZOOMED,
   BLOCKS_PER_COLUMN,
   BLOCKS_PER_EPOCH,
   BLOCKS_PER_ROW,
+  MIN_ZOOM,
 } from './constants';
 import { getBlockOpacity, getIndexFromCoords } from './utils';
 
@@ -57,6 +59,8 @@ export const BlockNumbers = memo(
     countTotalBlocks: number;
     location: Coordinates;
   }) => {
+    const blockWindowSize =
+      zoom > MIN_ZOOM + 0.6 ? BLOCK_WINDOW_SIZE_ZOOMED : BLOCK_WINDOW_SIZE;
     const countEpochs = Math.ceil(countTotalBlocks / BLOCKS_PER_EPOCH);
     const minX = 0;
     const minY = 0;
@@ -66,17 +70,17 @@ export const BlockNumbers = memo(
     // Drawing 800k+ blocks would be super slow
     // We're going to select an area around the center of the screen to draw block numbers
     const windowStartX = clamp(
-      Math.floor(location.x / BLOCK_SIZE) - BLOCK_WINDOW_SIZE * 0.5,
+      Math.floor(location.x / BLOCK_SIZE) - blockWindowSize * 0.5,
       minX,
       maxX
     );
     const windowStartY = clamp(
-      Math.floor(location.y / BLOCK_SIZE) - BLOCK_WINDOW_SIZE * 0.5,
+      Math.floor(location.y / BLOCK_SIZE) - blockWindowSize * 0.5,
       minY,
       maxY
     );
-    const windowEndX = clamp(windowStartX + BLOCK_WINDOW_SIZE, minX, maxX);
-    const windowEndY = clamp(windowStartY + BLOCK_WINDOW_SIZE, minY, maxY);
+    const windowEndX = clamp(windowStartX + blockWindowSize, minX, maxX);
+    const windowEndY = clamp(windowStartY + blockWindowSize, minY, maxY);
 
     const opacity = getBlockOpacity(zoom);
 

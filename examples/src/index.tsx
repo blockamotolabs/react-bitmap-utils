@@ -10,9 +10,12 @@ import {
   Rectangle,
   remapValue,
   Scale,
+  Text,
   Translate,
+  useAverageFrameRate,
   useEventHandlers,
   useRecommendedPixelRatio,
+  WHITE,
 } from '@bitmapland/react-bitmap-utils';
 import React, { useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -28,6 +31,7 @@ import {
   MIN_ZOOM,
 } from './constants';
 import { Crosshair } from './crosshair';
+import { CUSTOM_RENDERERS } from './custom-renderers';
 import { DifficultyPeriods } from './difficulty-periods';
 import { EmptyMask } from './empty-mask';
 import { EpochLabels } from './epoch-labels';
@@ -38,7 +42,7 @@ import { getBlockOpacity, getTargetBlock } from './utils';
 const App = () => {
   // The average frame rate hook causes the map to re-render every frame
   // This is only used when we're testing performance of the map on various devices
-  // const averageFrameRate = useAverageFrameRate();
+  const averageFrameRate = useAverageFrameRate();
   const countTotalBlocks = 812345;
   const countEpochs = Math.ceil(countTotalBlocks / BLOCKS_PER_EPOCH);
 
@@ -352,6 +356,7 @@ const App = () => {
         backgroundColor={BLACK}
         style={{ width: '100%', height: '100%', cursor: 'move' }}
         onResize={setDimensions}
+        renderers={CUSTOM_RENDERERS}
       >
         <Translate x={width * 0.5} y={height * 0.5}>
           <Scale x={scale} y={scale}>
@@ -390,12 +395,14 @@ const App = () => {
                 zoom={zoom}
               />
             </Translate>
+            {/* This helps to pinpoint the center of the screen during development */}
+            {/* The Crosshair component uses a custom component/renderer - have a look in crosshair.tsx and custom-renderers.tsx */}
             <Crosshair scale={scale} />
           </Scale>
         </Translate>
-        {/* <Text x={4} y={4} fontSize={12} fill="white">
+        <Text x={4} y={4} fontSize={12} fill={WHITE}>
           {averageFrameRate.toFixed(0)} FPS
-        </Text> */}
+        </Text>
       </Canvas>
     </>
   );

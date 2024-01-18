@@ -22,8 +22,13 @@ export interface CanvasBufferProps
 }
 
 export interface IntrinsicCanvasBufferProps
-  extends Required<Pick<CanvasBufferProps, 'pixelRatio' | 'width' | 'height'>>,
-    Omit<CanvasBufferProps, 'pixelRatio' | 'width' | 'height' | 'onResize'> {
+  extends Required<
+      Pick<CanvasBufferProps, 'pixelRatio' | 'width' | 'height' | 'renderers'>
+    >,
+    Omit<
+      CanvasBufferProps,
+      'pixelRatio' | 'width' | 'height' | 'renderers' | 'onResize'
+    > {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
 }
@@ -38,6 +43,7 @@ export const CanvasBuffer = memo(
         onResize,
         backgroundColor,
         children,
+        renderers: rendererOverrides,
         ...props
       }: CanvasBufferProps,
       ref: ForwardedRef<HTMLCanvasElement>
@@ -54,6 +60,14 @@ export const CanvasBuffer = memo(
           height: heightDefined * pixelRatioDefined,
         }),
         [heightDefined, widthDefined, pixelRatioDefined]
+      );
+
+      const renderers = useMemo(
+        () => ({
+          ...parentCanvasContextValue.renderers,
+          ...rendererOverrides,
+        }),
+        [parentCanvasContextValue.renderers, rendererOverrides]
       );
 
       const canvasCtx = useMemo(() => {
@@ -73,6 +87,7 @@ export const CanvasBuffer = memo(
           height: dimensions.height,
           pixelRatio: pixelRatioDefined,
           parent: parentCanvasContextValue,
+          renderers,
         }),
         [
           canvasCtx,
@@ -80,6 +95,7 @@ export const CanvasBuffer = memo(
           dimensions.width,
           parentCanvasContextValue,
           pixelRatioDefined,
+          renderers,
         ]
       );
 
@@ -111,6 +127,7 @@ export const CanvasBuffer = memo(
             backgroundColor={backgroundColor}
             canvas={canvasCtx.canvas}
             ctx={canvasCtx.ctx}
+            renderers={renderers}
           >
             {children}
           </CanvasElementType.CanvasBuffer>
