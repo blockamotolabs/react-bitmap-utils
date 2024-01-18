@@ -1,4 +1,4 @@
-import { HandlerNameToEventName } from '../types';
+import { HandlerNameToEventName } from '../internal/types';
 
 const MATCHES_ON_PREFIX = /^on/;
 
