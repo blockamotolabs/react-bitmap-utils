@@ -7,6 +7,7 @@ export interface LineProps extends CommonCanvasComponentProps {
   endY: number;
   stroke?: string;
   strokeWidth?: number;
+  /** Does not start a new shape when true */
   continuePath?: boolean;
 }
 

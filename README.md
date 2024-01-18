@@ -55,6 +55,8 @@ The `pixelRatio` prop is used to scale the canvas to achieve crisper, higher den
 
 You can also define a `backgroundColor` to fill the canvas with a solid color before drawing any of its descendants.
 
+Examples:
+
 The below example will render a canvas that matches the size of its parent element, has a black background, and will scale the canvas density based on the current device.
 
 ```tsx
@@ -81,6 +83,8 @@ const App = () => {
 Every component that can be drawn within a `Canvas` (excluding the `Canvas` itself) accepts a `restore` prop. If `true` the canvas state will be saved before this element is rendered and restored once complete.
 
 Components that explicitly change the global state of the canvas (`Translate`, `Rotate`, `Scale`, `Opacity`) will automatically save and restore the canvas state if they have any children. If you want to avoid restoring the state after using one of these with children you can set the `restore` prop to `false`.
+
+Examples:
 
 In the below example the `fillStyle` of the canvas will be set to `"red"` and then restored to its previous state after the `Rectangle` is rendered.
 
@@ -109,6 +113,99 @@ The below example will draw `20px` by `20px`` red and blue rectangles next to ea
   <Rectangle x={0} y={0} width={10} height={10} fill="red" />
   <Rectangle x={10} y={0} width={10} height={10} fill="blue" />
 </>
+```
+
+#### Rectangle
+
+Draws a rectangle.
+
+Props:
+
+```ts
+export interface RectangleProps extends CommonCanvasComponentProps {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fill?: string;
+  stroke?: string;
+  strokeWidth?: number;
+}
+```
+
+Examples:
+
+The below example will draw a `10px` by `10px` red rectangle in the top left corner of the canvas.
+
+```tsx
+<Rectangle x={0} y={0} width={10} height={10} fill="red" />
+```
+
+#### Line
+
+Draws a line.
+
+Props:
+
+```ts
+export interface LineProps extends CommonCanvasComponentProps {
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+  stroke?: string;
+  strokeWidth?: number;
+  /** Does not start a new shape when true */
+  continuePath?: boolean;
+}
+```
+
+Examples:
+
+On a 100x100 canvas the below example will draw a red line from the top center of the canvas to the bottom center.
+
+```tsx
+<Line startX={50} startY={0} endX={50} endY={100} stroke="red" />
+```
+
+#### Text
+
+Draws text.
+
+Props:
+
+```ts
+export interface TextProps extends CommonCanvasComponentProps {
+  x: number;
+  y: number;
+  fontFamily?: string;
+  fontSize?: number;
+  fontStyle?: 'normal' | 'italic' | 'oblique';
+  fontVariant?: 'normal' | 'small-caps';
+  fontWeight?: 'normal' | 'bold' | 'bolder' | 'lighter' | number;
+  textAlign?: 'start' | 'end' | 'left' | 'right' | 'center';
+  verticalAlign?:
+    | 'top'
+    | 'hanging'
+    | 'middle'
+    | 'alphabetic'
+    | 'ideographic'
+    | 'bottom';
+  fill?: string;
+  stroke?: string;
+  strokeWidth?: number;
+  children: number | string | readonly (number | string)[];
+}
+```
+
+Examples:
+
+Ona 100x100 canvas the below example will draw the text `"Hello, World!"` in the center of the canvas.
+
+```tsx
+<Text x={50} y={50} align="center" verticalAlign="middle" fill="black">
+  Hello, World!
+</Text>
 ```
 
 ## Contributing
