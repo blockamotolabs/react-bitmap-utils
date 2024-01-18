@@ -1,6 +1,6 @@
 import {
   BLACK,
-  ForEach,
+  For,
   Line,
   Opacity,
   remapValue,
@@ -36,7 +36,7 @@ export const Grid = memo(
       <Opacity
         opacity={remapValue(zoom, visibleAfter, MAX_ZOOM - 0.5, 0, 1, true)}
       >
-        <ForEach end={countEpochs * BLOCKS_PER_ROW}>
+        <For end={countEpochs * BLOCKS_PER_ROW}>
           {({ index }) => (
             <Line
               key={index}
@@ -48,8 +48,8 @@ export const Grid = memo(
               strokeWidth={1 / scale}
             />
           )}
-        </ForEach>
-        <ForEach end={BLOCKS_PER_COLUMN}>
+        </For>
+        <For end={BLOCKS_PER_COLUMN}>
           {({ index }) => (
             <Line
               key={index}
@@ -61,7 +61,7 @@ export const Grid = memo(
               strokeWidth={1 / scale}
             />
           )}
-        </ForEach>
+        </For>
       </Opacity>
     );
   }

@@ -1,4 +1,4 @@
-import { BLACK, ForEach, Line } from '@blockamotolabs/react-bitmap-utils';
+import { BLACK, For, Line } from '@blockamotolabs/react-bitmap-utils';
 import React, { memo } from 'react';
 
 import { BLOCK_SIZE, BLOCKS_PER_COLUMN, BLOCKS_PER_ROW } from './constants';
@@ -6,7 +6,7 @@ import { getEpochSeparatorWidth } from './utils';
 
 export const EpochSeparators = memo(
   ({ countEpochs, scale }: { countEpochs: number; scale: number }) => (
-    <ForEach start={1} end={countEpochs}>
+    <For start={1} end={countEpochs}>
       {({ index }) => (
         <Line
           key={index}
@@ -19,7 +19,7 @@ export const EpochSeparators = memo(
           strokeWidth={getEpochSeparatorWidth(scale)}
         />
       )}
-    </ForEach>
+    </For>
   )
 );
 
