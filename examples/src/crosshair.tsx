@@ -1,4 +1,4 @@
-import { Line, Scale } from '@bitmapland/react-bitmap-utils';
+import { Line, Scale } from '@blockamotolabs/react-bitmap-utils';
 import React, { memo } from 'react';
 
 import { Circle } from './custom-renderers';

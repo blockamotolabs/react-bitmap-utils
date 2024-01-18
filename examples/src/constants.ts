@@ -1,4 +1,4 @@
-import { roundSquareRoot } from '@bitmapland/react-bitmap-utils';
+import { roundSquareRoot } from '@blockamotolabs/react-bitmap-utils';
 
 // The width/height of each block in pixels
 export const BLOCK_SIZE = 100;

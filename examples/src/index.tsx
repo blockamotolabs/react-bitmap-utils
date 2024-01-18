@@ -16,7 +16,7 @@ import {
   useEventHandlers,
   useRecommendedPixelRatio,
   WHITE,
-} from '@bitmapland/react-bitmap-utils';
+} from '@blockamotolabs/react-bitmap-utils';
 import React, { useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 

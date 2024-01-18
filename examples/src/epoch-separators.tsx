@@ -1,4 +1,4 @@
-import { BLACK, ForEach, Line } from '@bitmapland/react-bitmap-utils';
+import { BLACK, ForEach, Line } from '@blockamotolabs/react-bitmap-utils';
 import React, { memo } from 'react';
 
 import { BLOCK_SIZE, BLOCKS_PER_COLUMN, BLOCKS_PER_ROW } from './constants';

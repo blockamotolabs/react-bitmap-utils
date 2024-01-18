@@ -1,4 +1,4 @@
-import { Opacity, Rectangle, WHITE } from '@bitmapland/react-bitmap-utils';
+import { Opacity, Rectangle, WHITE } from '@blockamotolabs/react-bitmap-utils';
 import React, { memo } from 'react';
 
 import { BLOCK_SIZE } from './constants';

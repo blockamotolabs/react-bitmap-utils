@@ -3,7 +3,7 @@ import {
   ORANGE_DARK,
   Rectangle,
   While,
-} from '@bitmapland/react-bitmap-utils';
+} from '@blockamotolabs/react-bitmap-utils';
 import React, { memo } from 'react';
 
 import {

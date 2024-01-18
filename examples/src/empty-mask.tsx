@@ -1,4 +1,4 @@
-import { BLACK, Rectangle } from '@bitmapland/react-bitmap-utils';
+import { BLACK, Rectangle } from '@blockamotolabs/react-bitmap-utils';
 import React, { memo } from 'react';
 
 import {

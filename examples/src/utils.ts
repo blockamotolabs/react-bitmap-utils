@@ -1,4 +1,4 @@
-import { Coordinates, remapValue } from '@bitmapland/react-bitmap-utils';
+import { Coordinates, remapValue } from '@blockamotolabs/react-bitmap-utils';
 
 import {
   BLOCK_SIZE,
