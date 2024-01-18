@@ -1,5 +1,19 @@
 # @blockamotolabs/react-bitmap-utils
 
+## Intro
+
+React Bitmap Utils is a set of React components and utilities for drawing Bitmap related imagery to an HTML5 canvas.
+
+While this library is in a pre-release version (0.x.x) minor version changes may include breaking changes. We will try to avoid this where possible, but it may be necessary.
+
+## Examples
+
+You can find examples that demonstrate most of the library's features and some performance enhancements used by [bitmap.land](bitmap.land) in the [examples](https://github.com/blockamotolabs/react-bitmap-utils/tree/main/examples) directory.
+
+A live version of these examples is published [here](https://blockamotolabs.github.io/react-bitmap-utils/).
+
+![Image of example map](https://github.com/blockamotolabs/react-bitmap-utils/tree/main/images/screenshot.png)
+
 ## Contributing
 
 If you plan on contributing to this project please make sure your code conforms to our defined standards, and therefore passes all linting, type-checking, formatting and unit tests.
