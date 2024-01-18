@@ -16,6 +16,20 @@ A live version of these examples is published [here](https://blockamotolabs.gith
 
 ## Documentation
 
+### Installation
+
+Install the library (`-P` will save this to your `package.json` production dependencies):
+
+```shell
+npm install @blockamotolabs/react-bitmap-utils -P
+```
+
+If this is a blank project you will also need to install React and React DOM:
+
+```shell
+npm install react react-dom -P
+```
+
 ### Constants
 
 Currently we only expose a few constants for the colors used on [bitmap.land](bitmap.land).
