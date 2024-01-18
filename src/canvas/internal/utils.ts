@@ -1,9 +1,9 @@
-import { AnyObject, HandlerNameToEventName } from '../../internal/types';
 import {
   CanvasComponentRenderers,
   ReconciledCanvasChild,
   ReconciledTextChild,
 } from '../types';
+import { AnyObject, HandlerNameToEventName } from './types';
 
 const MATCHES_ON_PREFIX = /^on/;
 

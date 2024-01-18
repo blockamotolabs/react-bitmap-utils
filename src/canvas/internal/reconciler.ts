@@ -3,13 +3,13 @@ import { ReactNode } from 'react';
 import Reconciler, { HostConfig } from 'react-reconciler';
 import { DefaultEventPriority } from 'react-reconciler/constants';
 
-import { AnyObject } from '../../internal/types';
 import {
   CanvasElementType,
   InternalCanvasElementType,
   ReconciledCanvasChild,
   ReconciledTextChild,
 } from '../types';
+import { AnyObject } from './types';
 
 export interface Container {
   type: InternalCanvasElementType.Root;

@@ -1,4 +1,4 @@
-import { AnyObject } from '../internal/types';
+import { AnyObject } from './internal/types';
 import { IntrinsicCanvasBufferProps } from './canvas-buffer';
 import { ImageProps } from './image';
 import { LineProps } from './line';
