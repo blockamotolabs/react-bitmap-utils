@@ -16,6 +16,41 @@ A live version of these examples is published [here](https://blockamotolabs.gith
 
 ## Documentation
 
+### Table of contents
+
+- [Constants](#constants)
+- [Common Canvas Component Props](#common-canvas-component-props)
+- [Canvas Components](#canvas-components)
+  - [Canvas](#canvas)
+  - [Rectangle](#rectangle)
+  - [Line](#line)
+  - [Text](#text)
+  - [Image](#image)
+  - [Translate](#translate)
+  - [Rotate](#rotate)
+  - [Scale](#scale)
+  - [Opacity](#opacity)
+  - [For](#for)
+  - [While](#while)
+  - [CanvasBuffer](#canvasbuffer)
+- [Hooks](#hooks)
+  - [useRecommendedPixelRatio](#userecommendedpixelratio)
+  - [useFrameTimes](#useframetimes)
+  - [useAverageFrameRate](#useaverageframerate)
+  - [useDelta](#usedelta)
+  - [useEventHandlers](#useeventhandlers)
+  - [useCanvasContext](#usecanvascontext)
+- [Utils](#utils)
+  - [degreesToRadians](#degreestoradians)
+  - [radiansToDegrees](#radianstodegrees)
+  - [percentageOf](#percentageof)
+  - [clamp](#clamp)
+  - [remapValue](#remapvalue)
+  - [getDimensions](#getdimensions)
+  - [getLocationWithinElement](#getlocationwithinelement)
+  - [getDistance](#getdistance)
+  - [roundSquareRoot](#roundsquareroot)
+
 ### Installation
 
 Install the library (`-P` will save this to your `package.json` production dependencies):
@@ -39,6 +74,43 @@ export const BLACK = '#181c1f';
 export const WHITE = '#ffffff';
 export const ORANGE = '#ff9500';
 export const ORANGE_DARK = '#ff7e00';
+```
+
+### Common Canvas Component Props
+
+Every component that can be drawn within a `Canvas` (excluding the `Canvas` itself) accepts a `restore` prop. If `true` the canvas state will be saved before this element is rendered and restored once complete.
+
+Components that explicitly change the global state of the canvas (`Translate`, `Rotate`, `Scale`, `Opacity`) will automatically save and restore the canvas state if they have any children. If you want to avoid restoring the state after using one of these with children you can set the `restore` prop to `false`.
+
+Examples:
+
+In the below example the `fillStyle` of the canvas will be set to `"red"` and then restored to its previous state after the `Rectangle` is rendered.
+
+```tsx
+<Rectangle x={0} y={0} width={10} height={10} fill="red" restore />
+```
+
+The below example will draw a `20px` by `20px` red rectangle, and a `20px` by `20px` blue rectangle to its right.
+
+If the `restore` prop were not provided it would draw a `20px` by `20px` red rectangle, and a `10px` by `10px` blue rectangle in the top right corner of the red rectangle.
+
+```tsx
+<>
+  <Scale x={2} y={2} restore={false}>
+    <Rectangle x={0} y={0} width={10} height={10} fill="red" />
+  </Scale>
+  <Rectangle x={10} y={0} width={10} height={10} fill="blue" />
+</>
+```
+
+The below example will draw `20px` by `20px` red and blue rectangles next to each other because the `Scale` did not have any children, and therefore it is assumed that everything following it should be scaled.
+
+```tsx
+<>
+  <Scale x={2} y={2} />
+  <Rectangle x={0} y={0} width={10} height={10} fill="red" />
+  <Rectangle x={10} y={0} width={10} height={10} fill="blue" />
+</>
 ```
 
 ### Canvas Components
@@ -90,43 +162,6 @@ const App = () => {
     </Canvas>
   );
 };
-```
-
-#### Common Canvas Component Props
-
-Every component that can be drawn within a `Canvas` (excluding the `Canvas` itself) accepts a `restore` prop. If `true` the canvas state will be saved before this element is rendered and restored once complete.
-
-Components that explicitly change the global state of the canvas (`Translate`, `Rotate`, `Scale`, `Opacity`) will automatically save and restore the canvas state if they have any children. If you want to avoid restoring the state after using one of these with children you can set the `restore` prop to `false`.
-
-Examples:
-
-In the below example the `fillStyle` of the canvas will be set to `"red"` and then restored to its previous state after the `Rectangle` is rendered.
-
-```tsx
-<Rectangle x={0} y={0} width={10} height={10} fill="red" restore />
-```
-
-The below example will draw a `20px` by `20px` red rectangle, and a `20px` by `20px` blue rectangle to its right.
-
-If the `restore` prop were not provided it would draw a `20px` by `20px` red rectangle, and a `10px` by `10px` blue rectangle in the top right corner of the red rectangle.
-
-```tsx
-<>
-  <Scale x={2} y={2} restore={false}>
-    <Rectangle x={0} y={0} width={10} height={10} fill="red" />
-  </Scale>
-  <Rectangle x={10} y={0} width={10} height={10} fill="blue" />
-</>
-```
-
-The below example will draw `20px` by `20px` red and blue rectangles next to each other because the `Scale` did not have any children, and therefore it is assumed that everything following it should be scaled.
-
-```tsx
-<>
-  <Scale x={2} y={2} />
-  <Rectangle x={0} y={0} width={10} height={10} fill="red" />
-  <Rectangle x={10} y={0} width={10} height={10} fill="blue" />
-</>
 ```
 
 #### Rectangle
@@ -221,6 +256,22 @@ Ona 100x100 canvas the below example will draw the text `"Hello, World!"` in the
   Hello, World!
 </Text>
 ```
+
+#### Image
+
+#### Translate
+
+#### Rotate
+
+#### Scale
+
+#### Opacity
+
+#### For
+
+#### While
+
+#### CanvasBuffer
 
 ### Hooks
 
