@@ -10,6 +10,7 @@
     "watch": "rm -rf build && mkdir -p examples/build && watchify ./examples/src/index.tsx --debug -t [ aliasify ] -t [ babelify --presets [ @babel/preset-env ] ] -p [ tsify --project examples/tsconfig.json ] -o examples/build/index.js",
     "reload": "livereload -e 'html,css,js' ./examples/",
     "build": "rm -rf build && tsc --project tsconfig.esm.json && tsc --project tsconfig.cjs.json",
+    "build-examples": "rm -rf examples/build && mkdir -p examples/build && browserify ./examples/src/index.tsx --debug -t [ aliasify ] -t [ babelify --presets [ @babel/preset-env ] ] -p [ tsify --project examples/tsconfig.json ] | terser --compress --mangle --source-map \"url='/build/index.js.map'\" --output examples/build/index.js",
     "format": "prettier --write '**/*'",
     "format-check": "prettier --check '**/*'",
     "typecheck": "tsc --noEmit --project tsconfig.json",
@@ -59,6 +60,7 @@
     "eslint-plugin-simple-import-sort": "^10.0.0",
     "jest": "^29.7.0",
     "prettier": "^3.1.1",
+    "terser": "^5.27.0",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
