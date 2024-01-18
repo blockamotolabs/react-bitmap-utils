@@ -77,10 +77,22 @@ The below example will draw a `20px` by `20px` red rectangle, and a `20px` by `2
 If the `restore` prop were not provided it would draw a `20px` by `20px` red rectangle, and a `10px` by `10px` blue rectangle in the top right corner of the red rectangle.
 
 ```tsx
-<Scale x={2} y={2} restore={false}>
-  <Rectangle x={0} y={0} width={10} height={10} fill="red" restore />
-</Scale>
-<Rectangle x={10} y={0} width={10} height={10} fill="blue" restore />
+<>
+  <Scale x={2} y={2} restore={false}>
+    <Rectangle x={0} y={0} width={10} height={10} fill="red" />
+  </Scale>
+  <Rectangle x={10} y={0} width={10} height={10} fill="blue" />
+</>
+```
+
+The below example will draw `20px` by `20px`` red and blue rectangles next to each other because the `Scale` did not have any children, and therefore it is assumed that everything following it should be scaled.
+
+```tsx
+<>
+  <Scale x={2} y={2} />
+  <Rectangle x={0} y={0} width={10} height={10} fill="red" />
+  <Rectangle x={10} y={0} width={10} height={10} fill="blue" />
+</>
 ```
 
 ## Contributing
