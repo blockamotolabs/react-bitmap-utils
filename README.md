@@ -208,6 +208,103 @@ Ona 100x100 canvas the below example will draw the text `"Hello, World!"` in the
 </Text>
 ```
 
+### Hooks
+
+#### useRecommendedPixelRatio
+
+Returns a recommended pixel ratio for the current device.
+
+Examples:
+
+```ts
+const pixelRatio = useRecommendedPixelRatio();
+```
+
+#### useFrameTimes
+
+Returns an array of the last X frame times (`Date.now()`) in milliseconds.
+
+The number of frames defaults to 60.
+
+Examples:
+
+```ts
+const times = useFrameTimes(10); // returns the time of the last 10 frames
+```
+
+#### useAverageFrameRate
+
+Returns the average frame rate (frames per second) over the last X frames.
+
+The number of frames defaults to 60.
+
+Examples:
+
+```ts
+const frameRate = useAverageFrameRate(10);
+```
+
+#### useDelta
+
+Returns the time in milliseconds since the last frame.
+
+Examples:
+
+```ts
+const delta = useDelta();
+```
+
+#### useEventHandlers
+
+Takes an object containing event handlers and applies them to an element (non-passive).
+
+End events (`mouseup`, `touchend`, `touchcancel`) are attached to the `window` to ensure they are captured even if the pointer leaves the element.
+
+You should `useMemo` your object to avoid the listeners being recreated on every render.
+
+Examples:
+
+```ts
+useEventHandlers(
+  useMemo(
+    () => ({
+      onWheel: (event: WheelEvent) => {},
+      onMouseDown: (event: MouseEvent) => {},
+      onMouseMove: (event: MouseEvent) => {},
+      onMouseUp: (event: MouseEvent) => {},
+      onMouseEnter: (event: MouseEvent) => {},
+      onMouseLeave: (event: MouseEvent) => {},
+      onTouchStart: (event: TouchEvent) => {},
+      onTouchMove: (event: TouchEvent) => {},
+      onTouchEnd: (event: TouchEvent) => {},
+      onTouchCancel: (event: TouchEvent) => {},
+    }),
+    []
+  ),
+  element
+);
+```
+
+#### useCanvasContext
+
+Returns the context for the closest parent `Canvas`.
+
+Note: the `width` and `height` here are not the `width` and `height` props that were provided. These are the dimensions of the canvas taking into account the `pixelRadio` scaling.
+
+This includes:
+
+```ts
+export interface CanvasContextValue {
+  canvas: HTMLCanvasElement | null;
+  ctx: CanvasRenderingContext2D | null;
+  width: number;
+  height: number;
+  pixelRatio: number;
+  renderers: Record<string, CanvasComponentRenderers<any>>;
+  parent?: CanvasContextValue | null;
+}
+```
+
 ### Utils
 
 #### degreesToRadians
