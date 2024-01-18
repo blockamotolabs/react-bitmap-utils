@@ -1,19 +1,20 @@
-import { IntrinsicCanvasBufferProps } from './canvas-buffer';
-import { ImageProps } from './image';
-import { drawToCanvas } from './internal/hooks';
-import { LineProps } from './line';
-import { OpacityProps } from './opacity';
-import { CanvasChild, TextChild } from './reconciler';
-import { RectangleProps } from './rectangle';
-import { RotateProps } from './rotate';
-import { ScaleProps } from './scale';
-import { TextProps } from './text';
-import { TranslateProps } from './translate';
+import { IntrinsicCanvasBufferProps } from '../canvas-buffer';
+import { ImageProps } from '../image';
+import { LineProps } from '../line';
+import { OpacityProps } from '../opacity';
+import { RectangleProps } from '../rectangle';
+import { RotateProps } from '../rotate';
+import { ScaleProps } from '../scale';
+import { TextProps } from '../text';
+import { TranslateProps } from '../translate';
 import {
   CanvasComponentRenderers,
   CanvasElementType,
   InternalCanvasElementType,
-} from './types';
+  ReconciledCanvasChild,
+  ReconciledTextChild,
+} from '../types';
+import { drawToCanvas } from './utils';
 
 const rectangleRenderers: CanvasComponentRenderers<RectangleProps> = {
   drawBeforeChildren: (
@@ -103,7 +104,9 @@ const scaleRenderers: CanvasComponentRenderers<ScaleProps> = {
   },
 };
 
-const stringify = (rendered: string | readonly (CanvasChild | TextChild)[]) => {
+const stringify = (
+  rendered: string | readonly (ReconciledCanvasChild | ReconciledTextChild)[]
+) => {
   if (typeof rendered === 'string') {
     return rendered;
   }

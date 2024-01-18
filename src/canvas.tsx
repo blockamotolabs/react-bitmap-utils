@@ -9,10 +9,10 @@ import React, {
   useState,
 } from 'react';
 
-import { getDimensions } from '../utils';
 import { useCanvasRefWrapper, useDrawToCanvas } from './internal/hooks';
-import { RENDERERS } from './renderers';
+import { RENDERERS } from './internal/renderers';
 import { CanvasComponentRenderers, Dimensions } from './types';
+import { getDimensions } from './utils';
 
 export interface CanvasProps
   extends Omit<HTMLAttributes<HTMLCanvasElement>, 'onResize'> {

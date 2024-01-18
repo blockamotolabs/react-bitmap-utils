@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 
-import { handlerNameToEventName } from '../utils';
-import { CanvasContext } from './context';
+import { CanvasContext } from './internal/context';
+import { handlerNameToEventName } from './internal/utils';
 import { Handlers } from './types';
 
 const MATCHES_ANDROID = /android/i;

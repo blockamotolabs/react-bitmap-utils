@@ -3,28 +3,17 @@ import { ReactNode } from 'react';
 import Reconciler, { HostConfig } from 'react-reconciler';
 import { DefaultEventPriority } from 'react-reconciler/constants';
 
-import { AnyObject } from '../internal/types';
 import {
   CanvasElementType,
-  CommonCanvasComponentProps,
   InternalCanvasElementType,
-} from './types';
-
-export interface TextChild {
-  type: InternalCanvasElementType.Text;
-  props?: never;
-  rendered: string;
-}
-
-export interface CanvasChild<P extends CommonCanvasComponentProps = AnyObject> {
-  type: CanvasElementType;
-  props: P;
-  rendered: (TextChild | CanvasChild)[];
-}
+  ReconciledCanvasChild,
+  ReconciledTextChild,
+} from '../types';
+import { AnyObject } from './types';
 
 export interface Container {
   type: InternalCanvasElementType.Root;
-  rendered: (string | TextChild | CanvasChild)[];
+  rendered: (string | ReconciledTextChild | ReconciledCanvasChild)[];
 }
 
 interface HostContext {}
@@ -36,14 +25,14 @@ const HOST_CONFIG: HostConfig<
   CanvasElementType,
   AnyObject,
   Container,
-  CanvasChild,
-  TextChild,
+  ReconciledCanvasChild,
+  ReconciledTextChild,
   never,
   never,
-  CanvasChild | TextChild,
+  ReconciledCanvasChild | ReconciledTextChild,
   HostContext,
   boolean,
-  CanvasChild[],
+  ReconciledCanvasChild[],
   ReturnType<(typeof globalThis)['setTimeout']>,
   -1
 > = {
