@@ -311,15 +311,16 @@ Takes a number and returns a whole number that is close to (or exactly) the squa
 
 The returned number will both be whole, and if the input were divided by the output the result would be a whole number.
 
+Yes, it could have a better name, but I like the opposing themes of "round square".
+
 Examples:
 
 ```ts
 roundSquareRoot(210000); // returns 500
-/*
 // 210000 / 500 = 420
 
 Math.sqrt(210000); // returns 458.257569495584
-
+/*
 // The closest number is 458
 // but 210000 / 458 = 458.51528384279476
 // which is not a whole number
