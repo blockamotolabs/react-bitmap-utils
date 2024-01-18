@@ -208,6 +208,124 @@ Ona 100x100 canvas the below example will draw the text `"Hello, World!"` in the
 </Text>
 ```
 
+### Utils
+
+#### degreesToRadians
+
+Takes degrees and converts it to radians.
+
+Examples:
+
+```ts
+degreesToRadians(0); // returns 0
+degreesToRadians(180); // returns Math.PI
+```
+
+#### radiansToDegrees
+
+Takes radians and converts it to degrees.
+
+Examples:
+
+```ts
+radiansToDegrees(0); // returns 0
+radiansToDegrees(Math.PI); // returns 180
+```
+
+#### percentageOf
+
+Takes a percentage and a total and returns the percentage value of that total.
+
+Examples:
+
+```ts
+percentageOf(50, 200); // returns 100
+```
+
+#### clamp
+
+Takes a value, and a min and max, and returns the value clamped between the min and max.
+
+Examples:
+
+```ts
+clamp(10, 0, 5); // returns 5
+clamp(10, 15, 20); // returns 15
+```
+
+#### remapValue
+
+Takes a value and two ranges. Maps the value from one range to another.
+
+Can optionally clamp the value to the output range.
+
+Examples:
+
+```ts
+remapValue(10, 0, 20, 0, 100); // returns 50
+remapValue(30, 0, 20, 0, 100); // returns 150
+remapValue(30, 0, 20, 0, 100, true); // returns 100
+```
+
+#### getDimensions
+
+Gets the scaled dimensions of a canvas taking into account the pixel ratio.
+
+Examples
+
+```ts
+getDimensions(2, 100, 100, canvasElement); // returns { width: 200, height: 200 }
+getDimensions(2, undefined, undefined, canvasElement); // returns { width: clientWidth * 2, height: clientHeight * 2 }
+```
+
+#### getLocationWithinElement
+
+Returns the coordinates of a pointer (mouse/touch `clientX` + `clientY`) location within an element;
+
+Examples:
+
+```ts
+getLocationWithinElement(event, element);
+getLocationWithinElement(event.touches[0], element);
+
+/*
+If the element were offset by 10px from the top and left of the page,
+and the pointer were at 20px from the top and left of the page,
+this would return { x: 10, y: 10 }
+*/
+```
+
+#### getDistance
+
+Returns the distance between two points.
+
+Examples:
+
+```ts
+getDistance({ x: 0, y: 0 }, { x: 10, y: 10 }); // returns 14.142135623730951
+```
+
+#### roundSquareRoot
+
+Takes a number and returns a whole number that is close to (or exactly) the square root of that number.
+
+The returned number will both be whole, and if the input were divided by the output the result would be a whole number.
+
+Examples:
+
+```ts
+roundSquareRoot(210000); // returns 500
+/*
+// 210000 / 500 = 420
+
+Math.sqrt(210000); // returns 458.257569495584
+
+// The closest number is 458
+// but 210000 / 458 = 458.51528384279476
+// which is not a whole number
+*/
+```
+
 ## Contributing
 
 If you plan on contributing to this project please make sure your code conforms to our defined standards, and therefore passes all linting, type-checking, formatting and unit tests.
