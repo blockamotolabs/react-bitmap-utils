@@ -14,6 +14,52 @@ A live version of these examples is published [here](https://blockamotolabs.gith
 
 ![Image of example map](https://github.com/blockamotolabs/react-bitmap-utils/tree/main/images/screenshot.png)
 
+## Documentation
+
+### Constants
+
+Currently we only expose a few constants for the colors used on [bitmap.land](bitmap.land).
+
+```ts
+export const BLACK = '#181c1f';
+export const WHITE = '#ffffff';
+export const ORANGE = '#ff9500';
+export const ORANGE_DARK = '#ff7e00';
+```
+
+### Canvas Components
+
+#### Canvas
+
+The `Canvas` component is a wrapper around the HTML5 canvas element and handles drawing any of its descendants to the canvas.
+
+You can either manually provide the desired `width` and or `height` of the canvas (which may be scaled if you're also providing a `pixelRatio`), or style the canvas with CSS and it'll automatically use the canvas's `clientWidth` and `clientHeight`.
+
+The `pixelRatio` prop is used to scale the canvas to achieve crisper, higher density drawings on high DPI screens. This will default to `1`, but you can use the `useRecommendedPixelRatio` hook to achieve sensible defaults for various devices, or provide your own value. If the `pixelRatio` were set to `2`, and the `width` and `height` were set to `100` the canvas would be `200px` wide and `200px` tall. You should then use CSS to scale the canvas back down to `100px` wide and `100px` tall.
+
+You can also define a `backgroundColor` to fill the canvas with a solid color before drawing any of its descendants.
+
+The below example will render a canvas that matches the size of its parent element, has a black background, and will scale the canvas density based on the current device.
+
+```tsx
+const App = () => {
+  const pixelRatio = useRecommendedPixelRatio();
+
+  return (
+    <Canvas
+      pixelRatio={pixelRatio}
+      backgroundColor="black"
+      style={{
+        width: '100%',
+        height: '100%',
+      }}
+    >
+      {/* Your elements here */}
+    </Canvas>
+  );
+};
+```
+
 ## Contributing
 
 If you plan on contributing to this project please make sure your code conforms to our defined standards, and therefore passes all linting, type-checking, formatting and unit tests.
