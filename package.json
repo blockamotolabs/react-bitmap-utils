@@ -4,6 +4,9 @@
   "description": "Utilities for drawing Bitmap Theory related imaging to HTML5 canvas with React",
   "main": "build/cjs/index.js",
   "module": "build/esm/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "concurrently -n 'watch ,serve ,reload' -c 'yellow,cyan,green' \"npm run serve\" \"npm run watch\" \"npm run reload\"",
     "serve": "http-server -p 8080 -c-1 examples",
