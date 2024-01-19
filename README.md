@@ -388,7 +388,98 @@ The below example will draw a 50% transparent red 10x10 rectangle.
 
 #### For
 
+Like a for loop, but for drawing elements.
+
+Optionally takes a `start` and `step` prop, and will call its child callback function from `start` to `end`, incrementing by `step` each time.
+
+The callback returns the element(s) you'd like to draw.
+
+By default `start` is `0` and `step` is `1`.
+
+Props:
+
+```ts
+export interface ForCallbackContext {
+  index: number;
+  start: number;
+  step: number;
+  end: number;
+}
+
+export interface ForProps extends CommonCanvasComponentProps {
+  start?: number;
+  step?: number;
+  end: number;
+  children: (context: ForCallbackContext) => ReactElement;
+}
+```
+
+Examples:
+
+The below example will draw 10 outlined 10x10 rectangles in a line.
+
+```tsx
+<For end={10}>
+  {({ index }) => (
+    <Rectangle
+      key={index}
+      x={index * 10}
+      y={0}
+      width={10}
+      height={10}
+      stroke="black"
+    />
+  )}
+</For>
+```
+
 #### While
+
+Like a while loop, but for drawing elements.
+
+Takes a `context` (object containing any data you'd like to use in the loop), and a `test` function that returns a boolean.
+
+The child callback receives the current state of the `context` and can mutate it, returning elements to be drawn.
+
+Props:
+
+```ts
+export interface WhileProps<T extends AnyObject>
+  extends CommonCanvasComponentProps {
+  context: T;
+  test: (context: T) => boolean;
+  children: (context: T) => ReactElement;
+}
+```
+
+Examples:
+
+The below example will draw 10 outlined 10x10 rectangles in a line.
+
+```tsx
+<While context={{ index: 0 }} test={({ index }) => index < 10}>
+  {(context) => {
+    // If we destructure our values here,
+    // we can safely mutate the context below
+    // without affecting the elements that are
+    // returned after the mutation
+    const { index } = context;
+
+    context.index += 1;
+
+    return (
+      <Rectangle
+        key={index}
+        x={index * 10}
+        y={0}
+        width={10}
+        height={10}
+        stroke="black"
+      />
+    );
+  }}
+</While>
+```
 
 #### CanvasBuffer
 
