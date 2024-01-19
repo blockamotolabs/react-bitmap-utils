@@ -19,7 +19,7 @@ import { drawToCanvas } from './utils';
 const rectangleRenderers: CanvasComponentRenderers<RectangleProps> = {
   drawBeforeChildren: (
     { ctx },
-    { x, y, width, height, fill, stroke, strokeWidth = 1 }
+    { props: { x, y, width, height, fill, stroke, strokeWidth = 1 } }
   ) => {
     if (!fill && !stroke) {
       ctx.rect(x, y, width, height);
@@ -41,7 +41,17 @@ const rectangleRenderers: CanvasComponentRenderers<RectangleProps> = {
 const lineRenderers: CanvasComponentRenderers<LineProps> = {
   drawBeforeChildren: (
     { ctx },
-    { startX, startY, endX, endY, stroke, strokeWidth = 1, continuePath }
+    {
+      props: {
+        startX,
+        startY,
+        endX,
+        endY,
+        stroke,
+        strokeWidth = 1,
+        continuePath,
+      },
+    }
   ) => {
     if (continuePath !== false) {
       ctx.beginPath();
@@ -59,14 +69,14 @@ const lineRenderers: CanvasComponentRenderers<LineProps> = {
 };
 
 const rotateRenderers: CanvasComponentRenderers<RotateProps> = {
-  drawBeforeChildren: ({ ctx }, { radians, restore }, rendered) => {
+  drawBeforeChildren: ({ ctx }, { props: { radians, restore }, rendered }) => {
     if (rendered.length && restore !== false) {
       ctx.save();
     }
 
     ctx.rotate(radians);
   },
-  drawAfterChildren: ({ ctx }, { restore }, rendered) => {
+  drawAfterChildren: ({ ctx }, { props: { restore }, rendered }) => {
     if (rendered.length && restore !== false) {
       ctx.restore();
     }
@@ -74,14 +84,17 @@ const rotateRenderers: CanvasComponentRenderers<RotateProps> = {
 };
 
 const translateRenderers: CanvasComponentRenderers<TranslateProps> = {
-  drawBeforeChildren: ({ ctx }, { x = 0, y = 0, restore }, rendered) => {
+  drawBeforeChildren: (
+    { ctx },
+    { props: { x = 0, y = 0, restore }, rendered }
+  ) => {
     if (rendered.length && restore !== false) {
       ctx.save();
     }
 
     ctx.translate(x, y);
   },
-  drawAfterChildren: ({ ctx }, { restore }, rendered) => {
+  drawAfterChildren: ({ ctx }, { props: { restore }, rendered }) => {
     if (rendered.length && restore !== false) {
       ctx.restore();
     }
@@ -89,7 +102,10 @@ const translateRenderers: CanvasComponentRenderers<TranslateProps> = {
 };
 
 const scaleRenderers: CanvasComponentRenderers<ScaleProps> = {
-  drawBeforeChildren: ({ ctx }, { x = 1, y = 1, restore }, rendered) => {
+  drawBeforeChildren: (
+    { ctx },
+    { props: { x = 1, y = 1, restore }, rendered }
+  ) => {
     if (rendered.length && restore !== false) {
       ctx.save();
     }
@@ -97,7 +113,7 @@ const scaleRenderers: CanvasComponentRenderers<ScaleProps> = {
     ctx.scale(x, y);
   },
 
-  drawAfterChildren: ({ ctx }, { restore }, rendered) => {
+  drawAfterChildren: ({ ctx }, { props: { restore }, rendered }) => {
     if (rendered.length && restore !== false) {
       ctx.restore();
     }
@@ -122,20 +138,22 @@ const textRenderers: CanvasComponentRenderers<TextProps> = {
   drawBeforeChildren: (
     { ctx },
     {
-      x,
-      y,
-      fontFamily = 'arial',
-      fontSize = 12,
-      fontStyle = 'normal',
-      fontVariant = 'normal',
-      fontWeight = 'normal',
-      textAlign = 'left',
-      verticalAlign = 'top',
-      fill,
-      stroke,
-      strokeWidth = 1,
-    },
-    rendered
+      props: {
+        x,
+        y,
+        fontFamily = 'arial',
+        fontSize = 12,
+        fontStyle = 'normal',
+        fontVariant = 'normal',
+        fontWeight = 'normal',
+        textAlign = 'left',
+        verticalAlign = 'top',
+        fill,
+        stroke,
+        strokeWidth = 1,
+      },
+      rendered,
+    }
   ) => {
     if (verticalAlign) {
       ctx.textBaseline = verticalAlign;
@@ -163,7 +181,10 @@ const textRenderers: CanvasComponentRenderers<TextProps> = {
 };
 
 const opacityRenderers: CanvasComponentRenderers<OpacityProps> = {
-  drawBeforeChildren: ({ ctx }, { opacity = 1, restore }, rendered) => {
+  drawBeforeChildren: (
+    { ctx },
+    { props: { opacity = 1, restore }, rendered }
+  ) => {
     if (rendered.length && restore !== false) {
       ctx.save();
     }
@@ -171,7 +192,7 @@ const opacityRenderers: CanvasComponentRenderers<OpacityProps> = {
     ctx.globalAlpha = opacity;
   },
 
-  drawAfterChildren: ({ ctx }, { restore }, rendered) => {
+  drawAfterChildren: ({ ctx }, { props: { restore }, rendered }) => {
     if (rendered.length && restore !== false) {
       ctx.restore();
     }
@@ -179,7 +200,7 @@ const opacityRenderers: CanvasComponentRenderers<OpacityProps> = {
 };
 
 const imageRenderers: CanvasComponentRenderers<ImageProps> = {
-  drawBeforeChildren: ({ ctx }, { x, y, width, height, src }) => {
+  drawBeforeChildren: ({ ctx }, { props: { x, y, width, height, src } }) => {
     ctx.drawImage(src, x, y, width, height);
   },
 };
@@ -187,38 +208,41 @@ const imageRenderers: CanvasComponentRenderers<ImageProps> = {
 const canvasBufferRenderers: CanvasComponentRenderers<IntrinsicCanvasBufferProps> =
   {
     handlesChildren: true,
-    drawBeforeChildren: (
-      { ctx: parentCtx },
-      {
-        width,
-        height,
-        drawX,
-        drawY,
-        drawWidth,
-        drawHeight,
-        backgroundColor,
-        pixelRatio,
-        canvas,
-        ctx,
-        renderers,
-      },
-      rendered
-    ) => {
+    drawBeforeChildren: ({ ctx: parentCtx }, element) => {
+      const {
+        props: {
+          width,
+          height,
+          drawX,
+          drawY,
+          drawWidth,
+          drawHeight,
+          backgroundColor,
+          pixelRatio,
+          canvas,
+          ctx,
+          renderers,
+        },
+        hasUpdates,
+      } = element;
+
       const dimensions = {
         width: width * pixelRatio,
         height: height * pixelRatio,
       };
 
-      drawToCanvas(
-        canvas,
-        ctx,
-        dimensions.width,
-        dimensions.height,
-        pixelRatio,
-        backgroundColor,
-        rendered,
-        renderers
-      );
+      if (hasUpdates) {
+        drawToCanvas(
+          canvas,
+          ctx,
+          dimensions.width,
+          dimensions.height,
+          pixelRatio,
+          backgroundColor,
+          element,
+          renderers
+        );
+      }
 
       parentCtx.drawImage(canvas, drawX, drawY, drawWidth, drawHeight);
     },
