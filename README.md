@@ -33,6 +33,9 @@ A live version of these examples is published [here](https://blockamotolabs.gith
   - [For](#for)
   - [While](#while)
   - [CanvasBuffer](#canvasbuffer)
+- [Custom Components/Renderers](#custom-componentsrenderers)
+  - [Custom Component](#custom-component)
+  - [Overriding Renderers](#overriding-renderers)
 - [Hooks](#hooks)
   - [useRecommendedPixelRatio](#userecommendedpixelratio)
   - [useFrameTimes](#useframetimes)
@@ -532,6 +535,180 @@ The below example will draw some text with a font size of 20px to the 200x200 bu
     </Text>
   </CanvasBuffer>
 </Canvas>
+```
+
+### Custom Components/Renderers
+
+#### Custom Component
+
+You can define your own intrinsic element components and renderers to use canvas context methods that aren't exposed by default.
+
+You could also, but this isn't necessary as you can combine existing components in a typical function/class component, use this to group drawing logic into a single component. E.g. a `TextBox` that renders both a rectangle and some text.
+
+First define your component - this can be a string, enum value, or object value.
+
+We use enums internally because we're using TypeScript and it's easier to reference all of the various element types.
+
+You should namespace your components to avoid conflicts with existing components (all of ours are prefixed with `Canvas.` - don't use this as you may break our existing components).
+
+Here's an example of a nice way to define a `Cirlce` element type:
+
+```ts
+export enum CustomCanvasElementType {
+  Circle = 'Custom.Circle',
+}
+```
+
+If you're using TypeScript you'll want to define a type for your component's props, and add this to the global `JSX.IntrinsicElements` interface.
+
+```ts
+interface CircleProps {
+  x: number;
+  y: number;
+  radius: number;
+  fill?: string;
+  stroke?: string;
+  strokeWidth?: number;
+}
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      [CustomCanvasElementType.Circle]: CircleProps;
+    }
+  }
+}
+```
+
+Now we can simply export the enum value as our component:
+
+```ts
+export const Circle = CustomCanvasElementType.Circle;
+```
+
+Next we need to define our renderers. Renderers have 3 properties. Here's the type of a component's renderers:
+
+```ts
+export interface CanvasComponentRenderers<
+  P extends CommonCanvasComponentProps,
+> {
+  // Prevents the canvas from handling drawing your component's children so you can manually handle them manually
+  handlesChildren?: boolean;
+  // Called before drawing the component's children - this will be the most used renderer
+  drawBeforeChildren?: (
+    canvasContext: DrawContext,
+    element: ReconciledCanvasChild<P>
+  ) => void;
+  // Called after drawing the component's children - this allows you to clean up state changes, or draw over the top of your children
+  drawAfterChildren?: (
+    canvasContext: DrawContext,
+    element: ReconciledCanvasChild<P>
+  ) => void;
+}
+```
+
+Here's an example of our `Circle` component's renderers:
+
+```ts
+const circleRenderers: CanvasComponentRenderers<CircleProps> = {
+  drawBeforeChildren: (
+    // The context includes the canvas, 2D rendering context, width, height, pixelRatio, and...
+    // ...a drawChild(child) function which handles drawing to the parent canvas.
+    { ctx },
+    { props: { x, y, radius, fill, stroke, strokeWidth } }
+    // If you want to manually handle the component's children (as opposed to letting the canvas renderer handle them)
+    // You can set handlesChildren to true.
+    // You should then use the "rendered" parameter of these drawing methods instead of props.children.
+    // props.children are the raw JSX elements, while rendered are the reconciled elements (including text nodes).
+    // If you use the props.children you will run into issues.
+    /*, rendered */
+  ) => {
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, 2 * Math.PI);
+    ctx.closePath();
+
+    if (fill) {
+      ctx.fillStyle = fill;
+      ctx.fill();
+    }
+
+    if (stroke) {
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = strokeWidth || 1;
+      ctx.stroke();
+    }
+  },
+};
+```
+
+Now all we have to do is stick our circle renderers into an object keyed by the element type:
+
+```ts
+export const CUSTOM_RENDERERS = {
+  [Circle]: circleRenderers,
+};
+```
+
+Note: your renderers/renderers object should not be defined inside of a component as this will cause unnecessary re-renders.
+
+The custom renderers object can then be provided to a `Canvas` and or `CanvasBuffer` component via the `renderers` prop.
+
+It is not necessary to pass the `renderers` prop to a `CanvasBuffer` inside a `Canvas` if the `renderers` prop was provided to the `Canvas`. They will be inherited.
+
+```tsx
+<Canvas width={100} heigh={100} renderers={CUSTOM_RENDERERS}>
+  <Circle x={50} y={50} radius={25} />
+</Canvas>
+```
+
+#### Overriding Renderers
+
+Note: the following is not recommended, as it may cause confusion if provided components no longer work in the same way as documented.
+
+You can use the same element name as one of the provided elements e.g. all of our elements are prefixed with `Canvas.`, so you could create your own `Canvas.Rectangle` with your own renderer if you wanted to override the render logic of one of the existing components.
+
+For example, we could override the `Canvas.Rectangle` component to draw a rectangle with rounded corners:
+
+```ts
+const rectangleRenderers: CanvasComponentRenderers<RectangleProps> = {
+  drawBeforeChildren: (
+    { ctx },
+    { props: { x, y, width, height, fill, stroke, strokeWidth = 1 } }
+  ) => {
+    ctx.beginPath();
+    ctx.moveTo(x + minRadius, y);
+    ctx.lineTo(x + width - minRadius, y);
+    ctx.arcTo(x + width, y, x + width, y + minRadius, minRadius);
+    ctx.lineTo(x + width, y + height - minRadius);
+    ctx.arcTo(
+      x + width,
+      y + height,
+      x + width - minRadius,
+      y + height,
+      minRadius
+    );
+    ctx.lineTo(x + minRadius, y + height);
+    ctx.arcTo(x, y + height, x, y + height - minRadius, minRadius);
+    ctx.lineTo(x, y + minRadius);
+    ctx.arcTo(x, y, x + minRadius, y, minRadius);
+    ctx.closePath();
+
+    if (fill) {
+      ctx.fillStyle = fill;
+      ctx.fill();
+    }
+
+    if (stroke && strokeWidth) {
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = strokeWidth;
+      ctx.stroke();
+    }
+  },
+};
+
+const CUSTOM_RENDERERS = {
+  [Rectangle]: rectangleRenderers,
+};
 ```
 
 ### Hooks
