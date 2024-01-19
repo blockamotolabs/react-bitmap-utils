@@ -56,9 +56,7 @@ export const useDrawToCanvas = (
     }
 
     const {
-      container: {
-        containerInfo: { rendered },
-      },
+      container: { containerInfo: root },
     } = rootContainerRef.current;
 
     const { canvas, ctx } = canvasCtx;
@@ -70,7 +68,7 @@ export const useDrawToCanvas = (
       dimensions.height,
       pixelRatio,
       backgroundColor,
-      rendered,
+      root,
       renderers
     );
   }, [

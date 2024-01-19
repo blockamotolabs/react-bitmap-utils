@@ -55,6 +55,7 @@ export interface ReconciledCanvasChild<
   type: CanvasElementType;
   props: P;
   rendered: (ReconciledTextChild | ReconciledCanvasChild)[];
+  hasUpdates: boolean;
 }
 
 export interface DrawContext {
@@ -72,13 +73,11 @@ export interface CanvasComponentRenderers<
   handlesChildren?: boolean;
   drawBeforeChildren?: (
     canvasContext: DrawContext,
-    props: P,
-    rendered: string | readonly (ReconciledCanvasChild | ReconciledTextChild)[]
+    element: ReconciledCanvasChild<P>
   ) => void;
   drawAfterChildren?: (
     canvasContext: DrawContext,
-    props: P,
-    rendered: string | readonly (ReconciledCanvasChild | ReconciledTextChild)[]
+    element: ReconciledCanvasChild<P>
   ) => void;
 }
 

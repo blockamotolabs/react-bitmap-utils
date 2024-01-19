@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ReactNode } from 'react';
+import { Children, ReactElement, ReactNode, ReactPortal } from 'react';
 import Reconciler, { HostConfig } from 'react-reconciler';
 import { DefaultEventPriority } from 'react-reconciler/constants';
 
@@ -21,6 +21,113 @@ interface HostContext {}
 const rootHostContext: HostContext = {};
 const childHostContext = {};
 
+const flattenChildren = (
+  children: ReactNode
+): readonly (
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | ReactElement
+  | ReactPortal
+)[] => {
+  return Children.toArray(children).reduce<
+    readonly (
+      | string
+      | number
+      | boolean
+      | null
+      | undefined
+      | ReactElement
+      | ReactPortal
+    )[]
+  >((acc, child) => {
+    if (!!child && typeof child === 'object') {
+      if (Symbol.iterator in child) {
+        return [...acc, ...flattenChildren(child)];
+      }
+
+      return [...acc, child, ...flattenChildren(child.props.children)];
+    }
+
+    return [...acc, child];
+  }, []);
+};
+
+const compareProps = (oldProps: AnyObject, newProps: AnyObject) => {
+  const oldEntries = Object.entries(oldProps);
+  const newEntries = Object.entries(newProps);
+
+  if (oldEntries.length !== newEntries.length) {
+    return true;
+  }
+
+  for (let i = 0; i < newEntries.length; i += 1) {
+    const entry = newEntries[i];
+
+    if (!entry) {
+      continue;
+    }
+
+    const [key, value] = entry;
+
+    if (key === 'children') {
+      continue;
+    }
+
+    if (value !== oldProps[key]) {
+      return true;
+    }
+  }
+};
+
+const UPDATE_CHECK_MAP: Record<
+  string,
+  (oldProps: AnyObject, newProps: AnyObject) => boolean
+> = {
+  [CanvasElementType.CanvasBuffer]: (oldProps, newProps) => {
+    if (compareProps(oldProps, newProps)) {
+      return true;
+    }
+
+    const oldChildren = flattenChildren(oldProps.children);
+    const newChildren = flattenChildren(newProps.children);
+
+    if (oldChildren.length !== newChildren.length) {
+      return true;
+    }
+
+    for (let i = 0; i < newChildren.length; i += 1) {
+      const oldChild = oldChildren[i];
+      const newChild = newChildren[i];
+
+      if (typeof oldChild !== typeof newChild) {
+        return true;
+      }
+
+      if (
+        (typeof oldChild !== 'object' || typeof newChild !== 'object') &&
+        oldChild !== newChild
+      ) {
+        return true;
+      }
+
+      if (
+        !!oldChild &&
+        typeof oldChild === 'object' &&
+        !!newChild &&
+        typeof newChild === 'object' &&
+        compareProps(oldChild.props, newChild.props)
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  },
+};
+
 const HOST_CONFIG: HostConfig<
   CanvasElementType,
   AnyObject,
@@ -31,7 +138,9 @@ const HOST_CONFIG: HostConfig<
   never,
   ReconciledCanvasChild | ReconciledTextChild,
   HostContext,
-  boolean,
+  {
+    hasUpdates: boolean;
+  },
   ReconciledCanvasChild[],
   ReturnType<(typeof globalThis)['setTimeout']>,
   -1
@@ -62,6 +171,7 @@ const HOST_CONFIG: HostConfig<
       type,
       props,
       rendered,
+      hasUpdates: true,
     };
   },
   createTextInstance: (text, _rootContainer, _hostContext) => ({
@@ -81,14 +191,33 @@ const HOST_CONFIG: HostConfig<
   finalizeInitialChildren: () => false,
   prepareUpdate: (
     _instance,
-    _type,
-    _oldProps,
-    _newProps,
+    type,
+    oldProps,
+    newProps,
     _rootContainer,
     _hostContext
-  ) => true,
-  commitUpdate: (instance, _updatePayload, type, _oldProps, newProps) => {
+  ) => {
+    const getShouldUpdate = UPDATE_CHECK_MAP[type];
+
+    if (!getShouldUpdate) {
+      return {
+        hasUpdates: true,
+      };
+    }
+
+    if (getShouldUpdate(oldProps, newProps)) {
+      return {
+        hasUpdates: true,
+      };
+    }
+
+    return {
+      hasUpdates: false,
+    };
+  },
+  commitUpdate: (instance, updatePayload, type, _oldProps, newProps) => {
     instance.props = newProps;
+    instance.hasUpdates = updatePayload.hasUpdates;
 
     if (HOST_CONFIG.shouldSetTextContent(type, newProps)) {
       instance.rendered = [
