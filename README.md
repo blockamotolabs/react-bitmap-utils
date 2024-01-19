@@ -483,6 +483,57 @@ The below example will draw 10 outlined 10x10 rectangles in a line.
 
 #### CanvasBuffer
 
+The `CanvasBuffer` component creates an off-screen canvas element. Any children of the `CanvasBuffer` will be drawn to this off-screen canvas. The off-screen canvas is then drawn to the parent canvas as if it were an image.
+
+This component is particularly useful for rendering clarity/performance improvements e.g.
+
+Some browsers don't handle drawing very small/large text. Instead you can draw the text at a reasonable scale to the off-screen canvas, and then the off-screen canvas is drawn to the parent canvas at the desired scale.
+
+The `CanvasBuffer` component will also only re-render its children if they (or its props) have changed, meaning you can use this to draw complex shapes only once (or when they need to be changed), and they will then be drawn to the parent canvas without needing to be re-rendered.
+
+You can specify all the same props as to the `Canvas` component, plus `drawX`, `drawY`, `drawWidth` and `drawHeight` which define where and at what size the off-screen canvas should be drawn to the parent canvas.
+
+Props:
+
+```ts
+export interface CanvasBufferProps
+  extends CanvasProps,
+    CommonCanvasComponentProps {
+  drawX: number;
+  drawY: number;
+  drawWidth: number;
+  drawHeight: number;
+}
+```
+
+Examples:
+
+The below example will draw some text with a font size of 20px to the 200x200 buffer, but then the buffer is drawn to the main canvas at 100x100 resulting in 10px text rendered on the main canvas.
+
+```tsx
+<Canvas width={100} height={100}>
+  <CanvasBuffer
+    width={200}
+    height={200}
+    drawX={0}
+    drawY={0}
+    drawWidth={100}
+    drawHeight={100}
+  >
+    <Text
+      x={100}
+      y={100}
+      fontSize={20}
+      align="center"
+      verticalAlign="middle"
+      fill="black"
+    >
+      Hello, World!
+    </Text>
+  </CanvasBuffer>
+</Canvas>
+```
+
 ### Hooks
 
 #### useRecommendedPixelRatio
