@@ -1,8 +1,10 @@
 import {
   CanvasComponentRenderers,
+  InternalCanvasElementType,
   ReconciledCanvasChild,
   ReconciledTextChild,
 } from '../types';
+import { Container } from './reconciler';
 import { AnyObject, HandlerNameToEventName } from './types';
 
 const MATCHES_ON_PREFIX = /^on/;
@@ -38,12 +40,14 @@ export const drawToCanvas = (
   height: number,
   pixelRatio: number,
   backgroundColor: string | undefined,
-  rendered:
-    | string
-    | readonly (string | ReconciledCanvasChild | ReconciledTextChild)[],
+  element: ReconciledCanvasChild | Container,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   renderers: Record<string, CanvasComponentRenderers<any>>
 ) => {
+  if (element.type !== InternalCanvasElementType.Root && !element.hasUpdates) {
+    return;
+  }
+
   canvas.width = width;
   canvas.height = height;
 
@@ -57,7 +61,10 @@ export const drawToCanvas = (
   const drawChild = (
     child: string | ReconciledCanvasChild | ReconciledTextChild
   ) => {
-    if (typeof child === 'string') {
+    if (
+      typeof child === 'string' ||
+      child.type === InternalCanvasElementType.Text
+    ) {
       return;
     }
 
@@ -80,8 +87,7 @@ export const drawToCanvas = (
         height: canvas.height / pixelRatio,
         pixelRatio,
       },
-      child.props,
-      child.rendered
+      child
     );
 
     if (!renderer.handlesChildren && isArray(child.rendered)) {
@@ -97,16 +103,19 @@ export const drawToCanvas = (
         height: canvas.height,
         pixelRatio,
       },
-      child.props,
-      child.rendered
+      child
     );
 
     if (child.props?.restore) {
       ctx.restore();
     }
+
+    if (element.type !== InternalCanvasElementType.Root) {
+      element.hasUpdates = false;
+    }
   };
 
-  if (isArray(rendered)) {
-    rendered.forEach(drawChild);
+  if (isArray(element.rendered)) {
+    element.rendered.forEach(drawChild);
   }
 };
