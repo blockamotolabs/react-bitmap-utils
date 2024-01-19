@@ -4,6 +4,12 @@
 /build/*
 /.vscode/*
 
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+
 npm-debug.log*
 
 .DS_Store
