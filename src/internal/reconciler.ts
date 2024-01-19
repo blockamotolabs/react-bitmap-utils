@@ -55,7 +55,10 @@ const flattenChildren = (
   }, []);
 };
 
-const compareProps = (oldProps: AnyObject, newProps: AnyObject) => {
+const getPropsExcludingChildrenHaveChanged = (
+  oldProps: AnyObject,
+  newProps: AnyObject
+) => {
   const oldEntries = Object.entries(oldProps);
   const newEntries = Object.entries(newProps);
 
@@ -87,7 +90,7 @@ const UPDATE_CHECK_MAP: Record<
   (oldProps: AnyObject, newProps: AnyObject) => boolean
 > = {
   [CanvasElementType.CanvasBuffer]: (oldProps, newProps) => {
-    if (compareProps(oldProps, newProps)) {
+    if (getPropsExcludingChildrenHaveChanged(oldProps, newProps)) {
       return true;
     }
 
@@ -118,7 +121,7 @@ const UPDATE_CHECK_MAP: Record<
         typeof oldChild === 'object' &&
         !!newChild &&
         typeof newChild === 'object' &&
-        compareProps(oldChild.props, newChild.props)
+        getPropsExcludingChildrenHaveChanged(oldChild.props, newChild.props)
       ) {
         return true;
       }
