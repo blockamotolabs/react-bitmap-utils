@@ -18,6 +18,7 @@ A live version of these examples is published [here](https://blockamotolabs.gith
 
 ### Table of contents
 
+- [Installation](#installation)
 - [Constants](#constants)
 - [Common Canvas Component Props](#common-canvas-component-props)
 - [Canvas Components](#canvas-components)
