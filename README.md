@@ -649,7 +649,7 @@ export const CUSTOM_RENDERERS = {
 };
 ```
 
-Note: your renderers/renderers object should not be defined inside of a component as this will cause unnecessary re-renders.
+Note: your renderers/renderers object should not be defined inside of a component as this will cause unnecessary re-renders, and should not rely on any external state.
 
 The custom renderers object can then be provided to a `Canvas` and or `CanvasBuffer` component via the `renderers` prop.
 
