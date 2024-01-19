@@ -618,11 +618,10 @@ const circleRenderers: CanvasComponentRenderers<CircleProps> = {
     { ctx },
     { props: { x, y, radius, fill, stroke, strokeWidth } }
     // If you want to manually handle the component's children (as opposed to letting the canvas renderer handle them)
-    // You can set handlesChildren to true.
-    // You should then use the "rendered" parameter of these drawing methods instead of props.children.
-    // props.children are the raw JSX elements, while rendered are the reconciled elements (including text nodes).
-    // If you use the props.children you will run into issues.
-    /*, rendered */
+    // You can set "handlesChildren" to true.
+    // You should then use the "rendered" key of the reconciled element as opposed to the "props.children".
+    // "props.children" are the raw JSX elements, while "rendered" are the reconciled elements (including text nodes).
+    // If you use the "props.children" you will run into issues.
   ) => {
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, 2 * Math.PI);
