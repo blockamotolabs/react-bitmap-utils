@@ -27,7 +27,7 @@ export interface CircleProps extends CommonCanvasComponentProps {
   radius: number;
   fill?: string;
   stroke?: string;
-  lineWidth?: number;
+  strokeWidth?: number;
 }
 
 const circleRenderers: CanvasComponentRenderers<CircleProps> = {
@@ -36,7 +36,7 @@ const circleRenderers: CanvasComponentRenderers<CircleProps> = {
     // The context includes the canvas, 2D rendering context, width, height, pixelRatio, and...
     // ...a drawChild(child) function which handles drawing to the parent canvas.
     { ctx },
-    { props: { x, y, radius, fill, stroke, lineWidth } }
+    { props: { x, y, radius, fill, stroke, strokeWidth } }
     // If you want to manually handle the component's children (as opposed to letting the canvas renderer handle them)
     // You can set handlesChildren to true.
     // You should then use the "rendered" parameter of these drawing methods instead of props.children.
@@ -55,7 +55,7 @@ const circleRenderers: CanvasComponentRenderers<CircleProps> = {
 
     if (stroke) {
       ctx.strokeStyle = stroke;
-      ctx.lineWidth = lineWidth || 1;
+      ctx.lineWidth = strokeWidth || 1;
       ctx.stroke();
     }
   },
