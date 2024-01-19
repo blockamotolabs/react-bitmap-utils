@@ -670,11 +670,16 @@ You can use the same element name as one of the provided elements e.g. all of ou
 For example, we could override the `Canvas.Rectangle` component to draw a rectangle with rounded corners:
 
 ```ts
+// Define our renderers
 const rectangleRenderers: CanvasComponentRenderers<RectangleProps> = {
   drawBeforeChildren: (
     { ctx },
     { props: { x, y, width, height, fill, stroke, strokeWidth = 1 } }
   ) => {
+    // Don't let the radius be larger than half the width/height, or it will look weird
+    const minRadius = Math.min(width / 2, height / 2, 5);
+
+    // Draw the rectangle with rounded corners
     ctx.beginPath();
     ctx.moveTo(x + minRadius, y);
     ctx.lineTo(x + width - minRadius, y);
@@ -693,11 +698,13 @@ const rectangleRenderers: CanvasComponentRenderers<RectangleProps> = {
     ctx.arcTo(x, y, x + minRadius, y, minRadius);
     ctx.closePath();
 
+    // Optionally fill the rectangle
     if (fill) {
       ctx.fillStyle = fill;
       ctx.fill();
     }
 
+    // Optionally stroke the rectangle
     if (stroke && strokeWidth) {
       ctx.strokeStyle = stroke;
       ctx.lineWidth = strokeWidth;
@@ -706,6 +713,7 @@ const rectangleRenderers: CanvasComponentRenderers<RectangleProps> = {
   },
 };
 
+// Override the existing renderer in our custom renderers
 const CUSTOM_RENDERERS = {
   [Rectangle]: rectangleRenderers,
 };
