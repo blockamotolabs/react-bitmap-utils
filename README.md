@@ -259,13 +259,132 @@ Ona 100x100 canvas the below example will draw the text `"Hello, World!"` in the
 
 #### Image
 
+Draws an image to the canvas.
+
+Props:
+
+```ts
+export interface ImageProps extends CommonCanvasComponentProps {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  src: Parameters<CanvasRenderingContext2D['drawImage']>[0];
+}
+```
+
+Examples:
+
+The below example will draw a 100x100 image in the top left corner of the canvas.
+
+```tsx
+<Image x=[0] y={0} width{100} height{100} src={image} />
+```
+
+The image component can draw more than just your average jpeg, including other canvases:
+
+```ts
+type CanvasImageSource =
+  | HTMLOrSVGImageElement
+  | HTMLVideoElement
+  | HTMLCanvasElement
+  | ImageBitmap
+  | OffscreenCanvas
+  | VideoFrame;
+```
+
 #### Translate
+
+Changes the anchor point of the canvas so any nested/future elements will be offset.
+
+Props:
+
+```ts
+export interface TranslateProps
+  extends PropsWithChildren<CommonCanvasComponentProps> {
+  x?: number;
+  y?: number;
+}
+```
+
+Examples:
+
+The below examples will draw a red 10x10 rectangle 10 pixels from both the top and left of the canvas.
+
+```tsx
+<Translate x={10} y={10}>
+  <Rectangle x={0} y={0} width={10} height={10} fill="red" />
+</Translate>
+```
 
 #### Rotate
 
+Rotates the canvas so any nested/future elements will be rotated.
+
+Props:
+
+```ts
+export interface RotateProps
+  extends PropsWithChildren<CommonCanvasComponentProps> {
+  radians: number;
+}
+```
+
+Examples:
+
+The below example will draw a red 10x10 rectangle rotated 45 degrees.
+
+```tsx
+<Rotate radians={degreesToRadians(45)}>
+  <Rectangle x={0} y={0} width={10} height={10} fill="red" />
+</Rotate>
+```
+
 #### Scale
 
+Scales the canvas so any nested/future elements will be drawn larger/smaller.
+
+Props:
+
+```ts
+export interface RotateProps
+  extends PropsWithChildren<CommonCanvasComponentProps> {
+  radians: number;
+}
+```
+
+Examples:
+
+The below example will draw a red 20x20 rectangle.
+
+```tsx
+<Scale x={2} y={2}>
+  <Rectangle x={0} y={0} width={10} height={10} fill="red" />
+</Scale>
+```
+
 #### Opacity
+
+Sets the opacity of the canvas so any nested/future elements will be drawn with the provided opacity (transparent).
+
+Props:
+
+```ts
+export interface OpacityProps
+  extends PropsWithChildren<CommonCanvasComponentProps> {
+  opacity: number;
+}
+```
+
+Examples:
+
+The below example will draw a 50% transparent red 10x10 rectangle.
+
+```tsx
+<Opacity opacity={0.5}>
+  <Rectangle x={0} y={0} width={10} height={10} fill="red" />
+</Scale>
+```
 
 #### For
 
