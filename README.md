@@ -576,7 +576,7 @@ export interface CanvasContextValue {
   height: number;
   pixelRatio: number;
   renderers: Record<string, CanvasComponentRenderers<any>>;
-  parent?: CanvasContextValue | null;
+  parent: CanvasContextValue | null;
 }
 ```
 

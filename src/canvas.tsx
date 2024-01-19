@@ -67,6 +67,7 @@ export const Canvas = memo(
             height: dimensions.height,
             pixelRatio,
             renderers,
+            parent: null,
           };
         }
 
@@ -76,6 +77,7 @@ export const Canvas = memo(
           height: dimensions.height,
           pixelRatio,
           renderers,
+          parent: null,
         };
       }, [
         canvasCtx,
