@@ -733,6 +733,10 @@ const CUSTOM_RENDERERS = {
 
 Returns a recommended pixel ratio for the current device.
 
+This will return `2` for devices with a `devicePixelRatio` of `2` or higher, and `1` for all other devices.
+
+This will also return `1` if we think the device is an Android device, as they don't handle canvas scaling very well unless you are drawing very few elements.
+
 Examples:
 
 ```ts
