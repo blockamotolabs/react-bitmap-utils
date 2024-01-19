@@ -549,13 +549,13 @@ First define your component - this can be a string, enum value, or object value.
 
 We use enums internally because we're using TypeScript and it's easier to reference all of the various element types.
 
-You should namespace your components to avoid conflicts with existing components (all of ours are prefixed with `Canvas.` - don't use this as you may break our existing components).
+You should namespace your components to avoid conflicts with existing components (all of ours are prefixed with `Canvas.` and `Canvas.Internal.` - don't use this as you may break our existing components).
 
-Here's an example of a nice way to define a `Cirlce` element type:
+Here's an example of a nice way to define a `Circle` element type:
 
 ```ts
 export enum CustomCanvasElementType {
-  Circle = 'Custom.Circle',
+  Circle = 'Canvas.Custom.Circle',
 }
 ```
 
