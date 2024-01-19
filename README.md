@@ -670,6 +670,12 @@ You can use the same element name as one of the provided elements e.g. all of ou
 For example, we could override the `Canvas.Rectangle` component to draw a rectangle with rounded corners:
 
 ```ts
+import {
+  CanvasComponentRenderers,
+  Rectangle,
+  RectangleProps,
+} from '@blockamotolabs/react-bitmap-utils';
+
 // Define our renderers
 const rectangleRenderers: CanvasComponentRenderers<RectangleProps> = {
   drawBeforeChildren: (
@@ -715,6 +721,8 @@ const rectangleRenderers: CanvasComponentRenderers<RectangleProps> = {
 
 // Override the existing renderer in our custom renderers
 const CUSTOM_RENDERERS = {
+  // Because we're referencing the Rectangle component from the library the key will be "Canvas.Rectangle"
+  // You could also just manually set the key to "Canvas.Rectangle", but if the library changes your code will break
   [Rectangle]: rectangleRenderers,
 };
 ```
