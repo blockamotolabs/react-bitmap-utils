@@ -73,6 +73,12 @@ If this is a blank project you will also need to install React and React DOM:
 npm install react react-dom -P
 ```
 
+If you're using TypeScript you'll also want to install it, and the types for React and React DOM:
+
+```shell
+npm install typescript @types/react @types/react-dom -P
+```
+
 ### Constants
 
 Currently we only expose a few constants for the colors used on [bitmap.land](bitmap.land).
@@ -355,9 +361,10 @@ Scales the canvas so any nested/future elements will be drawn larger/smaller.
 Props:
 
 ```ts
-export interface RotateProps
+export interface ScaleProps
   extends PropsWithChildren<CommonCanvasComponentProps> {
-  radians: number;
+  x?: number;
+  y?: number;
 }
 ```
 
