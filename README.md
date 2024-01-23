@@ -79,6 +79,19 @@ If you're using TypeScript you'll also want to install it, and the types for Rea
 npm install typescript @types/react @types/react-dom -P
 ```
 
+If using TypeScript you will also need to define the following in your `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "target": "ES2015"
+  }
+}
+```
+
+ES2015 or higher is required. If you can't target ES2015 or higher, instead set `"downlevelIteration": true`.
+
 ### Constants
 
 Currently we only expose a few constants for the colors used on [bitmap.land](bitmap.land).
