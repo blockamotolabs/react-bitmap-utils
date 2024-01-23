@@ -85,12 +85,12 @@ If using TypeScript you will also need to define the following in your `tsconfig
 {
   "compilerOptions": {
     "jsx": "react",
-    // ES2015 or higher is required
-    // If you can't target ES2015 or higher, instead set "downlevelIteration": true
     "target": "ES2015"
   }
 }
 ```
+
+ES2015 or higher is required. If you can't target ES2015 or higher, instead set `"downlevelIteration": true`.
 
 ### Constants
 
