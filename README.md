@@ -54,6 +54,10 @@ A live version of these examples is published [here](https://blockamotolabs.gith
   - [getLocationWithinElement](#getlocationwithinelement)
   - [getDistance](#getdistance)
   - [roundSquareRoot](#roundsquareroot)
+- [Contributing](#contributing)
+  - [Setup](#setup)
+  - [Dev server](#dev-server)
+  - [Tests, linting, type-checking and formatting](#tests-linting-type-checking-and-formatting)
 
 ### Installation
 
@@ -991,7 +995,7 @@ npm run dev
 
 You can then access this at [http://localhost:8080](http://localhost:8080)
 
-## Tests, linting, type-checking and formatting
+### Tests, linting, type-checking and formatting
 
 You can run all of the checks with:
 
