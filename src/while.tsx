@@ -4,7 +4,7 @@ import { AnyObject } from './internal/types';
 import { CommonCanvasComponentProps } from './types';
 
 export interface WhileProps<T extends AnyObject>
-  extends CommonCanvasComponentProps {
+  extends Omit<CommonCanvasComponentProps, 'children'> {
   context: T;
   test: (context: T) => boolean;
   children: (context: T) => ReactElement;

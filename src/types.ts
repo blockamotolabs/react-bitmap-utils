@@ -1,3 +1,5 @@
+import type { PropsWithChildren } from 'react';
+
 import type { AnyObject } from './internal/types';
 
 export enum CanvasElementType {
@@ -55,9 +57,9 @@ export interface CanvasComponentRenderers<
   ) => void;
 }
 
-export interface CommonCanvasComponentProps {
+export type CommonCanvasComponentProps = PropsWithChildren<{
   restore?: boolean;
-}
+}>;
 
 export interface Coordinates {
   x: number;

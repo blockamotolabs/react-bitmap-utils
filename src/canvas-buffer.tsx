@@ -14,7 +14,7 @@ import { CanvasElementType, CommonCanvasComponentProps } from './types';
 
 export interface CanvasBufferProps
   extends CanvasProps,
-    CommonCanvasComponentProps {
+    Omit<CommonCanvasComponentProps, 'children'> {
   drawX: number;
   drawY: number;
   drawWidth: number;

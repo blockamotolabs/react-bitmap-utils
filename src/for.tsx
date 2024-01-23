@@ -9,7 +9,7 @@ export interface ForCallbackContext {
   end: number;
 }
 
-export interface ForProps extends CommonCanvasComponentProps {
+export interface ForProps extends Omit<CommonCanvasComponentProps, 'children'> {
   start?: number;
   step?: number;
   end: number;
