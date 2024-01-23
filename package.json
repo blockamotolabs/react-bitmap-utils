@@ -19,7 +19,8 @@
     "typecheck": "tsc --noEmit --project tsconfig.json",
     "lint": "eslint '**/*.{js,ts,tsx}'",
     "tests": "jest --runInBand --coverage",
-    "test": "npm run typecheck && npm run format-check && npm run lint && npm run tests"
+    "test": "npm run typecheck && npm run format-check && npm run lint && npm run tests",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
