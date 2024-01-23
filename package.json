@@ -26,9 +26,10 @@
     "url": "git+https://github.com/blockamotolabs/react-bitmap-utils.git"
   },
   "keywords": [
+    "react",
+    "canvas",
     "bitmap",
     "theory",
-    "react",
     "utils",
     "bitcoin",
     "btc",
@@ -37,7 +38,16 @@
     "blockamoto",
     "blockamotolabs"
   ],
-  "author": "Bitmap Dev",
+  "author": {
+    "name": "Blockamoto Labs",
+    "url": "https://github.com/blockamotolabs"
+  },
+  "contributors": [
+    {
+      "name": "Bitmap Dev",
+      "url": "https://github.com/bitmapdev"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/blockamotolabs/react-bitmap-utils/issues"
