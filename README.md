@@ -361,9 +361,10 @@ Scales the canvas so any nested/future elements will be drawn larger/smaller.
 Props:
 
 ```ts
-export interface RotateProps
+export interface ScaleProps
   extends PropsWithChildren<CommonCanvasComponentProps> {
-  radians: number;
+  x?: number;
+  y?: number;
 }
 ```
 
