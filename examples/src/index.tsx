@@ -349,62 +349,60 @@ const App = () => {
   );
 
   return (
-    <>
-      <Canvas
-        ref={setCanvas}
-        pixelRatio={pixelRatio}
-        backgroundColor={BLACK}
-        style={{ width: '100%', height: '100%', cursor: 'move' }}
-        onResize={setDimensions}
-        renderers={CUSTOM_RENDERERS}
-      >
-        <Translate x={width * 0.5} y={height * 0.5}>
-          <Scale x={scale} y={scale}>
-            <Translate x={-locationWithDrag.x} y={-locationWithDrag.y}>
-              {/* This just helps us to visualize the area of the map while constructing the visuals */}
-              <Rectangle
-                x={0}
-                y={0}
-                width={mapWidth}
-                height={mapHeight}
-                fill={ORANGE}
-              />
-              {/* This adds the orange striping for the difficulty adjustment periods */}
-              <DifficultyPeriods
-                countEpochs={countEpochs}
-                countTotalBlocks={countTotalBlocks}
-              />
-              {/* Instead of drawing as many rectangles as there are blocks, it's far more performant to draw vertical and horizontal lines */}
-              <Grid countEpochs={countEpochs} zoom={zoom} scale={scale} />
-              <EpochSeparators countEpochs={countEpochs} scale={scale} />
-              {/* If you look inside the BlockNumbers component you'll see we only ever draw a limited set of blocks */}
-              <BlockNumbers
-                countTotalBlocks={countTotalBlocks}
-                zoom={zoom}
-                location={locationWithDrag}
-              />
-              <EpochLabels countEpochs={countEpochs} zoom={zoom} />
-              {/* This is used to mask the end of the chain where an epoch is not complete */}
-              <EmptyMask
-                countEpochs={countEpochs}
-                countTotalBlocks={countTotalBlocks}
-              />
-              <BlockHighlight
-                highlightedBlock={highlightedBlock}
-                scale={scale}
-                zoom={zoom}
-              />
-            </Translate>
-            {/* This helps to pinpoint the center of the screen during development */}
-            {/* The Crosshair component uses a custom component/renderer - have a look in crosshair.tsx and custom-renderers.tsx */}
-            <Crosshair scale={scale} />
-          </Scale>
-        </Translate>
-        <Text x={4} y={4} fontSize={12} fill={WHITE}>
-          {averageFrameRate.toFixed(0)} FPS
-        </Text>
-      </Canvas>
-    </>
+    <Canvas
+      ref={setCanvas}
+      pixelRatio={pixelRatio}
+      backgroundColor={BLACK}
+      style={{ width: '100%', height: '100%', cursor: 'move' }}
+      onResize={setDimensions}
+      renderers={CUSTOM_RENDERERS}
+    >
+      <Translate x={width * 0.5} y={height * 0.5}>
+        <Scale x={scale} y={scale}>
+          <Translate x={-locationWithDrag.x} y={-locationWithDrag.y}>
+            {/* This just helps us to visualize the area of the map while constructing the visuals */}
+            <Rectangle
+              x={0}
+              y={0}
+              width={mapWidth}
+              height={mapHeight}
+              fill={ORANGE}
+            />
+            {/* This adds the orange striping for the difficulty adjustment periods */}
+            <DifficultyPeriods
+              countEpochs={countEpochs}
+              countTotalBlocks={countTotalBlocks}
+            />
+            {/* Instead of drawing as many rectangles as there are blocks, it's far more performant to draw vertical and horizontal lines */}
+            <Grid countEpochs={countEpochs} zoom={zoom} scale={scale} />
+            <EpochSeparators countEpochs={countEpochs} scale={scale} />
+            {/* If you look inside the BlockNumbers component you'll see we only ever draw a limited set of blocks */}
+            <BlockNumbers
+              countTotalBlocks={countTotalBlocks}
+              zoom={zoom}
+              location={locationWithDrag}
+            />
+            <EpochLabels countEpochs={countEpochs} zoom={zoom} />
+            {/* This is used to mask the end of the chain where an epoch is not complete */}
+            <EmptyMask
+              countEpochs={countEpochs}
+              countTotalBlocks={countTotalBlocks}
+            />
+            <BlockHighlight
+              highlightedBlock={highlightedBlock}
+              scale={scale}
+              zoom={zoom}
+            />
+          </Translate>
+          {/* This helps to pinpoint the center of the screen during development */}
+          {/* The Crosshair component uses a custom component/renderer - have a look in crosshair.tsx and custom-renderers.tsx */}
+          <Crosshair scale={scale} />
+        </Scale>
+      </Translate>
+      <Text x={4} y={4} fontSize={12} fill={WHITE}>
+        {averageFrameRate.toFixed(0)} FPS
+      </Text>
+    </Canvas>
   );
 };
 
