@@ -1,13 +1,4 @@
-import { IntrinsicCanvasBufferProps } from './canvas-buffer';
-import { ImageProps } from './image';
-import { AnyObject } from './internal/types';
-import { LineProps } from './line';
-import { OpacityProps } from './opacity';
-import { RectangleProps } from './rectangle';
-import { RotateProps } from './rotate';
-import { ScaleProps } from './scale';
-import { TextProps } from './text';
-import { TranslateProps } from './translate';
+import type { AnyObject } from './internal/types';
 
 export enum CanvasElementType {
   Rectangle = 'Canvas.Rectangle',
@@ -24,23 +15,6 @@ export enum CanvasElementType {
 export enum InternalCanvasElementType {
   Root = 'Canvas.Internal.Root',
   Text = 'Canvas.Internal.Text',
-}
-
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace JSX {
-    interface IntrinsicElements {
-      [CanvasElementType.Rectangle]: RectangleProps;
-      [CanvasElementType.Line]: LineProps;
-      [CanvasElementType.Rotate]: RotateProps;
-      [CanvasElementType.Translate]: TranslateProps;
-      [CanvasElementType.Scale]: ScaleProps;
-      [CanvasElementType.Text]: TextProps;
-      [CanvasElementType.Opacity]: OpacityProps;
-      [CanvasElementType.Image]: ImageProps;
-      [CanvasElementType.CanvasBuffer]: IntrinsicCanvasBufferProps;
-    }
-  }
 }
 
 export interface ReconciledTextChild {
