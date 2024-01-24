@@ -1,6 +1,6 @@
 {
   "name": "@blockamotolabs/react-bitmap-utils",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Utilities for drawing Bitmap Theory related imaging to HTML5 canvas with React",
   "main": "build/cjs/index.js",
   "module": "build/esm/index.js",
