@@ -1,10 +1,6 @@
-import React, {
-  ForwardedRef,
-  forwardRef,
-  memo,
-  useEffect,
-  useMemo,
-} from 'react';
+import React, { ForwardedRef } from 'react';
+
+const { forwardRef, memo, useEffect, useMemo } = React;
 
 import { CanvasProps } from './canvas';
 import { useCanvasContext } from './hooks';

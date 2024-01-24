@@ -1,13 +1,6 @@
-import React, {
-  ForwardedRef,
-  forwardRef,
-  HTMLAttributes,
-  memo,
-  ReactNode,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { ForwardedRef, HTMLAttributes, ReactNode } from 'react';
+
+const { forwardRef, memo, useEffect, useMemo, useState } = React;
 
 import { useCanvasRefWrapper, useDrawToCanvas } from './internal/hooks';
 import { RENDERERS } from './internal/renderers';

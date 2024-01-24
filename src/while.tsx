@@ -1,4 +1,6 @@
-import React, { memo, ReactElement } from 'react';
+import React, { ReactElement } from 'react';
+
+const { memo } = React;
 
 import { AnyObject } from './internal/types';
 import { CommonCanvasComponentProps } from './types';

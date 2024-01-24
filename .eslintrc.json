@@ -291,7 +291,30 @@
         "additionalHooks": "(useRequestAnimationFrame)"
       }
     ],
-    "react/prop-types": 0
+    "react/prop-types": 0,
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "react",
+            "importNames": [
+              "memo",
+              "useMemo",
+              "useCallback",
+              "useEffect",
+              "useLayoutEffect",
+              "useState",
+              "useReducer",
+              "useRef",
+              "useContext",
+              "forwardRef"
+            ],
+            "message": "Please destructure from React instead."
+          }
+        ]
+      }
+    ]
   },
   "overrides": [
     {
