@@ -1,3 +1,5 @@
+import './global-types';
+
 export * from './constants';
 export * from './canvas';
 export * from './hooks';

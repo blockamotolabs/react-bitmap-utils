@@ -1,10 +1,6 @@
-import React, {
-  ForwardedRef,
-  forwardRef,
-  memo,
-  useEffect,
-  useMemo,
-} from 'react';
+import React, { ForwardedRef } from 'react';
+
+const { forwardRef, memo, useEffect, useMemo } = React;
 
 import { CanvasProps } from './canvas';
 import { useCanvasContext } from './hooks';
@@ -14,7 +10,7 @@ import { CanvasElementType, CommonCanvasComponentProps } from './types';
 
 export interface CanvasBufferProps
   extends CanvasProps,
-    CommonCanvasComponentProps {
+    Omit<CommonCanvasComponentProps, 'children'> {
   drawX: number;
   drawY: number;
   drawWidth: number;

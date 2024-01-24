@@ -3,9 +3,9 @@ import React, {
   ForwardedRef,
   ReactNode,
   SetStateAction,
-  useCallback,
-  useRef,
 } from 'react';
+
+const { useCallback, useRef } = React;
 
 import { CanvasComponentRenderers, CanvasContextValue } from '../types';
 import { getDimensions } from '../utils';

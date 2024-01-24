@@ -4,6 +4,7 @@
 /build/*
 /.vscode/*
 
+*.txt
 *.png
 *.jpg
 *.jpeg

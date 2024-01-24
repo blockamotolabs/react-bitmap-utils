@@ -1,4 +1,6 @@
-import React, { memo, ReactElement } from 'react';
+import React, { ReactElement } from 'react';
+
+const { memo } = React;
 
 import { CommonCanvasComponentProps } from './types';
 
@@ -9,7 +11,7 @@ export interface ForCallbackContext {
   end: number;
 }
 
-export interface ForProps extends CommonCanvasComponentProps {
+export interface ForProps extends Omit<CommonCanvasComponentProps, 'children'> {
   start?: number;
   step?: number;
   end: number;
